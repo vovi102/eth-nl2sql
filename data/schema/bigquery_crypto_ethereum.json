@@ -1,0 +1,530 @@
+{
+  "tables": {
+    "fetched_at": "2026-11-01T09:51:04+00:00",
+    "blocks": {
+      "source": "bigquery-public-data.crypto_ethereum.blocks",
+      "columns": {
+        "timestamp": {
+          "type": "TIMESTAMP",
+          "mode": "NULLABLE",
+          "description": "The timestamp for when the block was collated"
+        },
+        "number": {
+          "type": "INTEGER",
+          "mode": "NULLABLE",
+          "description": "The block number"
+        },
+        "hash": {
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "Hash of the block"
+        },
+        "parent_hash": {
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "Hash of the parent block"
+        },
+        "nonce": {
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "Hash of the generated proof-of-work"
+        },
+        "sha3_uncles": {
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "SHA3 of the uncles data in the block"
+        },
+        "logs_bloom": {
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "The bloom filter for the logs of the block"
+        },
+        "transactions_root": {
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "The root of the transaction trie of the block"
+        },
+        "state_root": {
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "The root of the final state trie of the block"
+        },
+        "receipts_root": {
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "The root of the receipts trie of the block"
+        },
+        "miner": {
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "The address of the beneficiary to whom the mining rewards were given"
+        },
+        "difficulty": {
+          "type": "NUMERIC",
+          "mode": "NULLABLE",
+          "description": "Integer of the difficulty for this block"
+        },
+        "total_difficulty": {
+          "type": "NUMERIC",
+          "mode": "NULLABLE",
+          "description": "Integer of the total difficulty of the chain until this block"
+        },
+        "size": {
+          "type": "INTEGER",
+          "mode": "NULLABLE",
+          "description": "The size of this block in bytes"
+        },
+        "extra_data": {
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "The extra data field of this block"
+        },
+        "gas_limit": {
+          "type": "INTEGER",
+          "mode": "NULLABLE",
+          "description": "The maximum gas allowed in this block"
+        },
+        "gas_used": {
+          "type": "INTEGER",
+          "mode": "NULLABLE",
+          "description": "The total used gas by all transactions in this block"
+        },
+        "transaction_count": {
+          "type": "INTEGER",
+          "mode": "NULLABLE",
+          "description": "The number of transactions in the block"
+        },
+        "base_fee_per_gas": {
+          "type": "INTEGER",
+          "mode": "NULLABLE",
+          "description": "Protocol base fee per gas, which can move up or down"
+        },
+        "withdrawals_root": {
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "The root of the withdrawal trie of the block"
+        },
+        "withdrawals": {
+          "type": "RECORD",
+          "mode": "REPEATED",
+          "description": "Validator withdrawals"
+        },
+        "blob_gas_used": {
+          "type": "INTEGER",
+          "mode": "NULLABLE",
+          "description": "The total amount of blob gas consumed by transactions in the block"
+        },
+        "excess_blob_gas": {
+          "type": "INTEGER",
+          "mode": "NULLABLE",
+          "description": "A running total of blob gas consumed in excess of the target, prior to the block. This is used to set blob gas pricing"
+        }
+      }
+    },
+    "transactions": {
+      "source": "bigquery-public-data.crypto_ethereum.transactions",
+      "columns": {
+        "hash": {
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "Hash of the transaction"
+        },
+        "nonce": {
+          "type": "INTEGER",
+          "mode": "NULLABLE",
+          "description": "The number of transactions made by the sender prior to this one"
+        },
+        "transaction_index": {
+          "type": "INTEGER",
+          "mode": "NULLABLE",
+          "description": "Integer of the transactions index position in the block"
+        },
+        "from_address": {
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "Address of the sender"
+        },
+        "to_address": {
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "Address of the receiver. null when its a contract creation transaction"
+        },
+        "value": {
+          "type": "NUMERIC",
+          "mode": "NULLABLE",
+          "description": "Value transferred in Wei"
+        },
+        "gas": {
+          "type": "INTEGER",
+          "mode": "NULLABLE",
+          "description": "Gas provided by the sender"
+        },
+        "gas_price": {
+          "type": "INTEGER",
+          "mode": "NULLABLE",
+          "description": "Gas price provided by the sender in Wei"
+        },
+        "input": {
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "The data sent along with the transaction"
+        },
+        "receipt_cumulative_gas_used": {
+          "type": "INTEGER",
+          "mode": "NULLABLE",
+          "description": "The total amount of gas used when this transaction was executed in the block"
+        },
+        "receipt_gas_used": {
+          "type": "INTEGER",
+          "mode": "NULLABLE",
+          "description": "The amount of gas used by this specific transaction alone"
+        },
+        "receipt_contract_address": {
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "The contract address created, if the transaction was a contract creation, otherwise null"
+        },
+        "receipt_root": {
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "32 bytes of post-transaction stateroot (pre Byzantium)"
+        },
+        "receipt_status": {
+          "type": "INTEGER",
+          "mode": "NULLABLE",
+          "description": "Either 1 (success) or 0 (failure) (post Byzantium)"
+        },
+        "block_timestamp": {
+          "type": "TIMESTAMP",
+          "mode": "NULLABLE",
+          "description": "Timestamp of the block where this transaction was in"
+        },
+        "block_number": {
+          "type": "INTEGER",
+          "mode": "NULLABLE",
+          "description": "Block number where this transaction was in"
+        },
+        "block_hash": {
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "Hash of the block where this transaction was in"
+        },
+        "max_fee_per_gas": {
+          "type": "INTEGER",
+          "mode": "NULLABLE",
+          "description": "Total fee that covers both base and priority fees"
+        },
+        "max_priority_fee_per_gas": {
+          "type": "INTEGER",
+          "mode": "NULLABLE",
+          "description": "Fee given to miners to incentivize them to include the transaction"
+        },
+        "transaction_type": {
+          "type": "INTEGER",
+          "mode": "NULLABLE",
+          "description": "Transaction type"
+        },
+        "receipt_effective_gas_price": {
+          "type": "INTEGER",
+          "mode": "NULLABLE",
+          "description": "The actual value per gas deducted from the senders account. Replacement of gas_price after EIP-1559"
+        },
+        "max_fee_per_blob_gas": {
+          "type": "INTEGER",
+          "mode": "NULLABLE",
+          "description": "The maximum fee a user is willing to pay per blob gas"
+        },
+        "blob_versioned_hashes": {
+          "type": "STRING",
+          "mode": "REPEATED",
+          "description": "A list of hashed outputs from kzg_to_versioned_hash"
+        },
+        "receipt_blob_gas_price": {
+          "type": "INTEGER",
+          "mode": "NULLABLE",
+          "description": "Blob gas price"
+        },
+        "receipt_blob_gas_used": {
+          "type": "INTEGER",
+          "mode": "NULLABLE",
+          "description": "Blob gas used"
+        }
+      }
+    },
+    "token_transfers": {
+      "source": "bigquery-public-data.crypto_ethereum.token_transfers",
+      "columns": {
+        "token_address": {
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "ERC20 token address"
+        },
+        "from_address": {
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "Address of the sender"
+        },
+        "to_address": {
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "Address of the receiver"
+        },
+        "value": {
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "Amount of tokens transferred (ERC20) / id of the token transferred (ERC721). Use safe_cast for casting to NUMERIC or FLOAT64"
+        },
+        "transaction_hash": {
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "Transaction hash"
+        },
+        "log_index": {
+          "type": "INTEGER",
+          "mode": "NULLABLE",
+          "description": "Log index in the transaction receipt"
+        },
+        "block_timestamp": {
+          "type": "TIMESTAMP",
+          "mode": "NULLABLE",
+          "description": "Timestamp of the block where this transfer was in"
+        },
+        "block_number": {
+          "type": "INTEGER",
+          "mode": "NULLABLE",
+          "description": "Block number where this transfer was in"
+        },
+        "block_hash": {
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "Hash of the block where this transfer was in"
+        }
+      }
+    },
+    "contracts": {
+      "source": "bigquery-public-data.crypto_ethereum.contracts",
+      "columns": {
+        "address": {
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "Address of the contract"
+        },
+        "bytecode": {
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "Bytecode of the contract"
+        },
+        "function_sighashes": {
+          "type": "STRING",
+          "mode": "REPEATED",
+          "description": "4-byte function signature hashes"
+        },
+        "is_erc20": {
+          "type": "BOOLEAN",
+          "mode": "NULLABLE",
+          "description": "Whether this contract is an ERC20 contract"
+        },
+        "is_erc721": {
+          "type": "BOOLEAN",
+          "mode": "NULLABLE",
+          "description": "Whether this contract is an ERC721 contract"
+        },
+        "block_timestamp": {
+          "type": "TIMESTAMP",
+          "mode": "NULLABLE",
+          "description": "Timestamp of the block where this contract was created"
+        },
+        "block_number": {
+          "type": "INTEGER",
+          "mode": "NULLABLE",
+          "description": "Block number where this contract was created"
+        },
+        "block_hash": {
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "Hash of the block where this contract was created"
+        }
+      }
+    },
+    "tokens": {
+      "source": "bigquery-public-data.crypto_ethereum.tokens_latest",
+      "columns": {
+        "address": {
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "The token contract address"
+        },
+        "symbol": {
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "The symbol the contract reported when last probed"
+        },
+        "name": {
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "The name the contract reported when last probed"
+        },
+        "decimals": {
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "Decimals as reported, as a string. Use safe_cast for casting to NUMERIC or FLOAT64"
+        },
+        "decimals_int": {
+          "type": "INTEGER",
+          "mode": "NULLABLE",
+          "description": "Decimals as an integer where the reported value is a sane decimal, else NULL"
+        },
+        "total_supply": {
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "The freshest known total supply: the latest reading when it is at least as recent as the metadata probe, else the probe's own value. NULL by design for pure ERC-1155 contracts"
+        },
+        "total_supply_bignumeric": {
+          "type": "BIGNUMERIC",
+          "mode": "NULLABLE",
+          "description": "The same supply as BIGNUMERIC where it fits, for arithmetic without casting"
+        },
+        "total_supply_block_number": {
+          "type": "INTEGER",
+          "mode": "NULLABLE",
+          "description": "The block total_supply was read at - the freshness handle the compat shape cannot carry"
+        },
+        "total_supply_block_timestamp": {
+          "type": "TIMESTAMP",
+          "mode": "NULLABLE",
+          "description": "Timestamp of the block total_supply was read at"
+        },
+        "metadata_block_number": {
+          "type": "INTEGER",
+          "mode": "NULLABLE",
+          "description": "Block the metadata (symbol/name/decimals/standards) was probed at"
+        },
+        "metadata_block_timestamp": {
+          "type": "TIMESTAMP",
+          "mode": "NULLABLE",
+          "description": "Timestamp of the metadata probe block"
+        },
+        "metadata_block_hash": {
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "Hash of the metadata probe block, the EIP-1898 reference the probe pinned"
+        },
+        "token_standard": {
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "The most specific standard the contract satisfies: ERC1155, ERC721 or ERC20"
+        },
+        "token_standards": {
+          "type": "STRING",
+          "mode": "REPEATED",
+          "description": "Every standard the contract satisfies, from bytecode evidence unioned with ERC-165 answers"
+        },
+        "protocols": {
+          "type": "STRING",
+          "mode": "REPEATED",
+          "description": "Protocol tags, lowercase - the extension point for standards beyond the launch set"
+        },
+        "is_erc20": {
+          "type": "BOOLEAN",
+          "mode": "NULLABLE",
+          "description": "The deployed bytecode satisfies the ERC-20 selector predicate"
+        },
+        "is_erc721": {
+          "type": "BOOLEAN",
+          "mode": "NULLABLE",
+          "description": "The deployed bytecode satisfies the ERC-721 selector predicate"
+        },
+        "is_erc1155": {
+          "type": "BOOLEAN",
+          "mode": "NULLABLE",
+          "description": "The deployed bytecode satisfies the ERC-1155 selector predicate"
+        },
+        "supports_erc721_interface": {
+          "type": "BOOLEAN",
+          "mode": "NULLABLE",
+          "description": "The contract answered the ERC-165 ERC-721 interface id"
+        },
+        "supports_erc1155_interface": {
+          "type": "BOOLEAN",
+          "mode": "NULLABLE",
+          "description": "The contract answered the ERC-165 ERC-1155 interface id"
+        },
+        "has_code_at_metadata_block": {
+          "type": "BOOLEAN",
+          "mode": "NULLABLE",
+          "description": "The address had runtime code at the metadata probe block"
+        },
+        "implementation_address": {
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "For proxies, the implementation the contract delegates to"
+        },
+        "proxy_standard": {
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "How implementation_address was determined: eip1167 or eip1967"
+        },
+        "admitted_by": {
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "Provenance of THIS probe row: what admitted the address on an admission row, or what triggered the re-probe on an upgrade/redeployment/sweep row (creation_bytecode, first_transfer_log, protocol_event, reconciliation_sweep). Read with probe_reason, which says which of the two it is"
+        },
+        "probe_reason": {
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "Why this probe ran: admission, upgrade, redeployment, sweep or protocol_added"
+        },
+        "creator_address": {
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "The address that deployed the contract"
+        },
+        "creation_transaction_hash": {
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "Hash of the transaction that deployed the contract"
+        },
+        "block_timestamp": {
+          "type": "TIMESTAMP",
+          "mode": "NULLABLE",
+          "description": "Timestamp of the block where this token was created"
+        },
+        "block_number": {
+          "type": "INTEGER",
+          "mode": "NULLABLE",
+          "description": "Block number where this token was created"
+        },
+        "block_hash": {
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "Hash of the block where this token was created"
+        }
+      }
+    },
+    "amended_tokens": {
+      "source": "bigquery-public-data.crypto_ethereum.amended_tokens",
+      "columns": {
+        "address": {
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "Lowercase token contract address."
+        },
+        "symbol": {
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "Amended symbol: the hand-written amendment when one exists, else the probed value."
+        },
+        "name": {
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "Amended name: the hand-written amendment when one exists, else the probed value."
+        },
+        "decimals": {
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "Amended decimals: the hand-written amendment when one exists, else the probed value."
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,22 @@
+class_id,name_en,name_vi,eth_labels_slugs,description,status,note
+cex,centralized exchange,sàn giao dịch tập trung,,"Sàn tập trung (Coinbase, Kraken, ...). Gán ở mức thực thể khi duyệt, vì slug eth-labels của sàn không đáng tin",approved,Người dùng duyệt 2026-11-01
+dex,decentralized exchange,sàn phi tập trung,dex,"Router/pool của sàn phi tập trung (Uniswap, Curve, ...)",approved,Người dùng duyệt 2026-11-01
+dex-aggregator,DEX aggregator,bộ tổng hợp DEX,dex-ag,"1inch, 0x, CoW Protocol, KyberSwap, ... Gán thêm khi duyệt",approved,Người dùng duyệt 2026-11-01
+bridge,bridge,cầu nối chuỗi,bridge|cross-chain,Contract chuyển tài sản giữa các chuỗi,approved,Người dùng duyệt 2026-11-01
+mixer,mixer,dịch vụ trộn coin,mixer|ethereum-mixer,"Pool trộn (Tornado.Cash: 0.1/1/10/100 ETH, ...)",approved,Người dùng duyệt 2026-11-01
+lending,lending protocol,giao thức cho vay,,"Aave, Compound, Morpho, Spark, ... Gán khi duyệt",approved,Người dùng duyệt 2026-11-01
+liquid-staking,liquid staking,staking thanh khoản,liquid-staking,"Lido, Rocket Pool, ether.fi, ...",approved,Người dùng duyệt 2026-11-01
+staking,staking,staking,staking,Contract/ví staking khác,approved,Người dùng duyệt 2026-11-01
+stablecoin,stablecoin,stablecoin,stablecoin,"Contract stablecoin (USDT, USDC, ...)",approved,Người dùng duyệt 2026-11-01
+layer-2,layer 2,lớp 2,layer-2,Contract của các rollup/L2 trên Ethereum,approved,Người dùng duyệt 2026-11-01
+oracle,oracle,oracle,oracle,"Chainlink, ...",approved,Người dùng duyệt 2026-11-01
+mev-bot,MEV bot,bot MEV,mev-bot|backrunning-bot|backrunning-bots,Bot săn MEV,approved,Người dùng duyệt 2026-11-01
+block-builder,block builder,block builder,mev-builder,"Builder dựng block (Titan, BuilderNet, ...)",approved,Người dùng duyệt 2026-11-01
+erc4337-bundler,ERC-4337 bundler,bundler ERC-4337,erc-4337-bundler,Bundler của account abstraction,approved,Người dùng duyệt 2026-11-01
+nft-marketplace,NFT marketplace,chợ NFT,marketplace,"OpenSea, Blur, ...",approved,Người dùng duyệt 2026-11-01
+sanctioned,OFAC-sanctioned,bị OFAC trừng phạt,ofac-sanctions-lists|ofac-sanctioned,Địa chỉ trong danh sách trừng phạt của OFAC,approved,Người dùng duyệt 2026-11-01
+exploit,exploit / hack,vụ hack,bybit-exploit|wazirx-exploit|bingx-exploit|filament-exploit|onyxdao-exploit|radiant-capital-exploit|truebit-exploit|unibtc-exploit|zkswap-exploit,Ví/contract liên quan đến các vụ hack,approved,Người dùng duyệt 2026-11-01
+mining-pool,mining pool,pool đào,mining,Pool đào (thời PoW) và ví liên quan,approved,Người dùng duyệt 2026-11-01
+market-maker,market maker,nhà tạo lập thị trường,,"Wintermute, Jump Trading, ... Gán khi duyệt",approved,Người dùng duyệt 2026-11-01
+yield,yield protocol,giao thức lợi suất,yield-farming|vaults,"Pendle, Convex, Yearn, ...",approved,Người dùng duyệt tạm thời 2026-11-01 theo đề xuất. [Claude đợt 2] Lớp mới
+rwa,real-world assets,tài sản thực mã hoá,real-world-assets|xstocks,"Token hoá cổ phiếu, trái phiếu, ... (Ondo, xStocks)",approved,Người dùng duyệt tạm thời 2026-11-01 theo đề xuất. [Claude đợt 2] Lớp mới

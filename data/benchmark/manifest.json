@@ -1,0 +1,1774 @@
+{
+ "created": "2026-11-01",
+ "seed": 20261101,
+ "knowledge_base_version": "7cf80cbf7c5de22be2305566062fe06100b4bad60d09df5d6fd9cc1aa9442cfe",
+ "knowledge_base_files": {
+  "data/entity_knowledge_base/entities.csv": "5e478abf412926164c80ce5a3ce3b1be4c7f44e29a050a7d6ddaf2ce1029e526",
+  "data/entity_knowledge_base/entity_addresses.csv": "60038c74be60a7ff7113b891c1791095f17f4a51a297a1d5fa7fdd02898ff91a",
+  "data/entity_knowledge_base/entity_aliases.csv": "f27579fc7ca7200e200bfe7dc71d8cbccac7e450a613fee1f826458c56dcacb4",
+  "data/entity_knowledge_base/entity_classes.csv": "f9cf799365ecbda77f51e96b5dddff021a8bfba1faee96c75c29fe21b301301e",
+  "data/schema/property_phrases.csv": "c93093c6d53a84a091a5b104ccc37c134cf3f094808e529b2ba769cf60563607",
+  "data/schema/property_senses.csv": "7f9d0ee6d394c8823f4e091bf2b6d8b04c5b62d446da21af6b913fa7f91a31f6"
+ },
+ "files": {
+  "dev.jsonl": {
+   "sha256": "383ec100a5a03cf12e339622eeeb34c73cdb99ee1b199275683db1b406bdd6fb",
+   "questions": 177
+  },
+  "test.jsonl": {
+   "sha256": "a6a55a38e9394d23aa02d86610d8ead2712445d7a0928cb154e426d613208a8f",
+   "questions": 328
+  }
+ },
+ "templates": {
+  "entity_eth_received": {
+   "group": "entity",
+   "split": "test",
+   "questions": 14,
+   "rejected": {}
+  },
+  "entity_call_count": {
+   "group": "entity",
+   "split": "test",
+   "questions": 14,
+   "rejected": {}
+  },
+  "entity_distinct_callers": {
+   "group": "entity",
+   "split": "dev",
+   "questions": 14,
+   "rejected": {
+    "empty result": 1
+   }
+  },
+  "entity_failed_calls": {
+   "group": "entity",
+   "split": "test",
+   "questions": 14,
+   "rejected": {
+    "empty result": 2
+   }
+  },
+  "entity_fees_paid": {
+   "group": "entity",
+   "split": "dev",
+   "questions": 14,
+   "rejected": {}
+  },
+  "entity_daily_calls": {
+   "group": "entity",
+   "split": "test",
+   "questions": 14,
+   "rejected": {}
+  },
+  "entity_top_callers": {
+   "group": "entity",
+   "split": "dev",
+   "questions": 14,
+   "rejected": {}
+  },
+  "entity_token_received": {
+   "group": "entity",
+   "split": "test",
+   "questions": 14,
+   "rejected": {
+    "empty result": 3,
+    "no token received by this target": 1
+   }
+  },
+  "address_eth_received": {
+   "group": "address",
+   "split": "test",
+   "questions": 13,
+   "rejected": {
+    "empty result": 1
+   }
+  },
+  "address_eth_sent": {
+   "group": "address",
+   "split": "dev",
+   "questions": 13,
+   "rejected": {
+    "empty result": 1
+   }
+  },
+  "address_tx_sent_count": {
+   "group": "address",
+   "split": "test",
+   "questions": 13,
+   "rejected": {
+    "empty result": 1
+   }
+  },
+  "address_token_received": {
+   "group": "address",
+   "split": "dev",
+   "questions": 13,
+   "rejected": {
+    "no token received by this target": 12,
+    "empty result": 7
+   }
+  },
+  "address_largest_eth_sent": {
+   "group": "address",
+   "split": "test",
+   "questions": 13,
+   "rejected": {}
+  },
+  "token_transfer_count": {
+   "group": "token",
+   "split": "test",
+   "questions": 13,
+   "rejected": {}
+  },
+  "token_amount_total": {
+   "group": "token",
+   "split": "test",
+   "questions": 13,
+   "rejected": {}
+  },
+  "token_distinct_senders": {
+   "group": "token",
+   "split": "dev",
+   "questions": 13,
+   "rejected": {}
+  },
+  "token_top_receivers": {
+   "group": "token",
+   "split": "test",
+   "questions": 13,
+   "rejected": {}
+  },
+  "token_largest_transfer": {
+   "group": "token",
+   "split": "test",
+   "questions": 13,
+   "rejected": {}
+  },
+  "token_daily_transfers": {
+   "group": "token",
+   "split": "dev",
+   "questions": 13,
+   "rejected": {}
+  },
+  "class_eth_received": {
+   "group": "class",
+   "split": "dev",
+   "questions": 14,
+   "rejected": {}
+  },
+  "class_call_count": {
+   "group": "class",
+   "split": "test",
+   "questions": 14,
+   "rejected": {}
+  },
+  "class_distinct_callers": {
+   "group": "class",
+   "split": "test",
+   "questions": 14,
+   "rejected": {}
+  },
+  "class_token_received": {
+   "group": "class",
+   "split": "dev",
+   "questions": 14,
+   "rejected": {
+    "empty result": 2
+   }
+  },
+  "class_top_contracts": {
+   "group": "class",
+   "split": "test",
+   "questions": 14,
+   "rejected": {}
+  },
+  "ambiguous_volume": {
+   "group": "ambiguous",
+   "split": "test",
+   "questions": 15,
+   "rejected": {
+    "empty result": 1
+   }
+  },
+  "ambiguous_value_received": {
+   "group": "ambiguous",
+   "split": "dev",
+   "questions": 15,
+   "rejected": {
+    "no token received by this target": 14,
+    "empty result": 4
+   }
+  },
+  "ambiguous_times": {
+   "group": "ambiguous",
+   "split": "test",
+   "questions": 15,
+   "rejected": {}
+  },
+  "ambiguous_users": {
+   "group": "ambiguous",
+   "split": "test",
+   "questions": 15,
+   "rejected": {}
+  },
+  "literal_eth_received": {
+   "group": "plain",
+   "split": "test",
+   "questions": 12,
+   "rejected": {
+    "empty result": 1
+   }
+  },
+  "literal_tx_sent_count": {
+   "group": "plain",
+   "split": "dev",
+   "questions": 12,
+   "rejected": {
+    "empty result": 2
+   }
+  },
+  "daily_avg_gas_price": {
+   "group": "plain",
+   "split": "test",
+   "questions": 12,
+   "rejected": {
+    "duplicate question": 2
+   }
+  },
+  "blob_tx_count": {
+   "group": "plain",
+   "split": "test",
+   "questions": 12,
+   "rejected": {
+    "duplicate question": 3
+   }
+  },
+  "contract_creation_count": {
+   "group": "plain",
+   "split": "test",
+   "questions": 12,
+   "rejected": {}
+  },
+  "top_block_producers": {
+   "group": "plain",
+   "split": "dev",
+   "questions": 12,
+   "rejected": {
+    "duplicate question": 2
+   }
+  },
+  "nil_eth_received": {
+   "group": "nil",
+   "split": "test",
+   "questions": 8,
+   "rejected": {
+    "duplicate question": 1
+   }
+  },
+  "nil_call_count": {
+   "group": "nil",
+   "split": "dev",
+   "questions": 8,
+   "rejected": {}
+  },
+  "nil_token_transfer_count": {
+   "group": "nil",
+   "split": "test",
+   "questions": 8,
+   "rejected": {
+    "duplicate question": 1
+   }
+  },
+  "unsupported_balance": {
+   "group": "unsupported",
+   "split": "test",
+   "questions": 8,
+   "rejected": {}
+  },
+  "unsupported_usd_value": {
+   "group": "unsupported",
+   "split": "test",
+   "questions": 8,
+   "rejected": {}
+  },
+  "unsupported_internal_eth": {
+   "group": "unsupported",
+   "split": "dev",
+   "questions": 8,
+   "rejected": {}
+  }
+ },
+ "counts": {
+  "by_split_lang": {
+   "dev/vi": 91,
+   "dev/en": 86,
+   "test/vi": 169,
+   "test/en": 159
+  },
+  "by_group": {
+   "entity": 112,
+   "address": 65,
+   "token": 78,
+   "class": 70,
+   "ambiguous": 60,
+   "plain": 72,
+   "nil": 24,
+   "unsupported": 24
+  },
+  "by_phenomenon": {
+   "multi_address": 137,
+   "alias": 154,
+   "class": 70,
+   "ambiguous_property": 60
+  }
+ },
+ "class_members": {
+  "dex": [
+   [
+    "uniswap",
+    19
+   ],
+   [
+    "kyberswap",
+    153
+   ],
+   [
+    "lighter",
+    4
+   ],
+   [
+    "chainflip",
+    2
+   ],
+   [
+    "sushiswap",
+    4430
+   ],
+   [
+    "balancer",
+    2870
+   ],
+   [
+    "pancakeswap",
+    256
+   ],
+   [
+    "curve",
+    208
+   ],
+   [
+    "bancor",
+    941
+   ],
+   [
+    "maverick-v2",
+    14
+   ]
+  ],
+  "dex-aggregator": [
+   [
+    "metamask",
+    13
+   ],
+   [
+    "0x",
+    73
+   ],
+   [
+    "1inch",
+    49
+   ],
+   [
+    "cow-protocol",
+    9
+   ],
+   [
+    "kyberswap",
+    153
+   ],
+   [
+    "velora",
+    15
+   ],
+   [
+    "tokenlon",
+    27
+   ],
+   [
+    "openocean",
+    1
+   ],
+   [
+    "odos",
+    1
+   ]
+  ],
+  "bridge": [
+   [
+    "metamask",
+    13
+   ],
+   [
+    "across-protocol",
+    32
+   ],
+   [
+    "layer-zero",
+    3
+   ],
+   [
+    "circle-cctp",
+    4
+   ],
+   [
+    "mayan",
+    2
+   ],
+   [
+    "debridge",
+    3
+   ],
+   [
+    "chainflip",
+    2
+   ],
+   [
+    "wormhole",
+    14
+   ],
+   [
+    "stargate",
+    31
+   ],
+   [
+    "aori",
+    1
+   ]
+  ],
+  "lending": [
+   [
+    "aave",
+    245
+   ],
+   [
+    "morpho",
+    54
+   ],
+   [
+    "spark",
+    4
+   ],
+   [
+    "euler",
+    49
+   ],
+   [
+    "dolomite",
+    1
+   ],
+   [
+    "liquity",
+    108
+   ],
+   [
+    "compound",
+    46
+   ],
+   [
+    "maple",
+    3
+   ],
+   [
+    "sky",
+    282
+   ],
+   [
+    "gearbox-protocol",
+    63
+   ]
+  ],
+  "layer-2": [
+   [
+    "arbitrum",
+    66
+   ],
+   [
+    "polygon",
+    43
+   ],
+   [
+    "base",
+    3
+   ],
+   [
+    "ink",
+    16
+   ],
+   [
+    "starknet",
+    17
+   ],
+   [
+    "blast",
+    12
+   ],
+   [
+    "mantle",
+    14
+   ],
+   [
+    "optimism",
+    31
+   ],
+   [
+    "scroll",
+    41
+   ],
+   [
+    "zksync",
+    16
+   ]
+  ]
+ },
+ "phenomena": {
+  "q00001": [
+   "multi_address"
+  ],
+  "q00002": [
+   "alias",
+   "multi_address"
+  ],
+  "q00003": [
+   "multi_address"
+  ],
+  "q00004": [],
+  "q00005": [
+   "multi_address"
+  ],
+  "q00006": [
+   "multi_address"
+  ],
+  "q00007": [
+   "alias",
+   "multi_address"
+  ],
+  "q00008": [
+   "multi_address"
+  ],
+  "q00009": [
+   "multi_address"
+  ],
+  "q00010": [
+   "alias",
+   "multi_address"
+  ],
+  "q00011": [
+   "multi_address"
+  ],
+  "q00012": [
+   "alias",
+   "multi_address"
+  ],
+  "q00013": [
+   "multi_address"
+  ],
+  "q00014": [
+   "alias",
+   "multi_address"
+  ],
+  "q00015": [
+   "alias",
+   "multi_address"
+  ],
+  "q00016": [
+   "multi_address"
+  ],
+  "q00017": [
+   "alias",
+   "multi_address"
+  ],
+  "q00018": [
+   "alias",
+   "multi_address"
+  ],
+  "q00019": [
+   "alias"
+  ],
+  "q00020": [
+   "multi_address"
+  ],
+  "q00021": [
+   "alias",
+   "multi_address"
+  ],
+  "q00022": [
+   "alias",
+   "multi_address"
+  ],
+  "q00023": [
+   "multi_address"
+  ],
+  "q00024": [
+   "multi_address"
+  ],
+  "q00025": [
+   "multi_address"
+  ],
+  "q00026": [
+   "multi_address"
+  ],
+  "q00027": [
+   "alias",
+   "multi_address"
+  ],
+  "q00028": [
+   "multi_address"
+  ],
+  "q00029": [
+   "multi_address"
+  ],
+  "q00030": [
+   "alias",
+   "multi_address"
+  ],
+  "q00031": [
+   "alias"
+  ],
+  "q00032": [
+   "alias",
+   "multi_address"
+  ],
+  "q00033": [
+   "multi_address"
+  ],
+  "q00034": [
+   "multi_address"
+  ],
+  "q00035": [
+   "multi_address"
+  ],
+  "q00036": [
+   "multi_address"
+  ],
+  "q00037": [
+   "alias",
+   "multi_address"
+  ],
+  "q00038": [
+   "multi_address"
+  ],
+  "q00039": [],
+  "q00040": [],
+  "q00041": [
+   "multi_address"
+  ],
+  "q00042": [
+   "alias",
+   "multi_address"
+  ],
+  "q00043": [],
+  "q00044": [],
+  "q00045": [],
+  "q00046": [],
+  "q00047": [],
+  "q00048": [],
+  "q00049": [],
+  "q00050": [],
+  "q00051": [],
+  "q00052": [],
+  "q00053": [],
+  "q00054": [],
+  "q00055": [],
+  "q00056": [],
+  "q00057": [],
+  "q00058": [],
+  "q00059": [
+   "alias"
+  ],
+  "q00060": [
+   "alias"
+  ],
+  "q00061": [
+   "alias"
+  ],
+  "q00062": [
+   "alias"
+  ],
+  "q00063": [
+   "alias"
+  ],
+  "q00064": [
+   "alias"
+  ],
+  "q00065": [],
+  "q00066": [],
+  "q00067": [
+   "alias"
+  ],
+  "q00068": [
+   "alias"
+  ],
+  "q00069": [],
+  "q00070": [],
+  "q00071": [],
+  "q00072": [
+   "alias"
+  ],
+  "q00073": [
+   "alias"
+  ],
+  "q00074": [
+   "alias"
+  ],
+  "q00075": [
+   "alias"
+  ],
+  "q00076": [],
+  "q00077": [
+   "alias"
+  ],
+  "q00078": [],
+  "q00079": [
+   "alias"
+  ],
+  "q00080": [
+   "alias"
+  ],
+  "q00081": [
+   "alias"
+  ],
+  "q00082": [
+   "alias"
+  ],
+  "q00083": [
+   "alias"
+  ],
+  "q00084": [
+   "alias"
+  ],
+  "q00085": [],
+  "q00086": [
+   "alias"
+  ],
+  "q00087": [],
+  "q00088": [
+   "alias"
+  ],
+  "q00089": [
+   "alias"
+  ],
+  "q00090": [
+   "alias"
+  ],
+  "q00091": [
+   "alias"
+  ],
+  "q00092": [
+   "alias"
+  ],
+  "q00093": [
+   "alias"
+  ],
+  "q00094": [],
+  "q00095": [
+   "class"
+  ],
+  "q00096": [
+   "class"
+  ],
+  "q00097": [
+   "class"
+  ],
+  "q00098": [
+   "class"
+  ],
+  "q00099": [
+   "class"
+  ],
+  "q00100": [
+   "class"
+  ],
+  "q00101": [
+   "class"
+  ],
+  "q00102": [
+   "class"
+  ],
+  "q00103": [
+   "class"
+  ],
+  "q00104": [
+   "class"
+  ],
+  "q00105": [
+   "class"
+  ],
+  "q00106": [
+   "class"
+  ],
+  "q00107": [
+   "class"
+  ],
+  "q00108": [
+   "class"
+  ],
+  "q00109": [
+   "class"
+  ],
+  "q00110": [
+   "alias",
+   "class"
+  ],
+  "q00111": [
+   "class"
+  ],
+  "q00112": [
+   "alias",
+   "class"
+  ],
+  "q00113": [
+   "alias",
+   "class"
+  ],
+  "q00114": [
+   "alias",
+   "class"
+  ],
+  "q00115": [
+   "alias",
+   "class"
+  ],
+  "q00116": [
+   "alias",
+   "class"
+  ],
+  "q00117": [
+   "alias",
+   "class"
+  ],
+  "q00118": [
+   "class"
+  ],
+  "q00119": [
+   "alias",
+   "class"
+  ],
+  "q00120": [
+   "class"
+  ],
+  "q00121": [
+   "class"
+  ],
+  "q00122": [
+   "class"
+  ],
+  "q00123": [
+   "ambiguous_property"
+  ],
+  "q00124": [
+   "ambiguous_property"
+  ],
+  "q00125": [
+   "ambiguous_property"
+  ],
+  "q00126": [
+   "alias",
+   "ambiguous_property"
+  ],
+  "q00127": [
+   "ambiguous_property"
+  ],
+  "q00128": [
+   "ambiguous_property"
+  ],
+  "q00129": [
+   "ambiguous_property"
+  ],
+  "q00130": [
+   "ambiguous_property"
+  ],
+  "q00131": [
+   "ambiguous_property"
+  ],
+  "q00132": [
+   "ambiguous_property"
+  ],
+  "q00133": [
+   "alias",
+   "ambiguous_property"
+  ],
+  "q00134": [
+   "alias",
+   "ambiguous_property"
+  ],
+  "q00135": [
+   "ambiguous_property"
+  ],
+  "q00136": [
+   "ambiguous_property"
+  ],
+  "q00137": [
+   "alias",
+   "ambiguous_property"
+  ],
+  "q00138": [],
+  "q00139": [],
+  "q00140": [],
+  "q00141": [],
+  "q00142": [],
+  "q00143": [],
+  "q00144": [],
+  "q00145": [],
+  "q00146": [],
+  "q00147": [],
+  "q00148": [],
+  "q00149": [],
+  "q00150": [],
+  "q00151": [],
+  "q00152": [],
+  "q00153": [],
+  "q00154": [],
+  "q00155": [],
+  "q00156": [],
+  "q00157": [],
+  "q00158": [],
+  "q00159": [],
+  "q00160": [],
+  "q00161": [],
+  "q00162": [],
+  "q00163": [],
+  "q00164": [],
+  "q00165": [],
+  "q00166": [],
+  "q00167": [],
+  "q00168": [],
+  "q00169": [],
+  "q00170": [
+   "multi_address"
+  ],
+  "q00171": [
+   "multi_address"
+  ],
+  "q00172": [
+   "alias",
+   "multi_address"
+  ],
+  "q00173": [
+   "multi_address"
+  ],
+  "q00174": [
+   "multi_address"
+  ],
+  "q00175": [
+   "alias",
+   "multi_address"
+  ],
+  "q00176": [
+   "multi_address"
+  ],
+  "q00177": [
+   "alias",
+   "multi_address"
+  ],
+  "q00178": [
+   "multi_address"
+  ],
+  "q00179": [
+   "multi_address"
+  ],
+  "q00180": [
+   "alias",
+   "multi_address"
+  ],
+  "q00181": [
+   "alias",
+   "multi_address"
+  ],
+  "q00182": [
+   "alias"
+  ],
+  "q00183": [
+   "multi_address"
+  ],
+  "q00184": [
+   "multi_address"
+  ],
+  "q00185": [
+   "alias",
+   "multi_address"
+  ],
+  "q00186": [
+   "multi_address"
+  ],
+  "q00187": [
+   "alias",
+   "multi_address"
+  ],
+  "q00188": [
+   "multi_address"
+  ],
+  "q00189": [
+   "alias",
+   "multi_address"
+  ],
+  "q00190": [
+   "alias",
+   "multi_address"
+  ],
+  "q00191": [
+   "multi_address"
+  ],
+  "q00192": [
+   "alias",
+   "multi_address"
+  ],
+  "q00193": [
+   "multi_address"
+  ],
+  "q00194": [
+   "alias",
+   "multi_address"
+  ],
+  "q00195": [
+   "multi_address"
+  ],
+  "q00196": [
+   "multi_address"
+  ],
+  "q00197": [
+   "alias",
+   "multi_address"
+  ],
+  "q00198": [],
+  "q00199": [
+   "multi_address"
+  ],
+  "q00200": [
+   "multi_address"
+  ],
+  "q00201": [
+   "multi_address"
+  ],
+  "q00202": [
+   "alias",
+   "multi_address"
+  ],
+  "q00203": [
+   "multi_address"
+  ],
+  "q00204": [
+   "alias",
+   "multi_address"
+  ],
+  "q00205": [
+   "multi_address"
+  ],
+  "q00206": [
+   "multi_address"
+  ],
+  "q00207": [],
+  "q00208": [
+   "multi_address"
+  ],
+  "q00209": [],
+  "q00210": [
+   "alias",
+   "multi_address"
+  ],
+  "q00211": [
+   "multi_address"
+  ],
+  "q00212": [
+   "alias",
+   "multi_address"
+  ],
+  "q00213": [
+   "multi_address"
+  ],
+  "q00214": [
+   "alias",
+   "multi_address"
+  ],
+  "q00215": [
+   "multi_address"
+  ],
+  "q00216": [
+   "alias",
+   "multi_address"
+  ],
+  "q00217": [
+   "alias",
+   "multi_address"
+  ],
+  "q00218": [
+   "multi_address"
+  ],
+  "q00219": [
+   "multi_address"
+  ],
+  "q00220": [
+   "multi_address"
+  ],
+  "q00221": [
+   "multi_address"
+  ],
+  "q00222": [
+   "multi_address"
+  ],
+  "q00223": [
+   "multi_address"
+  ],
+  "q00224": [
+   "multi_address"
+  ],
+  "q00225": [
+   "multi_address"
+  ],
+  "q00226": [
+   "multi_address"
+  ],
+  "q00227": [
+   "multi_address"
+  ],
+  "q00228": [
+   "alias"
+  ],
+  "q00229": [
+   "alias",
+   "multi_address"
+  ],
+  "q00230": [
+   "alias",
+   "multi_address"
+  ],
+  "q00231": [
+   "multi_address"
+  ],
+  "q00232": [
+   "alias",
+   "multi_address"
+  ],
+  "q00233": [
+   "multi_address"
+  ],
+  "q00234": [
+   "alias"
+  ],
+  "q00235": [
+   "alias"
+  ],
+  "q00236": [
+   "alias"
+  ],
+  "q00237": [
+   "alias",
+   "multi_address"
+  ],
+  "q00238": [
+   "alias",
+   "multi_address"
+  ],
+  "q00239": [
+   "alias",
+   "multi_address"
+  ],
+  "q00240": [
+   "alias",
+   "multi_address"
+  ],
+  "q00241": [
+   "multi_address"
+  ],
+  "q00242": [
+   "alias",
+   "multi_address"
+  ],
+  "q00243": [
+   "multi_address"
+  ],
+  "q00244": [
+   "alias",
+   "multi_address"
+  ],
+  "q00245": [
+   "alias",
+   "multi_address"
+  ],
+  "q00246": [
+   "alias",
+   "multi_address"
+  ],
+  "q00247": [
+   "multi_address"
+  ],
+  "q00248": [],
+  "q00249": [],
+  "q00250": [],
+  "q00251": [],
+  "q00252": [],
+  "q00253": [],
+  "q00254": [],
+  "q00255": [],
+  "q00256": [],
+  "q00257": [],
+  "q00258": [],
+  "q00259": [],
+  "q00260": [],
+  "q00261": [],
+  "q00262": [],
+  "q00263": [],
+  "q00264": [],
+  "q00265": [],
+  "q00266": [],
+  "q00267": [],
+  "q00268": [],
+  "q00269": [],
+  "q00270": [],
+  "q00271": [],
+  "q00272": [],
+  "q00273": [],
+  "q00274": [],
+  "q00275": [],
+  "q00276": [],
+  "q00277": [],
+  "q00278": [],
+  "q00279": [],
+  "q00280": [],
+  "q00281": [],
+  "q00282": [],
+  "q00283": [],
+  "q00284": [],
+  "q00285": [],
+  "q00286": [],
+  "q00287": [
+   "alias"
+  ],
+  "q00288": [],
+  "q00289": [
+   "alias"
+  ],
+  "q00290": [],
+  "q00291": [
+   "alias"
+  ],
+  "q00292": [
+   "alias"
+  ],
+  "q00293": [],
+  "q00294": [],
+  "q00295": [
+   "alias"
+  ],
+  "q00296": [],
+  "q00297": [],
+  "q00298": [
+   "alias"
+  ],
+  "q00299": [],
+  "q00300": [
+   "alias"
+  ],
+  "q00301": [],
+  "q00302": [
+   "alias"
+  ],
+  "q00303": [
+   "alias"
+  ],
+  "q00304": [
+   "alias"
+  ],
+  "q00305": [
+   "alias"
+  ],
+  "q00306": [
+   "alias"
+  ],
+  "q00307": [
+   "alias"
+  ],
+  "q00308": [],
+  "q00309": [
+   "alias"
+  ],
+  "q00310": [
+   "alias"
+  ],
+  "q00311": [
+   "alias"
+  ],
+  "q00312": [
+   "alias"
+  ],
+  "q00313": [
+   "alias"
+  ],
+  "q00314": [
+   "alias"
+  ],
+  "q00315": [
+   "alias"
+  ],
+  "q00316": [
+   "alias"
+  ],
+  "q00317": [],
+  "q00318": [
+   "alias"
+  ],
+  "q00319": [
+   "alias"
+  ],
+  "q00320": [],
+  "q00321": [],
+  "q00322": [],
+  "q00323": [
+   "alias"
+  ],
+  "q00324": [
+   "alias"
+  ],
+  "q00325": [
+   "alias"
+  ],
+  "q00326": [
+   "alias"
+  ],
+  "q00327": [],
+  "q00328": [],
+  "q00329": [
+   "alias"
+  ],
+  "q00330": [
+   "alias"
+  ],
+  "q00331": [
+   "alias"
+  ],
+  "q00332": [
+   "alias"
+  ],
+  "q00333": [
+   "alias"
+  ],
+  "q00334": [
+   "alias"
+  ],
+  "q00335": [],
+  "q00336": [],
+  "q00337": [],
+  "q00338": [
+   "alias"
+  ],
+  "q00339": [
+   "class"
+  ],
+  "q00340": [
+   "class"
+  ],
+  "q00341": [
+   "class"
+  ],
+  "q00342": [
+   "class"
+  ],
+  "q00343": [
+   "class"
+  ],
+  "q00344": [
+   "class"
+  ],
+  "q00345": [
+   "class"
+  ],
+  "q00346": [
+   "class"
+  ],
+  "q00347": [
+   "class"
+  ],
+  "q00348": [
+   "class"
+  ],
+  "q00349": [
+   "class"
+  ],
+  "q00350": [
+   "class"
+  ],
+  "q00351": [
+   "class"
+  ],
+  "q00352": [
+   "class"
+  ],
+  "q00353": [
+   "class"
+  ],
+  "q00354": [
+   "class"
+  ],
+  "q00355": [
+   "class"
+  ],
+  "q00356": [
+   "class"
+  ],
+  "q00357": [
+   "class"
+  ],
+  "q00358": [
+   "class"
+  ],
+  "q00359": [
+   "class"
+  ],
+  "q00360": [
+   "class"
+  ],
+  "q00361": [
+   "class"
+  ],
+  "q00362": [
+   "class"
+  ],
+  "q00363": [
+   "class"
+  ],
+  "q00364": [
+   "class"
+  ],
+  "q00365": [
+   "class"
+  ],
+  "q00366": [
+   "class"
+  ],
+  "q00367": [
+   "class"
+  ],
+  "q00368": [
+   "class"
+  ],
+  "q00369": [
+   "class"
+  ],
+  "q00370": [
+   "class"
+  ],
+  "q00371": [
+   "class"
+  ],
+  "q00372": [
+   "class"
+  ],
+  "q00373": [
+   "class"
+  ],
+  "q00374": [
+   "class"
+  ],
+  "q00375": [
+   "class"
+  ],
+  "q00376": [
+   "class"
+  ],
+  "q00377": [
+   "class"
+  ],
+  "q00378": [
+   "class"
+  ],
+  "q00379": [
+   "class"
+  ],
+  "q00380": [
+   "class"
+  ],
+  "q00381": [
+   "alias",
+   "ambiguous_property",
+   "multi_address"
+  ],
+  "q00382": [
+   "ambiguous_property",
+   "multi_address"
+  ],
+  "q00383": [
+   "alias",
+   "ambiguous_property"
+  ],
+  "q00384": [
+   "ambiguous_property"
+  ],
+  "q00385": [
+   "ambiguous_property",
+   "multi_address"
+  ],
+  "q00386": [
+   "alias",
+   "ambiguous_property",
+   "multi_address"
+  ],
+  "q00387": [
+   "alias",
+   "ambiguous_property"
+  ],
+  "q00388": [
+   "alias",
+   "ambiguous_property"
+  ],
+  "q00389": [
+   "ambiguous_property",
+   "multi_address"
+  ],
+  "q00390": [
+   "ambiguous_property",
+   "multi_address"
+  ],
+  "q00391": [
+   "alias",
+   "ambiguous_property"
+  ],
+  "q00392": [
+   "alias",
+   "ambiguous_property"
+  ],
+  "q00393": [
+   "ambiguous_property",
+   "multi_address"
+  ],
+  "q00394": [
+   "alias",
+   "ambiguous_property",
+   "multi_address"
+  ],
+  "q00395": [
+   "ambiguous_property"
+  ],
+  "q00396": [
+   "ambiguous_property"
+  ],
+  "q00397": [
+   "ambiguous_property",
+   "multi_address"
+  ],
+  "q00398": [
+   "alias",
+   "ambiguous_property"
+  ],
+  "q00399": [
+   "ambiguous_property"
+  ],
+  "q00400": [
+   "ambiguous_property",
+   "multi_address"
+  ],
+  "q00401": [
+   "alias",
+   "ambiguous_property",
+   "multi_address"
+  ],
+  "q00402": [
+   "alias",
+   "ambiguous_property"
+  ],
+  "q00403": [
+   "alias",
+   "ambiguous_property"
+  ],
+  "q00404": [
+   "alias",
+   "ambiguous_property",
+   "multi_address"
+  ],
+  "q00405": [
+   "alias",
+   "ambiguous_property",
+   "multi_address"
+  ],
+  "q00406": [
+   "alias",
+   "ambiguous_property"
+  ],
+  "q00407": [
+   "ambiguous_property"
+  ],
+  "q00408": [
+   "alias",
+   "ambiguous_property",
+   "multi_address"
+  ],
+  "q00409": [
+   "alias",
+   "ambiguous_property",
+   "multi_address"
+  ],
+  "q00410": [
+   "ambiguous_property"
+  ],
+  "q00411": [
+   "alias",
+   "ambiguous_property",
+   "multi_address"
+  ],
+  "q00412": [
+   "alias",
+   "ambiguous_property"
+  ],
+  "q00413": [
+   "ambiguous_property"
+  ],
+  "q00414": [
+   "alias",
+   "ambiguous_property"
+  ],
+  "q00415": [
+   "ambiguous_property",
+   "multi_address"
+  ],
+  "q00416": [
+   "alias",
+   "ambiguous_property",
+   "multi_address"
+  ],
+  "q00417": [
+   "alias",
+   "ambiguous_property"
+  ],
+  "q00418": [
+   "alias",
+   "ambiguous_property"
+  ],
+  "q00419": [
+   "ambiguous_property",
+   "multi_address"
+  ],
+  "q00420": [
+   "alias",
+   "ambiguous_property",
+   "multi_address"
+  ],
+  "q00421": [
+   "alias",
+   "ambiguous_property"
+  ],
+  "q00422": [
+   "alias",
+   "ambiguous_property"
+  ],
+  "q00423": [
+   "ambiguous_property",
+   "multi_address"
+  ],
+  "q00424": [
+   "ambiguous_property",
+   "multi_address"
+  ],
+  "q00425": [
+   "alias",
+   "ambiguous_property"
+  ],
+  "q00426": [],
+  "q00427": [],
+  "q00428": [],
+  "q00429": [],
+  "q00430": [],
+  "q00431": [],
+  "q00432": [],
+  "q00433": [],
+  "q00434": [],
+  "q00435": [],
+  "q00436": [],
+  "q00437": [],
+  "q00438": [],
+  "q00439": [],
+  "q00440": [],
+  "q00441": [],
+  "q00442": [],
+  "q00443": [],
+  "q00444": [],
+  "q00445": [],
+  "q00446": [],
+  "q00447": [],
+  "q00448": [],
+  "q00449": [],
+  "q00450": [],
+  "q00451": [],
+  "q00452": [],
+  "q00453": [],
+  "q00454": [],
+  "q00455": [],
+  "q00456": [],
+  "q00457": [],
+  "q00458": [],
+  "q00459": [],
+  "q00460": [],
+  "q00461": [],
+  "q00462": [],
+  "q00463": [],
+  "q00464": [],
+  "q00465": [],
+  "q00466": [],
+  "q00467": [],
+  "q00468": [],
+  "q00469": [],
+  "q00470": [],
+  "q00471": [],
+  "q00472": [],
+  "q00473": [],
+  "q00474": [],
+  "q00475": [],
+  "q00476": [],
+  "q00477": [],
+  "q00478": [],
+  "q00479": [],
+  "q00480": [],
+  "q00481": [],
+  "q00482": [],
+  "q00483": [],
+  "q00484": [],
+  "q00485": [],
+  "q00486": [],
+  "q00487": [],
+  "q00488": [],
+  "q00489": [],
+  "q00490": [],
+  "q00491": [],
+  "q00492": [],
+  "q00493": [],
+  "q00494": [],
+  "q00495": [],
+  "q00496": [],
+  "q00497": [],
+  "q00498": [
+   "alias",
+   "multi_address"
+  ],
+  "q00499": [
+   "multi_address"
+  ],
+  "q00500": [
+   "multi_address"
+  ],
+  "q00501": [
+   "multi_address"
+  ],
+  "q00502": [
+   "multi_address"
+  ],
+  "q00503": [
+   "multi_address"
+  ],
+  "q00504": [
+   "alias",
+   "multi_address"
+  ],
+  "q00505": [
+   "alias",
+   "multi_address"
+  ]
+ }
+}

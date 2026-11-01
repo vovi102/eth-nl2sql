@@ -1,0 +1,147 @@
+phrase,phrase_norm,lang,sense_id,status,note
+bao nhiêu ETH,bao nhieu eth,vi,eth_amount,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+lượng ETH,luong eth,vi,eth_amount,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+giá trị ETH,gia tri eth,vi,eth_amount,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+ETH amount,eth amount,en,eth_amount,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+how much ETH,how much eth,en,eth_amount,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+ETH value,eth value,en,eth_amount,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+lượng token,luong token,vi,token_amount,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+khối lượng,khoi luong,vi,token_amount,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+giá trị chuyển,gia tri chuyen,vi,token_amount,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+amount,amount,en,token_amount,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+volume,volume,en,token_amount,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+số lượt chuyển NFT,so luot chuyen nft,vi,nft_transfer_count,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+NFT transfers,nft transfers,en,nft_transfer_count,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+phí,phi,vi,tx_fee,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+phí giao dịch,phi giao dich,vi,tx_fee,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+phí gas,phi gas,vi,tx_fee,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+fee,fee,en,tx_fee,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+transaction fee,transaction fee,en,tx_fee,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+gas fee,gas fee,en,tx_fee,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+phí blob,phi blob,vi,blob_fee,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+blob fee,blob fee,en,blob_fee,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+giá gas,gia gas,vi,gas_price_paid,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+gas price,gas price,en,gas_price_paid,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+gas tiêu thụ,gas tieu thu,vi,gas_used,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+lượng gas dùng,luong gas dung,vi,gas_used,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+gas used,gas used,en,gas_used,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+gas limit,gas limit,en,gas_limit_tx,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+giới hạn gas,gioi han gas,vi,gas_limit_tx,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+phí cơ sở,phi co so,vi,base_fee,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+base fee,base fee,en,base_fee,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+tip,tip,en,priority_fee_cap,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+priority fee,priority fee,en,priority_fee_cap,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+phí ưu tiên,phi uu tien,vi,priority_fee_cap,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+thành công,thanh cong,vi,tx_success,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+successful,successful,en,tx_success,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+thất bại,that bai,vi,tx_failed,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+lỗi,loi,vi,tx_failed,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+bị revert,bi revert,vi,tx_failed,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+failed,failed,en,tx_failed,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+reverted,reverted,en,tx_failed,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+tạo contract,tao contract,vi,contract_creation,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+deploy contract,deploy contract,en,contract_creation,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+contract creation,contract creation,en,contract_creation,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+triển khai contract,trien khai contract,vi,contract_creation,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+giao dịch legacy,giao dich legacy,vi,tx_legacy,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+legacy transaction,legacy transaction,en,tx_legacy,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+EIP-1559,eip 1559,any,tx_eip1559,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+giao dịch blob,giao dich blob,vi,tx_blob,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+blob transaction,blob transaction,en,tx_blob,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+EIP-4844,eip 4844,any,tx_blob,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+EIP-7702,eip 7702,any,tx_eip7702,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+nhận,nhan,vi,received_by,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+được gửi tới,duoc gui toi,vi,received_by,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+chảy vào,chay vao,vi,received_by,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+received,received,en,received_by,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+inflow,inflow,en,received_by,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+sent to,sent to,en,received_by,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+gửi,gui,vi,sent_by,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+chuyển đi,chuyen di,vi,sent_by,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+rút ra,rut ra,vi,sent_by,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+sent,sent,en,sent_by,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+outflow,outflow,en,sent_by,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+sent from,sent from,en,sent_by,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+liên quan,lien quan,vi,involving,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+giao dịch của,giao dich cua,vi,involving,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+involving,involving,en,involving,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+gọi,goi,vi,contract_called,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+tương tác với,tuong tac voi,vi,contract_called,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+called,called,en,contract_called,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+interacted with,interacted with,en,contract_called,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+calls to,calls to,en,contract_called,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+của token,cua token,vi,of_token,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+transfers of,transfers of,en,of_token,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+số giao dịch,so giao dich,vi,tx_count,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+bao nhiêu giao dịch,bao nhieu giao dich,vi,tx_count,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+number of transactions,number of transactions,en,tx_count,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+transaction count,transaction count,en,tx_count,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+số lượt chuyển,so luot chuyen,vi,transfer_count,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+number of transfers,number of transfers,en,transfer_count,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+số người dùng,so nguoi dung,vi,distinct_senders,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+số ví hoạt động,so vi hoat dong,vi,distinct_senders,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+số địa chỉ gửi,so dia chi gui,vi,distinct_senders,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+unique senders,unique senders,en,distinct_senders,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+active addresses,active addresses,en,distinct_senders,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+users,users,en,distinct_senders,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+số địa chỉ nhận,so dia chi nhan,vi,distinct_receivers,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+unique receivers,unique receivers,en,distinct_receivers,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+số block,so block,vi,block_count,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+number of blocks,number of blocks,en,block_count,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+kích thước block,kich thuoc block,vi,block_size,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+block size,block size,en,block_size,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+gas của block,gas cua block,vi,block_gas_used,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+block gas used,block gas used,en,block_gas_used,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+số giao dịch trong block,so giao dich trong block,vi,block_tx_count,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+transactions per block,transactions per block,en,block_tx_count,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+người tạo block,nguoi tao block,vi,block_producer,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+miner,miner,en,block_producer,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+validator,validator,en,block_producer,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+fee recipient,fee recipient,en,block_producer,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+theo ngày,theo ngay,vi,day,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+mỗi ngày,moi ngay,vi,day,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+daily,daily,en,day,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+per day,per day,en,day,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+theo giờ,theo gio,vi,hour,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+mỗi giờ,moi gio,vi,hour,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+hourly,hourly,en,hour,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+per hour,per hour,en,hour,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+số dư,so du,vi,balance,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+balance,balance,en,balance,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+giá trị USD,gia tri usd,vi,usd_value,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+bao nhiêu đô,bao nhieu do,vi,usd_value,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+USD value,usd value,en,usd_value,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+in dollars,in dollars,en,usd_value,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+internal transaction,internal transaction,en,internal_eth,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+giao dịch nội bộ,giao dich noi bo,vi,internal_eth,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+khối lượng,khoi luong,vi,eth_amount,approved,"Người dùng duyệt 2026-11-01. [Claude benchmark] Cụm từ nhập nhằng (đặc thù 4): nghĩa chọn theo loại thực thể đã link (token → token_amount / transfer_count; thực thể, ví, lớp → eth_amount / tx_count)"
+volume,volume,en,eth_amount,approved,"Người dùng duyệt 2026-11-01. [Claude benchmark] Cụm từ nhập nhằng (đặc thù 4): nghĩa chọn theo loại thực thể đã link (token → token_amount / transfer_count; thực thể, ví, lớp → eth_amount / tx_count)"
+amount,amount,en,eth_amount,approved,"Người dùng duyệt 2026-11-01. [Claude benchmark] Cụm từ nhập nhằng (đặc thù 4): nghĩa chọn theo loại thực thể đã link (token → token_amount / transfer_count; thực thể, ví, lớp → eth_amount / tx_count)"
+giá trị chuyển,gia tri chuyen,vi,eth_amount,approved,"Người dùng duyệt 2026-11-01. [Claude benchmark] Cụm từ nhập nhằng (đặc thù 4): nghĩa chọn theo loại thực thể đã link (token → token_amount / transfer_count; thực thể, ví, lớp → eth_amount / tx_count)"
+giá trị,gia tri,vi,eth_amount,approved,"Người dùng duyệt 2026-11-01. [Claude benchmark] Cụm từ nhập nhằng (đặc thù 4): nghĩa chọn theo loại thực thể đã link (token → token_amount / transfer_count; thực thể, ví, lớp → eth_amount / tx_count)"
+giá trị,gia tri,vi,token_amount,approved,"Người dùng duyệt 2026-11-01. [Claude benchmark] Cụm từ nhập nhằng (đặc thù 4): nghĩa chọn theo loại thực thể đã link (token → token_amount / transfer_count; thực thể, ví, lớp → eth_amount / tx_count)"
+value,value,en,eth_amount,approved,"Người dùng duyệt 2026-11-01. [Claude benchmark] Cụm từ nhập nhằng (đặc thù 4): nghĩa chọn theo loại thực thể đã link (token → token_amount / transfer_count; thực thể, ví, lớp → eth_amount / tx_count)"
+value,value,en,token_amount,approved,"Người dùng duyệt 2026-11-01. [Claude benchmark] Cụm từ nhập nhằng (đặc thù 4): nghĩa chọn theo loại thực thể đã link (token → token_amount / transfer_count; thực thể, ví, lớp → eth_amount / tx_count)"
+số lượt,so luot,vi,tx_count,approved,"Người dùng duyệt 2026-11-01. [Claude benchmark] Cụm từ nhập nhằng (đặc thù 4): nghĩa chọn theo loại thực thể đã link (token → token_amount / transfer_count; thực thể, ví, lớp → eth_amount / tx_count)"
+số lượt,so luot,vi,transfer_count,approved,"Người dùng duyệt 2026-11-01. [Claude benchmark] Cụm từ nhập nhằng (đặc thù 4): nghĩa chọn theo loại thực thể đã link (token → token_amount / transfer_count; thực thể, ví, lớp → eth_amount / tx_count)"
+how many times,how many times,en,tx_count,approved,"Người dùng duyệt 2026-11-01. [Claude benchmark] Cụm từ nhập nhằng (đặc thù 4): nghĩa chọn theo loại thực thể đã link (token → token_amount / transfer_count; thực thể, ví, lớp → eth_amount / tx_count)"
+how many times,how many times,en,transfer_count,approved,"Người dùng duyệt 2026-11-01. [Claude benchmark] Cụm từ nhập nhằng (đặc thù 4): nghĩa chọn theo loại thực thể đã link (token → token_amount / transfer_count; thực thể, ví, lớp → eth_amount / tx_count)"
+gửi tới,gui toi,vi,received_by,approved,Người dùng duyệt 2026-11-01. [Claude] Đề xuất 2026-11-01 (bộ linking): 'giao dịch gửi tới Lido' = Lido nhận; hiện ra sent_by vì chỉ khớp 'gửi'
+gửi đến,gui den,vi,received_by,approved,Người dùng duyệt 2026-11-01. [Claude] Đề xuất 2026-11-01 (bộ linking): như 'gửi tới'
+chuyển tới,chuyen toi,vi,received_by,approved,Người dùng duyệt 2026-11-01. [Claude] Đề xuất 2026-11-01 (bộ linking): như 'gửi tới'
+chuyển đến,chuyen den,vi,received_by,approved,Người dùng duyệt 2026-11-01. [Claude] Đề xuất 2026-11-01 (bộ linking): như 'gửi tới'
+chuyển vào,chuyen vao,vi,received_by,approved,Người dùng duyệt 2026-11-01. [Claude] Đề xuất 2026-11-01 (bộ linking): như 'gửi tới'
+nạp vào,nap vao,vi,received_by,approved,Người dùng duyệt 2026-11-01. [Claude] Đề xuất 2026-11-01 (bộ linking): nạp tiền vào ví/contract
+transferred to,transferred to,en,received_by,approved,Người dùng duyệt 2026-11-01. [Claude] Đề xuất 2026-11-01 (bộ linking): như 'sent to'
+deposited into,deposited into,en,received_by,approved,Người dùng duyệt 2026-11-01. [Claude] Đề xuất 2026-11-01 (bộ linking): nạp vào contract/ví
+receive,receive,en,received_by,approved,"Người dùng duyệt 2026-11-01. [Claude] Đề xuất 2026-11-01 (bộ linking): dạng nguyên mẫu (ví dụ 3 của linking-labels.md); bộ linking đã tự khớp qua gốc từ, thêm để tường minh"
+gửi từ,gui tu,vi,sent_by,approved,Người dùng duyệt 2026-11-01. [Claude] Đề xuất 2026-11-01 (bộ linking): 'USDT gửi từ ví X' = X gửi
+chuyển từ,chuyen tu,vi,sent_by,approved,Người dùng duyệt 2026-11-01. [Claude] Đề xuất 2026-11-01 (bộ linking): như 'gửi từ'
+rút từ,rut tu,vi,sent_by,approved,Người dùng duyệt 2026-11-01. [Claude] Đề xuất 2026-11-01 (bộ linking): rút tiền ra khỏi ví/contract
+transferred from,transferred from,en,sent_by,approved,Người dùng duyệt 2026-11-01. [Claude] Đề xuất 2026-11-01 (bộ linking): như 'sent from'
+withdrawn from,withdrawn from,en,sent_by,approved,Người dùng duyệt 2026-11-01. [Claude] Đề xuất 2026-11-01 (bộ linking): rút ra khỏi contract/ví
+send,send,en,sent_by,approved,"Người dùng duyệt 2026-11-01. [Claude] Đề xuất 2026-11-01 (bộ linking): dạng nguyên mẫu (ví dụ 5 của linking-labels.md); bộ linking đã tự khớp qua gốc từ, thêm để tường minh"
+lượt chuyển,luot chuyen,vi,transfer_count,approved,Người dùng duyệt 2026-11-01. [Claude] Đề xuất 2026-11-01 (bộ linking): câu không có 'số'/'bao nhiêu' ('lượt chuyển USDT theo ngày')
+transfers,transfers,en,transfer_count,approved,Người dùng duyệt 2026-11-01. [Claude] Đề xuất 2026-11-01 (bộ linking): 'How many USDT transfers…': token chen giữa nên không khớp 'number of transfers'
+lượt chuyển NFT,luot chuyen nft,vi,nft_transfer_count,approved,Người dùng duyệt 2026-11-01. [Claude] Đề xuất 2026-11-01 (bộ linking): để 'lượt chuyển NFT' không rơi vào transfer_count khi thêm 'lượt chuyển'
+callers of,callers of,en,contract_called,approved,"Người dùng duyệt 2026-11-01. [Claude] Đề xuất 2026-11-01 (bộ linking): gold dev dùng 'callers of X' (q00018, q00026: entity_fees_paid); 'called' đã có"

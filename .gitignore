@@ -1,0 +1,19 @@
+# Build artifacts
+data/db/
+*.duckdb
+*.parquet
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+
+# Secrets / local
+.env
+.DS_Store
+
+# Third-party label snapshot (Etherscan data via eth-labels): re-fetch the pinned commit with
+# `eth-nl2sql fetch-labels`; source.json keeps the commit and SHA256 of each file.
+data/raw/labels/eth-labels/*.csv

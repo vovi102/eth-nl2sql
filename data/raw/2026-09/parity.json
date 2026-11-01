@@ -1,0 +1,756 @@
+{
+  "engine": "bigquery",
+  "tables": {
+    "amended_tokens": {
+      "all": {
+        "row_count": 95473,
+        "key_count": 95473,
+        "count_decimals": 75433,
+        "count_symbol": 94986
+      }
+    },
+    "blocks": {
+      "2026-09-01": {
+        "row_count": 7174,
+        "key_count": 7174,
+        "min_number": 25878705,
+        "max_number": 25885878,
+        "sum_transaction_count": 2013158,
+        "sum_gas_used": 217875665264
+      },
+      "2026-09-02": {
+        "row_count": 7173,
+        "key_count": 7173,
+        "min_number": 25885879,
+        "max_number": 25893051,
+        "sum_transaction_count": 1931448,
+        "sum_gas_used": 217854521065
+      },
+      "2026-09-03": {
+        "row_count": 7175,
+        "key_count": 7175,
+        "min_number": 25893052,
+        "max_number": 25900226,
+        "sum_transaction_count": 1880901,
+        "sum_gas_used": 217604246278
+      },
+      "2026-09-04": {
+        "row_count": 7173,
+        "key_count": 7173,
+        "min_number": 25900227,
+        "max_number": 25907399,
+        "sum_transaction_count": 1974876,
+        "sum_gas_used": 217636507628
+      },
+      "2026-09-05": {
+        "row_count": 7175,
+        "key_count": 7175,
+        "min_number": 25907400,
+        "max_number": 25914574,
+        "sum_transaction_count": 1728897,
+        "sum_gas_used": 218013345895
+      },
+      "2026-09-06": {
+        "row_count": 7179,
+        "key_count": 7179,
+        "min_number": 25914575,
+        "max_number": 25921753,
+        "sum_transaction_count": 1860182,
+        "sum_gas_used": 218248281797
+      },
+      "2026-09-07": {
+        "row_count": 7166,
+        "key_count": 7166,
+        "min_number": 25921754,
+        "max_number": 25928919,
+        "sum_transaction_count": 1936827,
+        "sum_gas_used": 217495897250
+      },
+      "2026-09-08": {
+        "row_count": 7170,
+        "key_count": 7170,
+        "min_number": 25928920,
+        "max_number": 25936089,
+        "sum_transaction_count": 1885366,
+        "sum_gas_used": 217871355953
+      },
+      "2026-09-09": {
+        "row_count": 7171,
+        "key_count": 7171,
+        "min_number": 25936090,
+        "max_number": 25943260,
+        "sum_transaction_count": 1917517,
+        "sum_gas_used": 217592100089
+      },
+      "2026-09-10": {
+        "row_count": 7170,
+        "key_count": 7170,
+        "min_number": 25943261,
+        "max_number": 25950430,
+        "sum_transaction_count": 2096674,
+        "sum_gas_used": 217743266385
+      },
+      "2026-09-11": {
+        "row_count": 7175,
+        "key_count": 7175,
+        "min_number": 25950431,
+        "max_number": 25957605,
+        "sum_transaction_count": 2097342,
+        "sum_gas_used": 217868075111
+      },
+      "2026-09-12": {
+        "row_count": 7175,
+        "key_count": 7175,
+        "min_number": 25957606,
+        "max_number": 25964780,
+        "sum_transaction_count": 1571235,
+        "sum_gas_used": 217765314373
+      },
+      "2026-09-13": {
+        "row_count": 7181,
+        "key_count": 7181,
+        "min_number": 25964781,
+        "max_number": 25971961,
+        "sum_transaction_count": 1476230,
+        "sum_gas_used": 218215505326
+      },
+      "2026-09-14": {
+        "row_count": 7175,
+        "key_count": 7175,
+        "min_number": 25971962,
+        "max_number": 25979136,
+        "sum_transaction_count": 1909218,
+        "sum_gas_used": 218136246019
+      },
+      "2026-09-15": {
+        "row_count": 7170,
+        "key_count": 7170,
+        "min_number": 25979137,
+        "max_number": 25986306,
+        "sum_transaction_count": 1894453,
+        "sum_gas_used": 217419891638
+      },
+      "2026-09-16": {
+        "row_count": 7175,
+        "key_count": 7175,
+        "min_number": 25986307,
+        "max_number": 25993481,
+        "sum_transaction_count": 1956696,
+        "sum_gas_used": 217620803975
+      },
+      "2026-09-17": {
+        "row_count": 7169,
+        "key_count": 7169,
+        "min_number": 25993482,
+        "max_number": 26000650,
+        "sum_transaction_count": 1955636,
+        "sum_gas_used": 217083761378
+      },
+      "2026-09-18": {
+        "row_count": 7185,
+        "key_count": 7185,
+        "min_number": 26000651,
+        "max_number": 26007835,
+        "sum_transaction_count": 2048145,
+        "sum_gas_used": 217883974753
+      },
+      "2026-09-19": {
+        "row_count": 7162,
+        "key_count": 7162,
+        "min_number": 26007836,
+        "max_number": 26014997,
+        "sum_transaction_count": 1745429,
+        "sum_gas_used": 216828371906
+      },
+      "2026-09-20": {
+        "row_count": 7172,
+        "key_count": 7172,
+        "min_number": 26014998,
+        "max_number": 26022169,
+        "sum_transaction_count": 1696117,
+        "sum_gas_used": 217431481616
+      },
+      "2026-09-21": {
+        "row_count": 7146,
+        "key_count": 7146,
+        "min_number": 26022170,
+        "max_number": 26029315,
+        "sum_transaction_count": 2085232,
+        "sum_gas_used": 216604636513
+      },
+      "2026-09-22": {
+        "row_count": 7148,
+        "key_count": 7148,
+        "min_number": 26029316,
+        "max_number": 26036463,
+        "sum_transaction_count": 2094087,
+        "sum_gas_used": 216553109908
+      },
+      "2026-09-23": {
+        "row_count": 7147,
+        "key_count": 7147,
+        "min_number": 26036464,
+        "max_number": 26043610,
+        "sum_transaction_count": 1820433,
+        "sum_gas_used": 217114419273
+      },
+      "2026-09-24": {
+        "row_count": 7138,
+        "key_count": 7138,
+        "min_number": 26043611,
+        "max_number": 26050748,
+        "sum_transaction_count": 1831489,
+        "sum_gas_used": 216330448199
+      },
+      "2026-09-25": {
+        "row_count": 7156,
+        "key_count": 7156,
+        "min_number": 26050749,
+        "max_number": 26057904,
+        "sum_transaction_count": 2113352,
+        "sum_gas_used": 216610077621
+      },
+      "2026-09-26": {
+        "row_count": 7165,
+        "key_count": 7165,
+        "min_number": 26057905,
+        "max_number": 26065069,
+        "sum_transaction_count": 1652718,
+        "sum_gas_used": 217230267606
+      },
+      "2026-09-27": {
+        "row_count": 7152,
+        "key_count": 7152,
+        "min_number": 26065070,
+        "max_number": 26072221,
+        "sum_transaction_count": 1609374,
+        "sum_gas_used": 217289535536
+      },
+      "2026-09-28": {
+        "row_count": 7175,
+        "key_count": 7175,
+        "min_number": 26072222,
+        "max_number": 26079396,
+        "sum_transaction_count": 2060459,
+        "sum_gas_used": 217163481113
+      },
+      "2026-09-29": {
+        "row_count": 7173,
+        "key_count": 7173,
+        "min_number": 26079397,
+        "max_number": 26086569,
+        "sum_transaction_count": 2021591,
+        "sum_gas_used": 216606571407
+      },
+      "2026-09-30": {
+        "row_count": 7168,
+        "key_count": 7168,
+        "min_number": 26086570,
+        "max_number": 26093737,
+        "sum_transaction_count": 2015774,
+        "sum_gas_used": 216728113713
+      }
+    },
+    "contracts": {
+      "all": {
+        "row_count": 309264,
+        "key_count": 309264,
+        "sum_block_number": 6910065580296,
+        "erc20": 67928
+      }
+    },
+    "token_transfers": {
+      "2026-09-01": {
+        "row_count": 3331325,
+        "key_count": 3331325,
+        "sum_block_number": 86221758711806,
+        "sum_log_index": 1964547559,
+        "sum_value_length": 39309548,
+        "tokens": 11781
+      },
+      "2026-09-02": {
+        "row_count": 3215284,
+        "key_count": 3215284,
+        "sum_block_number": 83241759865004,
+        "sum_log_index": 1765489281,
+        "sum_value_length": 36177804,
+        "tokens": 12585
+      },
+      "2026-09-03": {
+        "row_count": 2895366,
+        "key_count": 2895366,
+        "sum_block_number": 74980093099833,
+        "sum_log_index": 1356743112,
+        "sum_value_length": 33907119,
+        "tokens": 13441
+      },
+      "2026-09-04": {
+        "row_count": 2983899,
+        "key_count": 2983899,
+        "sum_block_number": 77294678553604,
+        "sum_log_index": 1580137361,
+        "sum_value_length": 35286826,
+        "tokens": 12246
+      },
+      "2026-09-05": {
+        "row_count": 3035657,
+        "key_count": 3035657,
+        "sum_block_number": 78656510371151,
+        "sum_log_index": 1684800771,
+        "sum_value_length": 35813014,
+        "tokens": 14987
+      },
+      "2026-09-06": {
+        "row_count": 3098033,
+        "key_count": 3098033,
+        "sum_block_number": 80295561357917,
+        "sum_log_index": 1703213400,
+        "sum_value_length": 36370253,
+        "tokens": 13477
+      },
+      "2026-09-07": {
+        "row_count": 3273722,
+        "key_count": 3273722,
+        "sum_block_number": 84872442081308,
+        "sum_log_index": 1709114679,
+        "sum_value_length": 37688268,
+        "tokens": 12568
+      },
+      "2026-09-08": {
+        "row_count": 3160623,
+        "key_count": 3160623,
+        "sum_block_number": 81962827601677,
+        "sum_log_index": 1630414201,
+        "sum_value_length": 36042354,
+        "tokens": 13164
+      },
+      "2026-09-09": {
+        "row_count": 3458652,
+        "key_count": 3458652,
+        "sum_block_number": 89715900434780,
+        "sum_log_index": 2466717457,
+        "sum_value_length": 39865570,
+        "tokens": 11868
+      },
+      "2026-09-10": {
+        "row_count": 3826672,
+        "key_count": 3826672,
+        "sum_block_number": 99289985088873,
+        "sum_log_index": 2278810015,
+        "sum_value_length": 44097947,
+        "tokens": 12368
+      },
+      "2026-09-11": {
+        "row_count": 3432802,
+        "key_count": 3432802,
+        "sum_block_number": 89095066063724,
+        "sum_log_index": 1895047632,
+        "sum_value_length": 40233816,
+        "tokens": 10674
+      },
+      "2026-09-12": {
+        "row_count": 3466231,
+        "key_count": 3466231,
+        "sum_block_number": 89987603646979,
+        "sum_log_index": 1997351896,
+        "sum_value_length": 39538045,
+        "tokens": 11747
+      },
+      "2026-09-13": {
+        "row_count": 3565818,
+        "key_count": 3565818,
+        "sum_block_number": 92598764908376,
+        "sum_log_index": 2156304759,
+        "sum_value_length": 40662267,
+        "tokens": 12723
+      },
+      "2026-09-14": {
+        "row_count": 3606637,
+        "key_count": 3606637,
+        "sum_block_number": 93683764836029,
+        "sum_log_index": 2095012751,
+        "sum_value_length": 40044217,
+        "tokens": 11729
+      },
+      "2026-09-15": {
+        "row_count": 3832886,
+        "key_count": 3832886,
+        "sum_block_number": 99588994743786,
+        "sum_log_index": 2401871447,
+        "sum_value_length": 43545596,
+        "tokens": 14192
+      },
+      "2026-09-16": {
+        "row_count": 4309835,
+        "key_count": 4309835,
+        "sum_block_number": 112012544749722,
+        "sum_log_index": 2970133850,
+        "sum_value_length": 47694449,
+        "tokens": 13314
+      },
+      "2026-09-17": {
+        "row_count": 4054547,
+        "key_count": 4054547,
+        "sum_block_number": 105406759942759,
+        "sum_log_index": 2805274057,
+        "sum_value_length": 46356686,
+        "tokens": 10119
+      },
+      "2026-09-18": {
+        "row_count": 3597042,
+        "key_count": 3597042,
+        "sum_block_number": 93538441445540,
+        "sum_log_index": 2171446002,
+        "sum_value_length": 42834279,
+        "tokens": 11497
+      },
+      "2026-09-19": {
+        "row_count": 3556498,
+        "key_count": 3556498,
+        "sum_block_number": 92509625669156,
+        "sum_log_index": 2184730675,
+        "sum_value_length": 43527043,
+        "tokens": 10877
+      },
+      "2026-09-20": {
+        "row_count": 3479966,
+        "key_count": 3479966,
+        "sum_block_number": 90543866525830,
+        "sum_log_index": 1968545107,
+        "sum_value_length": 43288766,
+        "tokens": 19114
+      },
+      "2026-09-21": {
+        "row_count": 3566494,
+        "key_count": 3566494,
+        "sum_block_number": 92821126695325,
+        "sum_log_index": 2174631249,
+        "sum_value_length": 43508498,
+        "tokens": 11930
+      },
+      "2026-09-22": {
+        "row_count": 4119299,
+        "key_count": 4119299,
+        "sum_block_number": 107236817102920,
+        "sum_log_index": 2800445198,
+        "sum_value_length": 49129778,
+        "tokens": 12690
+      },
+      "2026-09-23": {
+        "row_count": 3587899,
+        "key_count": 3587899,
+        "sum_block_number": 93430255311307,
+        "sum_log_index": 2551050982,
+        "sum_value_length": 42512387,
+        "tokens": 10898
+      },
+      "2026-09-24": {
+        "row_count": 3684493,
+        "key_count": 3684493,
+        "sum_block_number": 95969645676634,
+        "sum_log_index": 2751328087,
+        "sum_value_length": 46596089,
+        "tokens": 9967
+      },
+      "2026-09-25": {
+        "row_count": 3382018,
+        "key_count": 3382018,
+        "sum_block_number": 88114820911444,
+        "sum_log_index": 2262418552,
+        "sum_value_length": 39845207,
+        "tokens": 13127
+      },
+      "2026-09-26": {
+        "row_count": 3661859,
+        "key_count": 3661859,
+        "sum_block_number": 95433556603958,
+        "sum_log_index": 2504331085,
+        "sum_value_length": 44433943,
+        "tokens": 13651
+      },
+      "2026-09-27": {
+        "row_count": 3201909,
+        "key_count": 3201909,
+        "sum_block_number": 83468508075333,
+        "sum_log_index": 1855166056,
+        "sum_value_length": 38246804,
+        "tokens": 10878
+      },
+      "2026-09-28": {
+        "row_count": 2815141,
+        "key_count": 2815141,
+        "sum_block_number": 73406549932544,
+        "sum_log_index": 1359430716,
+        "sum_value_length": 37318818,
+        "tokens": 10878
+      },
+      "2026-09-29": {
+        "row_count": 2936230,
+        "key_count": 2936230,
+        "sum_block_number": 76585931270232,
+        "sum_log_index": 1621170667,
+        "sum_value_length": 39469801,
+        "tokens": 9913
+      },
+      "2026-09-30": {
+        "row_count": 3501297,
+        "key_count": 3501297,
+        "sum_block_number": 91349344112422,
+        "sum_log_index": 2163141727,
+        "sum_value_length": 42538971,
+        "tokens": 12052
+      }
+    },
+    "tokens": {
+      "all": {
+        "row_count": 95473,
+        "key_count": 95473,
+        "count_decimals_int": 75431,
+        "sum_decimals_int": 1136863,
+        "count_symbol": 94986
+      }
+    },
+    "transactions": {
+      "2026-09-01": {
+        "row_count": 2013158,
+        "key_count": 2013158,
+        "sum_block_number": 52105050333724,
+        "sum_receipt_gas_used": 217875665264,
+        "sum_value_length": 13070303,
+        "count_to_address": 2011338
+      },
+      "2026-09-02": {
+        "row_count": 1931448,
+        "key_count": 1931448,
+        "sum_block_number": 50004128594880,
+        "sum_receipt_gas_used": 217854521065,
+        "sum_value_length": 12552690,
+        "count_to_address": 1930000
+      },
+      "2026-09-03": {
+        "row_count": 1880901,
+        "key_count": 1880901,
+        "sum_block_number": 48709319628369,
+        "sum_receipt_gas_used": 217604246278,
+        "sum_value_length": 11747581,
+        "count_to_address": 1879600
+      },
+      "2026-09-04": {
+        "row_count": 1974876,
+        "key_count": 1974876,
+        "sum_block_number": 51156815786508,
+        "sum_receipt_gas_used": 217636507628,
+        "sum_value_length": 13293048,
+        "count_to_address": 1973712
+      },
+      "2026-09-05": {
+        "row_count": 1728897,
+        "key_count": 1728897,
+        "sum_block_number": 44797562483408,
+        "sum_receipt_gas_used": 218013345895,
+        "sum_value_length": 11055454,
+        "count_to_address": 1727529
+      },
+      "2026-09-06": {
+        "row_count": 1860182,
+        "key_count": 1860182,
+        "sum_block_number": 48212741383410,
+        "sum_receipt_gas_used": 218248281797,
+        "sum_value_length": 11848305,
+        "count_to_address": 1858923
+      },
+      "2026-09-07": {
+        "row_count": 1936827,
+        "key_count": 1936827,
+        "sum_block_number": 50212996800011,
+        "sum_receipt_gas_used": 217495897250,
+        "sum_value_length": 12393196,
+        "count_to_address": 1935307
+      },
+      "2026-09-08": {
+        "row_count": 1885366,
+        "key_count": 1885366,
+        "sum_block_number": 48892492529098,
+        "sum_receipt_gas_used": 217871355953,
+        "sum_value_length": 11469286,
+        "count_to_address": 1883865
+      },
+      "2026-09-09": {
+        "row_count": 1917517,
+        "key_count": 1917517,
+        "sum_block_number": 49739983348103,
+        "sum_receipt_gas_used": 217592100089,
+        "sum_value_length": 12409779,
+        "count_to_address": 1916260
+      },
+      "2026-09-10": {
+        "row_count": 2096674,
+        "key_count": 2096674,
+        "sum_block_number": 54402206055852,
+        "sum_receipt_gas_used": 217743266385,
+        "sum_value_length": 12703984,
+        "count_to_address": 2095103
+      },
+      "2026-09-11": {
+        "row_count": 2097342,
+        "key_count": 2097342,
+        "sum_block_number": 54434141720096,
+        "sum_receipt_gas_used": 217868075111,
+        "sum_value_length": 13569670,
+        "count_to_address": 2095999
+      },
+      "2026-09-12": {
+        "row_count": 1571235,
+        "key_count": 1571235,
+        "sum_block_number": 40791231375888,
+        "sum_receipt_gas_used": 217765314373,
+        "sum_value_length": 10343346,
+        "count_to_address": 1570018
+      },
+      "2026-09-13": {
+        "row_count": 1476230,
+        "key_count": 1476230,
+        "sum_block_number": 38335429478878,
+        "sum_receipt_gas_used": 218215505326,
+        "sum_value_length": 8842899,
+        "count_to_address": 1475065
+      },
+      "2026-09-14": {
+        "row_count": 1909218,
+        "key_count": 1909218,
+        "sum_block_number": 49593226209083,
+        "sum_receipt_gas_used": 218136246019,
+        "sum_value_length": 12503883,
+        "count_to_address": 1907564
+      },
+      "2026-09-15": {
+        "row_count": 1894453,
+        "key_count": 1894453,
+        "sum_block_number": 49223223468586,
+        "sum_receipt_gas_used": 217419891638,
+        "sum_value_length": 12149470,
+        "count_to_address": 1892596
+      },
+      "2026-09-16": {
+        "row_count": 1956696,
+        "key_count": 1956696,
+        "sum_block_number": 50854406524215,
+        "sum_receipt_gas_used": 217620803975,
+        "sum_value_length": 12322981,
+        "count_to_address": 1954691
+      },
+      "2026-09-17": {
+        "row_count": 1955636,
+        "key_count": 1955636,
+        "sum_block_number": 50841015499927,
+        "sum_receipt_gas_used": 217083761378,
+        "sum_value_length": 12711524,
+        "count_to_address": 1954314
+      },
+      "2026-09-18": {
+        "row_count": 2048145,
+        "key_count": 2048145,
+        "sum_block_number": 53260436794094,
+        "sum_receipt_gas_used": 217883974753,
+        "sum_value_length": 13237173,
+        "count_to_address": 2046971
+      },
+      "2026-09-19": {
+        "row_count": 1745429,
+        "key_count": 1745429,
+        "sum_block_number": 45401138335083,
+        "sum_receipt_gas_used": 216828371906,
+        "sum_value_length": 11289809,
+        "count_to_address": 1744338
+      },
+      "2026-09-20": {
+        "row_count": 1696117,
+        "key_count": 1696117,
+        "sum_block_number": 44130590453642,
+        "sum_receipt_gas_used": 217431481616,
+        "sum_value_length": 10818650,
+        "count_to_address": 1695059
+      },
+      "2026-09-21": {
+        "row_count": 2085232,
+        "key_count": 2085232,
+        "sum_block_number": 54270147182032,
+        "sum_receipt_gas_used": 216604636513,
+        "sum_value_length": 12947979,
+        "count_to_address": 2083642
+      },
+      "2026-09-22": {
+        "row_count": 2094087,
+        "key_count": 2094087,
+        "sum_block_number": 54514970050968,
+        "sum_receipt_gas_used": 216553109908,
+        "sum_value_length": 12495267,
+        "count_to_address": 2091810
+      },
+      "2026-09-23": {
+        "row_count": 1820433,
+        "key_count": 1820433,
+        "sum_block_number": 47404348170372,
+        "sum_receipt_gas_used": 217114419273,
+        "sum_value_length": 11382146,
+        "count_to_address": 1818823
+      },
+      "2026-09-24": {
+        "row_count": 1831489,
+        "key_count": 1831489,
+        "sum_block_number": 47705306786880,
+        "sum_receipt_gas_used": 216330448199,
+        "sum_value_length": 11430409,
+        "count_to_address": 1830155
+      },
+      "2026-09-25": {
+        "row_count": 2113352,
+        "key_count": 2113352,
+        "sum_block_number": 55062033721815,
+        "sum_receipt_gas_used": 216610077621,
+        "sum_value_length": 13407929,
+        "count_to_address": 2111010
+      },
+      "2026-09-26": {
+        "row_count": 1652718,
+        "key_count": 1652718,
+        "sum_block_number": 43072380501617,
+        "sum_receipt_gas_used": 217230267606,
+        "sum_value_length": 10285801,
+        "count_to_address": 1651103
+      },
+      "2026-09-27": {
+        "row_count": 1609374,
+        "key_count": 1609374,
+        "sum_block_number": 41954494666950,
+        "sum_receipt_gas_used": 217289535536,
+        "sum_value_length": 10094427,
+        "count_to_address": 1608365
+      },
+      "2026-09-28": {
+        "row_count": 2060459,
+        "key_count": 2060459,
+        "sum_block_number": 53728357328694,
+        "sum_receipt_gas_used": 217163481113,
+        "sum_value_length": 13507583,
+        "count_to_address": 2059184
+      },
+      "2026-09-29": {
+        "row_count": 2021591,
+        "key_count": 2021591,
+        "sum_block_number": 52729416987482,
+        "sum_receipt_gas_used": 216606571407,
+        "sum_value_length": 13373390,
+        "count_to_address": 2020208
+      },
+      "2026-09-30": {
+        "row_count": 2015774,
+        "key_count": 2015774,
+        "sum_block_number": 52592112767811,
+        "sum_receipt_gas_used": 216728113713,
+        "sum_value_length": 13325692,
+        "count_to_address": 2013800
+      }
+    }
+  }
+}

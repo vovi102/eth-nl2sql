@@ -1,0 +1,293 @@
+{
+  "questions": 177,
+  "mentions_strict": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "tp": 199,
+    "pred": 199,
+    "gold": 199
+  },
+  "mentions_loose": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "tp": 199,
+    "pred": 199,
+    "gold": 199
+  },
+  "entity_accuracy_at_1": {
+    "accuracy": 1.0,
+    "hits": 191,
+    "total": 191
+  },
+  "entity_accuracy_at_1_by_type": {
+    "address": {
+      "accuracy": 1.0,
+      "hits": 41,
+      "total": 41
+    },
+    "class": {
+      "accuracy": 1.0,
+      "hits": 28,
+      "total": 28
+    },
+    "entity": {
+      "accuracy": 1.0,
+      "hits": 50,
+      "total": 50
+    },
+    "literal_address": {
+      "accuracy": 1.0,
+      "hits": 12,
+      "total": 12
+    },
+    "token": {
+      "accuracy": 1.0,
+      "hits": 60,
+      "total": 60
+    }
+  },
+  "entity_recall_at_5": {
+    "accuracy": 1.0,
+    "hits": 191,
+    "total": 191
+  },
+  "nil_accuracy": {
+    "accuracy": 1.0,
+    "hits": 8,
+    "total": 8
+  },
+  "nil_reason_accuracy": {
+    "accuracy": 1.0,
+    "hits": 8,
+    "total": 8
+  },
+  "class_accuracy": {
+    "accuracy": 1.0,
+    "hits": 28,
+    "total": 28
+  },
+  "properties": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "tp": 432,
+    "pred": 432,
+    "gold": 432
+  },
+  "properties_explicit": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "tp": 337,
+    "pred": 337,
+    "gold": 337
+  },
+  "time_accuracy": {
+    "accuracy": 1.0,
+    "hits": 177,
+    "total": 177
+  },
+  "unsupported_accuracy": {
+    "accuracy": 1.0,
+    "hits": 177,
+    "total": 177
+  },
+  "by_lang": {
+    "en": {
+      "questions": 86,
+      "mentions_strict": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "tp": 96,
+        "pred": 96,
+        "gold": 96
+      },
+      "mentions_loose": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "tp": 96,
+        "pred": 96,
+        "gold": 96
+      },
+      "entity_accuracy_at_1": {
+        "accuracy": 1.0,
+        "hits": 92,
+        "total": 92
+      },
+      "entity_accuracy_at_1_by_type": {
+        "address": {
+          "accuracy": 1.0,
+          "hits": 19,
+          "total": 19
+        },
+        "class": {
+          "accuracy": 1.0,
+          "hits": 14,
+          "total": 14
+        },
+        "entity": {
+          "accuracy": 1.0,
+          "hits": 25,
+          "total": 25
+        },
+        "literal_address": {
+          "accuracy": 1.0,
+          "hits": 6,
+          "total": 6
+        },
+        "token": {
+          "accuracy": 1.0,
+          "hits": 28,
+          "total": 28
+        }
+      },
+      "entity_recall_at_5": {
+        "accuracy": 1.0,
+        "hits": 92,
+        "total": 92
+      },
+      "nil_accuracy": {
+        "accuracy": 1.0,
+        "hits": 4,
+        "total": 4
+      },
+      "nil_reason_accuracy": {
+        "accuracy": 1.0,
+        "hits": 4,
+        "total": 4
+      },
+      "class_accuracy": {
+        "accuracy": 1.0,
+        "hits": 14,
+        "total": 14
+      },
+      "properties": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "tp": 207,
+        "pred": 207,
+        "gold": 207
+      },
+      "properties_explicit": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "tp": 162,
+        "pred": 162,
+        "gold": 162
+      },
+      "time_accuracy": {
+        "accuracy": 1.0,
+        "hits": 86,
+        "total": 86
+      },
+      "unsupported_accuracy": {
+        "accuracy": 1.0,
+        "hits": 86,
+        "total": 86
+      }
+    },
+    "vi": {
+      "questions": 91,
+      "mentions_strict": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "tp": 103,
+        "pred": 103,
+        "gold": 103
+      },
+      "mentions_loose": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "tp": 103,
+        "pred": 103,
+        "gold": 103
+      },
+      "entity_accuracy_at_1": {
+        "accuracy": 1.0,
+        "hits": 99,
+        "total": 99
+      },
+      "entity_accuracy_at_1_by_type": {
+        "address": {
+          "accuracy": 1.0,
+          "hits": 22,
+          "total": 22
+        },
+        "class": {
+          "accuracy": 1.0,
+          "hits": 14,
+          "total": 14
+        },
+        "entity": {
+          "accuracy": 1.0,
+          "hits": 25,
+          "total": 25
+        },
+        "literal_address": {
+          "accuracy": 1.0,
+          "hits": 6,
+          "total": 6
+        },
+        "token": {
+          "accuracy": 1.0,
+          "hits": 32,
+          "total": 32
+        }
+      },
+      "entity_recall_at_5": {
+        "accuracy": 1.0,
+        "hits": 99,
+        "total": 99
+      },
+      "nil_accuracy": {
+        "accuracy": 1.0,
+        "hits": 4,
+        "total": 4
+      },
+      "nil_reason_accuracy": {
+        "accuracy": 1.0,
+        "hits": 4,
+        "total": 4
+      },
+      "class_accuracy": {
+        "accuracy": 1.0,
+        "hits": 14,
+        "total": 14
+      },
+      "properties": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "tp": 225,
+        "pred": 225,
+        "gold": 225
+      },
+      "properties_explicit": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "tp": 175,
+        "pred": 175,
+        "gold": 175
+      },
+      "time_accuracy": {
+        "accuracy": 1.0,
+        "hits": 91,
+        "total": 91
+      },
+      "unsupported_accuracy": {
+        "accuracy": 1.0,
+        "hits": 91,
+        "total": 91
+      }
+    }
+  }
+}

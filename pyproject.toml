@@ -1,0 +1,37 @@
+[project]
+name = "eth-nl2sql"
+version = "0.1.0"
+description = "NL-to-SQL trên dữ liệu Ethereum"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "duckdb>=1.1",
+    "google-cloud-bigquery>=3.47.0",
+    "google-cloud-bigquery-storage>=2.43.0",
+    "pyarrow>=25.0.1",
+    "rapidfuzz>=3.14.5",
+    "sqlglot>=30.27.0",
+]
+
+[project.scripts]
+eth-nl2sql = "eth_nl2sql.cli:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=8",
+    "ruff>=0.6",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
