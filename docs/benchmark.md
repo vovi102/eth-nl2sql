@@ -206,6 +206,35 @@ Mỗi template sinh câu VI và EN tỉ lệ 1:1. Đặc thù của từng câu 
    Loại câu lỗi, câu chạy chậm, câu trả về rỗng hoặc chỉ có NULL/0, trừ khi template chủ ý hỏi
    điều đó.
 
+4. **Gắn nhãn khả năng phân biệt** (2026-11-01; gắn nhãn, không lọc). Sau khi sinh, mỗi câu có
+   gold SQL được chạy thêm các biến thể sai (`benchmark_validate.wrong_variants`):
+   - `status`: bỏ điều kiện `receipt_status`;
+   - `direction`: đổi `to_address` ↔ `from_address` ở chỗ so với địa chỉ đã link;
+   - `time`: bỏ điều kiện thời gian, trừ khi khoảng thời gian là cả tháng 9 (khi đó hai câu như
+     nhau).
+
+5. **Ưu tiên mềm cho `tx_success` ngầm** (quyết định B, 2026-11-01). Câu có `tx_success` ngầm mà
+   bỏ `receipt_status = 1` vẫn ra cùng đáp án thì được thay bằng một câu khác cùng template,
+   cùng cách diễn đạt và cùng ngôn ngữ, nếu một trong 20 ứng viên rút thêm phân biệt được lỗi
+   này. Ứng viên rút bằng RNG riêng (seed, template, số thứ tự câu), nên RNG chung vẫn rút như cũ
+   và mọi template khác giữ nguyên câu hỏi. Không áp dụng cho `address_largest_eth_sent`, vì
+   giao dịch thất bại hiếm khi là giao dịch lớn nhất. Đây là sai lệch chọn mẫu có chủ đích:
+   trong 7 template này, ví/thực thể nghiêng về những nơi có giao dịch thất bại mang ETH. Luận
+   văn phải nêu rõ điều này.
+
+6. **Không hoà ở `LIMIT`** (2026-11-03, người dùng chọn). Câu hỏi top-k hay "lớn nhất" không
+   nói cách phá hoà. Nếu kết quả gold đổi khi đảo chiều khoá phá hoà cuối cùng của `ORDER BY`
+   (`benchmark_validate.reversed_tie_break`), một câu SQL đúng mà phá hoà cách khác sẽ bị chấm
+   sai, và chấm sai hay đúng còn tuỳ lần chạy, vì DuckDB chạy song song. Câu như vậy được thay
+   giống bước 5: tối đa 20 ứng viên cùng template, cùng cách diễn đạt và cùng ngôn ngữ, rút bằng
+   RNG riêng; ứng viên phải không hoà và vẫn giữ ưu tiên mềm của bước 5. Không tìm được thì giữ
+   câu cũ và ghi cảnh báo.
+
+   Bước 4 gắn nhãn các câu. `manifest.json` → `discriminates` ghi cho mỗi câu biến thể nào cho kết quả **khác** gold
+   (`true`), giống gold (`false`), hoặc chạy quá giờ (`null`). Bước này không dùng RNG, nên cùng
+   seed vẫn cho đúng các câu như cũ. `evaluate-sql` báo thêm EX trên tập con phân biệt được của
+   từng loại lỗi (`discriminating`).
+
 ## 7. Tập thực thể (quyết định 6 của `proposed-method.md` §9)
 
 Khoảng 169 thực thể đã duyệt sau hai đợt bổ sung (đề xuất ghi trong `data/entity_knowledge_base/`,
@@ -242,6 +271,33 @@ ghi file). Seed cố định 20261101; chạy lại trên cùng KB và database 
 - `manifest.json` ghi SHA256 từng CSV (`knowledge_base_files`, cùng khoá đường dẫn với
   `entity_linking_evaluation.knowledge_base_version`), SHA256 của dev/test, số câu bị loại theo lý
   do, top-10 thành viên của mỗi lớp.
+
+**Khả năng phân biệt** (2026-11-01). Lần sinh lại đầu tiên chỉ gắn nhãn: câu hỏi và gold không
+đổi, chỉ đổi `knowledge_base_version` vì `property_phrases.csv` đã sửa. Lần thứ hai thêm ưu tiên
+mềm (bước 5 ở mục 6); chỉ đổi 53 câu của 7 template có `tx_success` ngầm.
+
+| Lỗi | dev | test | test trước ưu tiên mềm |
+|---|---|---|---|
+| `direction` | 114/123 | 185/187 | 185/187 |
+| `time` | 105/105 | 197/199 | 200/202 |
+| `status`, `tx_success` tường minh hoặc `tx_failed` | (không có template) | 26/26 | 26/26 |
+| `status`, `tx_success` ngầm | 31/35 (trước: 11/35) | 46/60 | 13/60 |
+
+**Bỏ câu hoà ở `LIMIT`** (2026-11-03, bước 6 ở mục 6). Lần sinh lại này thay 6 câu: 4 câu
+`entity_top_callers` ở dev (q00031, q00034, q00036, q00037; ví dụ Gearbox Protocol: các ví từ hạng 1 đến
+hạng 8 đều gọi đúng 2 lần) và 2 câu `address_largest_eth_sent` ở test. Mọi câu khác giữ nguyên id và nội
+dung. `knowledge_base_version` đổi vì `property_senses.csv` có thêm cột `evidence_hint`.
+
+Trên test, 13 câu `tx_success` ngầm còn lại không phân biệt được đều thuộc
+`address_largest_eth_sent`. Độ đa dạng giữ gần nguyên: số đích khác nhau mỗi template thay đổi
+trong khoảng −2 đến +1.
+
+Trước ưu tiên mềm, `tx_success` ngầm hầu như không phân biệt được ở ví có tên và địa chỉ gõ sẵn: `address_eth_sent`
+0/13, `address_eth_received` 1/13, `address_largest_eth_sent` 0/13, `literal_eth_received` 0/12,
+`ambiguous_value_received` 0/8. Các ví này gần như không có giao dịch thất bại mang ETH. Câu "giao
+dịch lớn nhất" về cấu trúc gần như không bao giờ phân biệt được, vì giao dịch thất bại hiếm khi là
+giao dịch lớn nhất. Thực thể và lớp thì tốt hơn: `class_eth_received` 11/14, `entity_eth_received`
+7/14.
 
 **Đối chiếu với bộ linking (chỉ trên dev).** Mention F1 0,944, entity acc@1 0,942, class 0,857,
 property F1 0,965, time 1,000. Các chỗ lệch đã xem từng câu; không có lỗi gold. Phần lớn là điểm

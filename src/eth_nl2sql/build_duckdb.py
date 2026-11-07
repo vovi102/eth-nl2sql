@@ -309,12 +309,14 @@ def load_link(
         con,
         "senses",
         senses.senses,
-        ["sense_id", "kind", "applies_to", "table_name", "expression", "unit", "description_vi"],
-    )
+        ["sense_id", "kind", "applies_to", "table_name", "expression", "unit", "evidence_hint",
+         "description_vi"],
+    )  # fmt: skip
     con.execute(
         f"""CREATE TABLE link.property_senses AS SELECT sense_id, kind, applies_to,
           {_split("table_name")}, nullif(expression, '') AS expression, nullif(unit, '') AS unit,
-          description_vi FROM senses ORDER BY sense_id"""
+          nullif(evidence_hint, '') AS evidence_hint, description_vi FROM senses
+          ORDER BY sense_id"""
     )
     _register(con, "phrases", senses.phrases, ["phrase", "phrase_norm", "lang", "sense_id"])
     con.execute("CREATE TABLE link.property_phrases AS SELECT * FROM phrases ORDER BY phrase_norm")

@@ -22,6 +22,7 @@ from eth_nl2sql.benchmark_build import (
     load_link_tables,
     placeholder_addresses,
     split_templates,
+    ties_at_limit,
 )
 from eth_nl2sql.benchmark_templates import GROUPS, TEMPLATES, Fill, time_fill
 from eth_nl2sql.benchmark_validate import check_record, check_sql, substitute_placeholders
@@ -205,3 +206,19 @@ def test_build_on_the_fixture_database(
     for r in records:
         assert r["knowledge_base_version"] == manifest["knowledge_base_version"]
         assert check_record(r, senses) == []
+    answerable = {r["question_id"] for r in records if r["gold_sql"] is not None}
+    assert set(manifest["discriminates"]) == answerable
+    for checks in manifest["discriminates"].values():
+        assert set(checks) <= {"status", "direction", "time"}
+        assert all(v in (True, False, None) for v in checks.values())
+
+
+def test_ties_at_limit() -> None:
+    con = duckdb.connect()
+    con.execute("CREATE TABLE t AS SELECT * FROM (VALUES ('a', 3), ('b', 2), ('c', 2)) v(a, n)")
+    top = "SELECT a, n FROM t ORDER BY n DESC NULLS LAST, a ASC NULLS LAST LIMIT {k}"
+    no_link = LinkTables  # a record without mentions never looks at the link tables
+    assert ties_at_limit({"gold_sql": top.format(k=2), "mentions": []}, no_link, con, 5)
+    assert not ties_at_limit({"gold_sql": top.format(k=1), "mentions": []}, no_link, con, 5)
+    assert not ties_at_limit({"gold_sql": top.format(k=3), "mentions": []}, no_link, con, 5)
+    assert not ties_at_limit({"gold_sql": None, "mentions": []}, no_link, con, 5)

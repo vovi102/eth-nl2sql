@@ -1,0 +1,328 @@
+{"question_id": "q00178", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00179", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00180", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Binder Error: Referenced column \"token_standard\" not found in FROM clause!", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00181", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00182", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00183", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00184", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Binder Error: Referenced column \"token_standard\" not found in FROM clause!", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00185", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00186", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Conversion Error: Type VARCHAR with value '0xdda135a0d36455d96a873f174a415b55e2d04157' can't be cast to the destination type TUPLE(VARCHAR, VARCHAR, VARCHAR) when casting from source column to_address", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00187", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00188", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00189", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00190", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Binder Error: Referenced column \"token_standard\" not found in FROM clause!", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00191", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00192", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00193", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00194", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00195", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00196", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00197", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00198", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00199", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00200", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00201", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00202", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00203", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00204", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Binder Error: Referenced column \"symbol\" not found in FROM clause!", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00205", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00206", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00207", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00208", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00209", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00210", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00211", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00212", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00213", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00214", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00215", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00216", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Binder Error: Referenced column \"token_standards\" not found in FROM clause!", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00217", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00218", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00219", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00220", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Binder Error: Referenced column \"token_standard\" not found in FROM clause!", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00221", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00222", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Binder Error: Referenced column \"symbol\" not found in FROM clause!", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00223", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00224", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Binder Error: Referenced column \"token_standard\" not found in FROM clause!", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00225", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00226", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00227", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00228", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00229", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00230", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00231", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00232", "expected": "sql", "decision": "sql", "kind": "parse", "error": "SQLGlot cannot parse it as DuckDB", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00233", "expected": "sql", "decision": "sql", "kind": "extra_columns", "correct": false, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00234", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Binder Error: Referenced column \"token_standard\" not found in FROM clause!", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00235", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00236", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00237", "expected": "sql", "decision": "sql", "kind": "parse", "error": "SQLGlot cannot parse it as DuckDB", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00238", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Binder Error: Referenced column \"token_standard\" not found in FROM clause!", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00239", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Binder Error: Referenced column \"token_standards\" not found in FROM clause!", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00240", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00241", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00242", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Conversion Error: Type VARCHAR with value '0x50469bd70ce6162e8731ca2eddf07a80efa8ccac' can't be cast to the destination type TUPLE(VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00243", "expected": "sql", "decision": "sql", "kind": "parse", "error": "SQLGlot cannot parse it as DuckDB", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00244", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00245", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00246", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00247", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Binder Error: Referenced column \"token_standard\" not found in FROM clause!", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00248", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00249", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00250", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00251", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00252", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00253", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00254", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00255", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00256", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00257", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00258", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00259", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00260", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00261", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00262", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00263", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00264", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00265", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00266", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00267", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00268", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00269", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00270", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00271", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00272", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00273", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00274", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00275", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00276", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Binder Error: column \"value\" must appear in the GROUP BY clause or must be part of an aggregate function.", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00277", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Binder Error: Table \"T2\" does not have a column named \"name\"", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00278", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00279", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00280", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00281", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00282", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00283", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00284", "expected": "sql", "decision": "sql", "kind": "extra_columns", "correct": false, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00285", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Binder Error: Table \"T2\" does not have a column named \"name\"", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00286", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Binder Error: column \"value\" must appear in the GROUP BY clause or must be part of an aggregate function.", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00287", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00288", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00289", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00290", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00291", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Binder Error: Table \"token_transfers\" does not have a column named \"decimals\"", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00292", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00293", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00294", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00295", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00296", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00297", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00298", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00299", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00300", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00301", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00302", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00303", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00304", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00305", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00306", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00307", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00308", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00309", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00310", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00311", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00312", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00313", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Binder Error: Table \"T2\" does not have a column named \"symbol\"", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00314", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00315", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00316", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00317", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00318", "expected": "sql", "decision": "sql", "kind": "parse", "error": "SQLGlot cannot parse it as DuckDB", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00319", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Binder Error: Table \"T2\" does not have a column named \"name\"", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00320", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00321", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00322", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00323", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Binder Error: Table \"T2\" does not have a column named \"symbol\"", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00324", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00325", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Binder Error: Table \"T2\" does not have a column named \"symbol\"", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00326", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Binder Error: No function matches the given name and argument types 'sum(VARCHAR)'. You might need to add explicit type casts.", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00327", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00328", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00329", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00330", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00331", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00332", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00333", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00334", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Binder Error: No function matches the given name and argument types 'sum(VARCHAR)'. You might need to add explicit type casts.", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00335", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00336", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00337", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00338", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00339", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00340", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Binder Error: Referenced column \"token_standards\" not found in FROM clause!", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00341", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00342", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00343", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Binder Error: Referenced column \"token_standards\" not found in FROM clause!", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00344", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00345", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Conversion Error: Type VARCHAR with value '0x95ad61b0a150d79219dcf64e1e6cc01f0b64c4ce' can't be cast to the destination type TUPLE(VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00346", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00347", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Binder Error: Referenced column \"calls\" not found in FROM clause!", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00348", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00349", "expected": "sql", "decision": "sql", "kind": "parse", "error": "SQLGlot cannot parse it as DuckDB", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00350", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00351", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00352", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00353", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Binder Error: Referenced column \"token_standards\" not found in FROM clause!", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00354", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00355", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Binder Error: Referenced column \"implementation_address\" not found in FROM clause!", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00356", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Binder Error: Referenced column \"symbol\" not found in FROM clause!", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00357", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00358", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00359", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Binder Error: Referenced column \"token_standards\" not found in FROM clause!", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00360", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Binder Error: Referenced column \"symbol\" not found in FROM clause!", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00361", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00362", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Binder Error: Referenced column \"token_standards\" not found in FROM clause!", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00363", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Binder Error: Referenced column \"token_standards\" not found in FROM clause!", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00364", "expected": "sql", "decision": "sql", "kind": "timeout", "error": "slower than 30 s", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00365", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Binder Error: Referenced column \"symbol\" not found in FROM clause!", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00366", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Binder Error: Referenced column \"token_standards\" not found in FROM clause!", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00367", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Binder Error: Table \"t2\" does not have a column named \"address\"", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00368", "expected": "sql", "decision": "nil", "kind": "abstained", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00369", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00370", "expected": "sql", "decision": "nil", "kind": "abstained", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00371", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Binder Error: Table \"t2\" does not have a column named \"is_erc1155\"", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00372", "expected": "sql", "decision": "nil", "kind": "abstained", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00373", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00374", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00375", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00376", "expected": "sql", "decision": "nil", "kind": "abstained", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00377", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Binder Error: Table \"T1\" does not have a column named \"name\"", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00378", "expected": "sql", "decision": "nil", "kind": "abstained", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00379", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00380", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00381", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00382", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00383", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00384", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00385", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00386", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00387", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00388", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00389", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00390", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00391", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00392", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00393", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00394", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00395", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00396", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Binder Error: Referenced column \"implementation_address\" not found in FROM clause!", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00397", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00398", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00399", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00400", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Binder Error: Referenced column \"token_standard\" not found in FROM clause!", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00401", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00402", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00403", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00404", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Binder Error: Referenced column \"symbol\" not found in FROM clause!", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00405", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Conversion Error: Type VARCHAR with value '0x278d858f05b94576c1e6f73285886876ff6ef8d2' can't be cast to the destination type TUPLE(VARCHAR, VARCHAR, VARCHAR) when casting from source column to_address", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00406", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00407", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00408", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Conversion Error: Type VARCHAR with value '0x808507121b80c02388fad14726482e061b8da827' can't be cast to the destination type TUPLE(VARCHAR, VARCHAR, VARCHAR) when casting from source column to_address", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00409", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00410", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00411", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00412", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00413", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00414", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00415", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00416", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Conversion Error: Type VARCHAR with value '0x2e5ea8be0e13e6d6330fe6101ca4b43ca209b5e5' can't be cast to the destination type TUPLE(VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00417", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Binder Error: Referenced column \"token_standard\" not found in FROM clause!", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00418", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00419", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00420", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00421", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00422", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00423", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00424", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00425", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00426", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00427", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00428", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00429", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00430", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00431", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00432", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00433", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00434", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Binder Error: No function matches the given name and argument types '/(VARCHAR, DOUBLE)'. You might need to add explicit type casts.", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00435", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00436", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00437", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00438", "expected": "sql", "decision": "sql", "kind": "parse", "error": "SQLGlot cannot parse it as DuckDB", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00439", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00440", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00441", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Binder Error: column \"receipt_effective_gas_price\" must appear in the GROUP BY clause or must be part of an aggregate function.", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00442", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00443", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Binder Error: column \"receipt_effective_gas_price\" must appear in the GROUP BY clause or must be part of an aggregate function.", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00444", "expected": "sql", "decision": "sql", "kind": "parse", "error": "SQLGlot cannot parse it as DuckDB", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00445", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Binder Error: column \"receipt_effective_gas_price\" must appear in the GROUP BY clause or must be part of an aggregate function.", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00446", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00447", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00448", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Binder Error: column \"receipt_effective_gas_price\" must appear in the GROUP BY clause or must be part of an aggregate function.", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00449", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Binder Error: column \"receipt_effective_gas_price\" must appear in the GROUP BY clause or must be part of an aggregate function.", "correct": false, "correct_extra_columns": false}
+{"question_id": "q00450", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00451", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00452", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00453", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00454", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00455", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00456", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00457", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00458", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00459", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00460", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00461", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00462", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00463", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00464", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00465", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00466", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00467", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00468", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00469", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00470", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00471", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00472", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00473", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00474", "expected": "nil", "decision": "nil", "kind": "correct", "correct": true, "correct_extra_columns": true}
+{"question_id": "q00475", "expected": "nil", "decision": "nil", "kind": "correct", "correct": true, "correct_extra_columns": true}
+{"question_id": "q00476", "expected": "nil", "decision": "nil", "kind": "correct", "correct": true, "correct_extra_columns": true}
+{"question_id": "q00477", "expected": "nil", "decision": "nil", "kind": "correct", "correct": true, "correct_extra_columns": true}
+{"question_id": "q00478", "expected": "nil", "decision": "nil", "kind": "correct", "correct": true, "correct_extra_columns": true}
+{"question_id": "q00479", "expected": "nil", "decision": "nil", "kind": "correct", "correct": true, "correct_extra_columns": true}
+{"question_id": "q00480", "expected": "nil", "decision": "nil", "kind": "correct", "correct": true, "correct_extra_columns": true}
+{"question_id": "q00481", "expected": "nil", "decision": "nil", "kind": "correct", "correct": true, "correct_extra_columns": true}
+{"question_id": "q00482", "expected": "nil", "decision": "nil", "kind": "correct", "correct": true, "correct_extra_columns": true}
+{"question_id": "q00483", "expected": "nil", "decision": "nil", "kind": "correct", "correct": true, "correct_extra_columns": true}
+{"question_id": "q00484", "expected": "nil", "decision": "nil", "kind": "correct", "correct": true, "correct_extra_columns": true}
+{"question_id": "q00485", "expected": "nil", "decision": "nil", "kind": "correct", "correct": true, "correct_extra_columns": true}
+{"question_id": "q00486", "expected": "nil", "decision": "nil", "kind": "correct", "correct": true, "correct_extra_columns": true}
+{"question_id": "q00487", "expected": "nil", "decision": "nil", "kind": "correct", "correct": true, "correct_extra_columns": true}
+{"question_id": "q00488", "expected": "nil", "decision": "nil", "kind": "correct", "correct": true, "correct_extra_columns": true}
+{"question_id": "q00489", "expected": "nil", "decision": "nil", "kind": "correct", "correct": true, "correct_extra_columns": true}
+{"question_id": "q00490", "expected": "unsupported", "decision": "unsupported", "kind": "correct", "correct": true, "correct_extra_columns": true}
+{"question_id": "q00491", "expected": "unsupported", "decision": "unsupported", "kind": "correct", "correct": true, "correct_extra_columns": true}
+{"question_id": "q00492", "expected": "unsupported", "decision": "unsupported", "kind": "correct", "correct": true, "correct_extra_columns": true}
+{"question_id": "q00493", "expected": "unsupported", "decision": "unsupported", "kind": "correct", "correct": true, "correct_extra_columns": true}
+{"question_id": "q00494", "expected": "unsupported", "decision": "unsupported", "kind": "correct", "correct": true, "correct_extra_columns": true}
+{"question_id": "q00495", "expected": "unsupported", "decision": "unsupported", "kind": "correct", "correct": true, "correct_extra_columns": true}
+{"question_id": "q00496", "expected": "unsupported", "decision": "unsupported", "kind": "correct", "correct": true, "correct_extra_columns": true}
+{"question_id": "q00497", "expected": "unsupported", "decision": "unsupported", "kind": "correct", "correct": true, "correct_extra_columns": true}
+{"question_id": "q00498", "expected": "unsupported", "decision": "unsupported", "kind": "correct", "correct": true, "correct_extra_columns": true}
+{"question_id": "q00499", "expected": "unsupported", "decision": "unsupported", "kind": "correct", "correct": true, "correct_extra_columns": true}
+{"question_id": "q00500", "expected": "unsupported", "decision": "unsupported", "kind": "correct", "correct": true, "correct_extra_columns": true}
+{"question_id": "q00501", "expected": "unsupported", "decision": "unsupported", "kind": "correct", "correct": true, "correct_extra_columns": true}
+{"question_id": "q00502", "expected": "unsupported", "decision": "unsupported", "kind": "correct", "correct": true, "correct_extra_columns": true}
+{"question_id": "q00503", "expected": "unsupported", "decision": "unsupported", "kind": "correct", "correct": true, "correct_extra_columns": true}
+{"question_id": "q00504", "expected": "unsupported", "decision": "unsupported", "kind": "correct", "correct": true, "correct_extra_columns": true}
+{"question_id": "q00505", "expected": "unsupported", "decision": "unsupported", "kind": "correct", "correct": true, "correct_extra_columns": true}

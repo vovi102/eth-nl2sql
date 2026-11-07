@@ -1,7 +1,8 @@
 """The property-sense dictionary: question phrases -> SQL expressions over the main schema.
 
 data/schema/property_senses.csv holds one row per sense (an expression and the kind of entity
-it applies to); property_phrases.csv maps VI/EN phrases to senses. A phrase such as "giá trị"
+it applies to, and an optional English hint the evidence adds after the expression);
+property_phrases.csv maps VI/EN phrases to senses. A phrase such as "giá trị"
 is resolved by the type of the linked entity, not by the phrase alone (docs/proposed-method.md).
 Both files are reviewed like the entity knowledge base: only approved rows are loaded.
 """
@@ -18,8 +19,8 @@ from eth_nl2sql.entity_knowledge_base import normalize_alias, read_sheet
 SENSES_FILE = "property_senses.csv"
 PHRASES_FILE = "property_phrases.csv"
 SENSE_COLUMNS = (
-    "sense_id", "kind", "applies_to", "table_name", "expression", "unit", "description_vi",
-    "status", "note",
+    "sense_id", "kind", "applies_to", "table_name", "expression", "unit", "evidence_hint",
+    "description_vi", "status", "note",
 )  # fmt: skip
 PHRASE_COLUMNS = ("phrase", "phrase_norm", "lang", "sense_id", "status", "note")
 KINDS = ("measure", "filter", "aggregate", "dimension", "unsupported")

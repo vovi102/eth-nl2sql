@@ -17,6 +17,7 @@ import logging
 import random
 import re
 from collections import Counter, defaultdict
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
@@ -37,6 +38,7 @@ from eth_nl2sql.benchmark_templates import (
     time_fill,
 )
 from eth_nl2sql.entity_knowledge_base import ALIASES, ENTITIES, normalize_alias, read_sheet
+from eth_nl2sql.execution_evaluation import same_rows
 
 log = logging.getLogger(__name__)
 
@@ -47,6 +49,17 @@ DEFAULT_OUT_DIR = Path("data/benchmark")
 SEED = 20261101
 QUERY_TIMEOUT = 10.0
 ATTEMPTS_PER_QUESTION = 25
+# Soft preference (benchmark.md §6, decision B of 2026-11-01): a question with an implicit
+# tx_success whose answer does not change without receipt_status = 1 is swapped for one drawn
+# by its own RNG, when one of STATUS_ALTERNATIVES candidates tells the mistake apart. The shared
+# RNG draws as before, so every other question stays the same.
+STATUS_ALTERNATIVES = 20
+# "The largest ETH transaction" almost never tells the mistake apart: a failed transaction is
+# rarely the largest one.
+NO_STATUS_PREFERENCE = {"address_largest_eth_sent"}
+# A question whose gold rows change with the tie-break at its LIMIT (benchmark.md §6, step 6,
+# 2026-11-03) is replaced the same way, by one of TIE_ALTERNATIVES candidates without a tie.
+TIE_ALTERNATIVES = 20
 DEV_SHARE = 1 / 3
 MAX_TOKEN_DIGITS = 38  # token_transfers.value beyond DECIMAL(38,0) cannot be summed
 MIN_TOKEN_CALLERS = 1000
@@ -633,11 +646,59 @@ def verify(record: dict, link: LinkTables, con: duckdb.DuckDBPyConnection, timeo
     return {"rows": len(rows), "seconds": round(seconds, 2)}
 
 
+def _implicit_success(record: dict) -> bool:
+    return any(p["sense_id"] == "tx_success" and p["implicit"] for p in record["properties"])
+
+
+def _alternative(
+    record: dict, template: Template, variant: Variant, fillers: Fillers, link: LinkTables,
+    con: duckdb.DuckDBPyConnection, timeout: float, seen: set[str], alt_seed: str,
+    tries: int, accept: Callable[[dict], bool],
+) -> dict | None:  # fmt: skip
+    """A question of the same template, variant and language that `accept`s, drawn by its own
+    RNG so that the shared one draws as before; None if no candidate is accepted."""
+    rng = random.Random(alt_seed)
+    for _ in range(tries):
+        try:
+            other = make_record(rng, template, variant, record["lang"], fillers, link)
+            if other["question"] in seen:
+                continue
+            verify(other, link, con, timeout)
+        except Rejected:
+            continue
+        if accept(other):
+            return other
+    return None
+
+
+def ties_at_limit(
+    record: dict, link: LinkTables, con: duckdb.DuckDBPyConnection, timeout: float
+) -> bool:
+    """Do the gold rows change when the tie-break at the LIMIT is reversed?"""
+    if record["gold_sql"] is None:
+        return False
+    sql = validate.substitute_placeholders(record["gold_sql"], placeholder_addresses(link, record))
+    reversed_sql = validate.reversed_tie_break(sql)
+    if reversed_sql is None:
+        return False
+    try:
+        gold, _ = validate.run_sql(con, sql, timeout)
+        rows, _ = validate.run_sql(con, reversed_sql, timeout)
+    except validate.GoldQueryError:  # too slow to tell: kept, as discriminates does
+        return False
+    return not same_rows(gold, rows)
+
+
 def generate(
     template: Template, fillers: Fillers, link: LinkTables, con: duckdb.DuckDBPyConnection,
-    rng: random.Random, count: int, timeout: float, rejected: Counter,
+    rng: random.Random, count: int, timeout: float, rejected: Counter, seed: int = SEED,
 ) -> list[dict]:  # fmt: skip
     out, seen = [], set()
+    swapped = untied = 0
+
+    def tells_status_apart(r: dict) -> bool:
+        return _implicit_success(r) and bool(discriminates(r, link, con, timeout).get("status"))
+
     for _ in range(count * ATTEMPTS_PER_QUESTION):
         if len(out) == count:
             break
@@ -651,10 +712,76 @@ def generate(
         except Rejected as e:
             rejected[str(e)] += 1
             continue
+        if (
+            template.template_id not in NO_STATUS_PREFERENCE
+            and _implicit_success(record)
+            and not discriminates(record, link, con, timeout).get("status")
+        ):
+            alt_seed = f"{seed}:{template.template_id}:{len(out)}"
+            other = _alternative(
+                record, template, variant, fillers, link, con, timeout, seen | {record["question"]},
+                alt_seed, STATUS_ALTERNATIVES, tells_status_apart,
+            )  # fmt: skip
+            if other is not None:
+                record, swapped = other, swapped + 1
+        if ties_at_limit(record, link, con, timeout):
+            alt_seed = f"{seed}:{template.template_id}:{len(out)}:tie"
+
+            def no_tie(r: dict) -> bool:
+                if (
+                    template.template_id not in NO_STATUS_PREFERENCE
+                    and _implicit_success(r)
+                    and not tells_status_apart(r)
+                ):
+                    return False
+                return not ties_at_limit(r, link, con, timeout)
+
+            other = _alternative(
+                record, template, variant, fillers, link, con, timeout, seen | {record["question"]},
+                alt_seed, TIE_ALTERNATIVES, no_tie,
+            )  # fmt: skip
+            if other is None:
+                log.warning("%s: %r ties at its limit and no candidate does not",
+                            template.template_id, record["question"])  # fmt: skip
+            else:
+                record, untied = other, untied + 1
         seen.add(record["question"])
         out.append(record)
+    if swapped:
+        log.info("%s: %d questions swapped to tell a dropped receipt_status apart",
+                 template.template_id, swapped)  # fmt: skip
+    if untied:
+        log.info("%s: %d questions swapped for one without a tie at the limit",
+                 template.template_id, untied)  # fmt: skip
     if len(out) < count:
         log.warning("%s: only %d of %d questions", template.template_id, len(out), count)
+    return out
+
+
+def discriminates(
+    record: dict, link: LinkTables, con: duckdb.DuckDBPyConnection, timeout: float
+) -> dict[str, bool | None]:
+    """{check: does the mistake change the answer} for the checks of wrong_variants.
+
+    None when the mistaken query is too slow to tell. Uses no randomness, so annotating does
+    not change which questions a seed produces.
+    """
+    variants = validate.wrong_variants(record)
+    if not variants:
+        return {}
+    addresses = placeholder_addresses(link, record)
+    gold, _ = validate.run_sql(
+        con, validate.substitute_placeholders(record["gold_sql"], addresses), timeout
+    )
+    out: dict[str, bool | None] = {}
+    for check, sql in variants.items():
+        try:
+            mistaken = validate.substitute_placeholders(sql, addresses)
+            rows, _ = validate.run_sql(con, mistaken, timeout)
+        except validate.GoldQueryError:
+            out[check] = None
+            continue
+        out[check] = not same_rows(gold, rows)
     return out
 
 
@@ -729,14 +856,14 @@ def build(
         rejected[template.template_id] = Counter()
         count = max(1, round(template.count * count_scale))
         made = generate(
-            template, fillers, link, con, rng, count, timeout, rejected[template.template_id]
-        )
+            template, fillers, link, con, rng, count, timeout, rejected[template.template_id],
+            seed=seed,
+        )  # fmt: skip
         log.info("%-28s %3d questions", template.template_id, len(made))
         records[splits[template.template_id]] += made
-    con.close()
 
     groups = {t.template_id: t.group for t in TEMPLATES}
-    question_phenomena = {}
+    question_phenomena, question_checks = {}, {}
     n = 0
     for split in ("dev", "test"):
         for r in records[split]:
@@ -744,6 +871,10 @@ def build(
             r["question_id"] = f"q{n:05d}"
             r["knowledge_base_version"] = version
             question_phenomena[r["question_id"]] = phenomena(r, link, groups[r["template_id"]])
+            if r["gold_sql"] is not None:
+                question_checks[r["question_id"]] = discriminates(r, link, con, timeout)
+    con.close()
+    log.info("annotated %d questions with the mistakes they tell apart", len(question_checks))
     out_dir.mkdir(parents=True, exist_ok=True)
     manifest_files = {}
     for split, rows in records.items():
@@ -775,12 +906,25 @@ def build(
             "by_split_lang": dict(Counter(f"{s}/{r['lang']}" for s in records for r in records[s])),
             "by_group": dict(Counter(groups[r["template_id"]] for r in all_records)),
             "by_phenomenon": dict(Counter(p for ps in question_phenomena.values() for p in ps)),
+            "discriminates": {
+                f"{split}/{check}": {
+                    "applicable": sum(
+                        check in question_checks.get(r["question_id"], {}) for r in rows
+                    ),
+                    "discriminating": sum(
+                        question_checks.get(r["question_id"], {}).get(check) is True for r in rows
+                    ),
+                }
+                for split, rows in records.items()
+                for check in ("status", "direction", "time")
+            },
         },
         "class_members": {
             cid: [[eid, len(addresses)] for eid, addresses in members[:10]]
             for cid, members in fillers.classes.items()
         },
         "phenomena": question_phenomena,
+        "discriminates": question_checks,
     }
     (out_dir / "manifest.json").write_text(
         json.dumps(manifest, ensure_ascii=False, indent=1) + "\n", encoding="utf-8"
@@ -809,6 +953,8 @@ def main(argv: list[str] | None = None) -> int:
         print(f"  {name:<12} {info['questions']:>5} questions")
     print(f"  by group: {manifest['counts']['by_group']}")
     print(f"  by phenomenon: {manifest['counts']['by_phenomenon']}")
+    for key, c in manifest["counts"]["discriminates"].items():
+        print(f"  {key:<16} tells the mistake apart in {c['discriminating']}/{c['applicable']}")
     return 0
 
 

@@ -1,0 +1,37 @@
+{
+ "3b": {
+  "ex": 0.7682926829268293,
+  "correct": 252,
+  "questions": 328
+ },
+ "3b_no_placeholder_check": {
+  "ex": 0.6646341463414634,
+  "correct": 218,
+  "questions": 328
+ },
+ "3b_oracle_linking": {
+  "ex": 0.7896341463414634,
+  "correct": 259,
+  "questions": 328
+ },
+ "3b_linked_schema": {
+  "ex": 0.801829268292683,
+  "correct": 263,
+  "questions": 328
+ },
+ "3b_no_evidence": {
+  "ex": 0.01524390243902439,
+  "correct": 5,
+  "questions": 328
+ },
+ "3b_literal (only predicted)": {
+  "ex": 0.6896551724137931,
+  "correct": 180,
+  "questions": 261
+ },
+ "1.5b": {
+  "ex": 0.6128048780487805,
+  "correct": 201,
+  "questions": 328
+ }
+}

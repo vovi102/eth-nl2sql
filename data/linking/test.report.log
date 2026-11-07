@@ -1,0 +1,18 @@
+linked 328 questions into data/linking/test.predictions.jsonl
+questions                  328
+mentions_strict            P 0.974  R 0.990  F1 0.982  (303/311 pred, 306 gold)
+mentions_loose             P 0.974  R 0.990  F1 0.982  (303/311 pred, 306 gold)
+entity_accuracy_at_1       0.990  (287/290)
+entity_recall_at_5         0.997  (289/290)
+nil_accuracy               1.000  (16/16)
+nil_reason_accuracy        1.000  (16/16)
+class_accuracy             1.000  (42/42)
+properties                 P 0.972  R 0.963  F1 0.967  (719/740 pred, 747 gold)
+properties_explicit        P 0.966  R 0.957  F1 0.962  (577/597 pred, 603 gold)
+time_accuracy              1.000  (328/328)
+unsupported_accuracy       1.000  (328/328)
+  accuracy@1 address        1.000  (47/47)
+  accuracy@1 class          1.000  (42/42)
+  accuracy@1 entity         0.990  (101/102)
+  accuracy@1 literal_address 1.000  (12/12)
+  accuracy@1 token          0.977  (85/87)

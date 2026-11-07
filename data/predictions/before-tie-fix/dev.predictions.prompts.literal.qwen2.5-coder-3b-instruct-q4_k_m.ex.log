@@ -1,0 +1,24 @@
+--only-predicted: 137 questions scored, 40 left out
+  overall                EX 0.818  (+extra columns 0.818)  112/137
+  answerable             EX 0.793  (+extra columns 0.793)  96/121
+  unanswerable           EX 1.000  (+extra columns 1.000)  16/16
+  kinds: {'correct': 112, 'parse': 13, 'wrong_result': 7, 'execution': 5}
+  by_lang:
+    en                     EX 0.846  (+extra columns 0.846)  55/65
+    vi                     EX 0.792  (+extra columns 0.792)  57/72
+  by_group:
+    address                EX 0.846  (+extra columns 0.846)  22/26
+    ambiguous              EX 0.733  (+extra columns 0.733)  11/15
+    entity                 EX 0.433  (+extra columns 0.433)  13/30
+    nil                    EX 1.000  (+extra columns 1.000)  8/8
+    plain                  EX 1.000  (+extra columns 1.000)  24/24
+    token                  EX 1.000  (+extra columns 1.000)  26/26
+    unsupported            EX 1.000  (+extra columns 1.000)  8/8
+  by_phenomenon:
+    alias                  EX 0.881  (+extra columns 0.881)  37/42
+    ambiguous_property     EX 0.733  (+extra columns 0.733)  11/15
+    multi_address          EX 0.485  (+extra columns 0.485)  16/33
+  discriminating:
+    direction              EX 0.679  (+extra columns 0.679)  53/78
+    status                 EX 0.765  (+extra columns 0.765)  13/17
+    time                   EX 0.808  (+extra columns 0.808)  63/78

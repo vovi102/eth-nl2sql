@@ -21,9 +21,11 @@ PLACEHOLDER_RE = re.compile(r"\{(E\d+)\}")
 FORBIDDEN_RE = re.compile(r"(?i)\b(QUALIFY|EXCLUDE|list_\w+)\b")
 ORDER_BY_RE = re.compile(r"(?is)\bORDER BY\b(.*?)(?:\bLIMIT\b|$)")
 NULLS_RE = re.compile(r"(?i)\bNULLS (FIRST|LAST)\b")
-# Columns that make a row of a gold result unique, used to break ties in ORDER BY.
+# Columns that make a row of a gold result unique, used to break ties in ORDER BY. "hour",
+# "number" (a block) and "token_address" are for the train templates of phase 2 (2026-11-04);
+# no benchmark gold ends its ORDER BY with them.
 TIE_BREAKERS = {"hash", "transaction_hash", "log_index", "from_address", "to_address", "miner",
-                "day", "address"}  # fmt: skip
+                "day", "address", "hour", "number", "token_address"}  # fmt: skip
 DIALECTS = ("duckdb", "postgres")
 MENTION_FIELDS = {
     "entity": {"span", "text", "type", "target", "placeholder"},
@@ -176,3 +178,53 @@ def informative(rows: list) -> bool:
     if len(rows) == 1 and len(rows[0]) == 1:
         return rows[0][0] not in (None, 0)
     return True
+
+
+# Common mistakes a question can tell from the gold (benchmark.md §6): a variant of the gold SQL
+# that returns the gold's rows does not test that part of the question.
+STATUS_RE = re.compile(r" AND receipt_status = [01]\b|\breceipt_status = [01] AND ")
+DIRECTION_RE = re.compile(r"\b(to|from)_address (IN \{E\d+\}|= '0x)")
+TIME_RE = re.compile(
+    r"\b(block_timestamp|timestamp) >= TIMESTAMP '[^']+' AND \1 < TIMESTAMP '[^']+'"
+)
+WHOLE_MONTH = ("2026-09-01T00:00:00", "2026-10-01T00:00:00")
+
+
+def reversed_tie_break(sql: str) -> str | None:
+    """The query with its last ORDER BY key reversed, when it keeps the first rows (LIMIT) and
+    breaks ties; None otherwise. Run on SQL whose placeholders are already substituted.
+
+    The question does not say how to break a tie at the limit, so a gold answer that changes
+    with the tie-break cannot be told apart from a right query that breaks it another way.
+    """
+    tree = sqlglot.parse_one(sql, dialect="duckdb")
+    order = tree.args.get("order")
+    if tree.args.get("limit") is None or order is None or len(order.expressions) < 2:
+        return None
+    last = order.expressions[-1]
+    last.set("desc", not last.args.get("desc"))
+    return tree.sql(dialect="duckdb")
+
+
+def wrong_variants(record: dict) -> dict[str, str]:
+    """{check: gold SQL with that mistake} for the checks that apply to the record.
+
+    - status: the receipt_status condition dropped (implicit tx_success, or tx_failed).
+    - direction: to_address and from_address swapped where they meet the linked address.
+    - time: the time condition dropped, unless the range is all of September (the same query).
+    """
+    sql = record["gold_sql"]
+    out = {}
+    if STATUS_RE.search(sql):
+        out["status"] = STATUS_RE.sub("", sql, count=1)
+    if DIRECTION_RE.search(sql):
+        swap = {"to": "from", "from": "to"}
+        out["direction"] = DIRECTION_RE.sub(
+            lambda m: f"{swap[m.group(1)]}_address {m.group(2)}", sql
+        )
+    time = record["time"]
+    if time and (time["start"], time["end"]) != WHOLE_MONTH and TIME_RE.search(sql):
+        dropped = TIME_RE.sub("TRUE", sql, count=1)
+        out["time"] = dropped.replace("WHERE TRUE AND ", "WHERE ").replace(" AND TRUE", "")
+        out["time"] = re.sub(r" WHERE TRUE\b", "", out["time"])
+    return out

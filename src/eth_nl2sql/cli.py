@@ -1,9 +1,13 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import logging
+import statistics
 import sys
+import time
+from collections import Counter
 from pathlib import Path
 
 from eth_nl2sql import entity_knowledge_base as knowledge_base
@@ -26,7 +30,23 @@ from eth_nl2sql.entity_linking_evaluation import (
     write_records,
 )
 from eth_nl2sql.entity_linking_resources import load_resources
+from eth_nl2sql.execution_evaluation import (
+    GoldError,
+    gold_as_predictions,
+    report,
+    run_questions,
+)
+from eth_nl2sql.execution_evaluation import format_report as format_ex_report
 from eth_nl2sql.extract_bigquery import ExtractError, Extractor, Window, verify_extract
+from eth_nl2sql.prompt_builder import SCHEMA_MODES, PromptBuilder, PromptOptions, load_schema
+from eth_nl2sql.sql_execution import SqlRunner
+from eth_nl2sql.sql_generation import (
+    ClientError,
+    OpenAICompatibleClient,
+    generate,
+    shared_prefix,
+    summary,
+)
 
 DEFAULT_DB = Path("data/db/ethereum.duckdb")
 DEFAULT_MONTH_DIR = Path("data/raw/2026-09")
@@ -35,6 +55,10 @@ DEFAULT_PROPERTY_SENSES_DIR = Path("data/schema")
 DEFAULT_LABELS_DIR = Path("data/raw/labels/eth-labels")
 DEFAULT_KNOWLEDGE_BASE_DIR = Path("data/entity_knowledge_base")
 DEFAULT_LINKING_DIR = Path("data/linking")
+DEFAULT_PROMPTS_DIR = Path("data/prompts")
+DEFAULT_PREDICTIONS_DIR = Path("data/predictions")
+DEFAULT_SERVER = "http://127.0.0.1:8080"
+DEFAULT_MANIFEST = Path("data/benchmark/manifest.json")
 
 
 def _knowledge_base(args: argparse.Namespace) -> int:
@@ -94,6 +118,13 @@ def _linking(args: argparse.Namespace) -> int:
             args.report.write_text(json.dumps(report, indent=2) + "\n")
         return 0
 
+    if args.command == "build-prompts":
+        return _build_prompts(args)
+    if args.command == "evaluate-sql":
+        return _evaluate_sql(args)
+    if args.command == "generate-sql":
+        return _generate_sql(args)
+
     if bool(args.question) == bool(args.input):
         print("error: give either a question or --input", file=sys.stderr)
         return 2
@@ -110,6 +141,205 @@ def _linking(args: argparse.Namespace) -> int:
     if args.expand:
         for name, addresses in linker.placeholder_addresses(record).items():
             print(f"{{{name}}} = {len(addresses)} addresses: {', '.join(addresses[:3])}")
+    if args.prompt:
+        prompt = PromptBuilder(linker, load_schema(args.db)).build(record)
+        if prompt["decision"] != "sql":
+            print(f"\n[{prompt['decision']}] {prompt['answer']}")
+        for m in prompt.get("messages", []):
+            print(f"\n===== {m['role']}\n{m['content']}")
+    return 0
+
+
+def _prompt_options(args: argparse.Namespace) -> tuple[PromptOptions, str]:
+    """The options and the file-name tag of a prompt variant (proposed-method.md §7)."""
+    options = PromptOptions(
+        evidence=not args.no_evidence, placeholders=not args.literal, schema=args.schema
+    )
+    tags = [t for t, on in (("no-evidence", args.no_evidence), ("literal", args.literal),
+                            ("linked-schema", args.schema == "linked")) if on]  # fmt: skip
+    return options, ".".join(["prompts", *tags])
+
+
+def _build_prompts(args: argparse.Namespace) -> int:
+    """B6/B7 for every linking record of --input (linker predictions, or gold as oracle)."""
+    records = read_records(args.input, allow_test=args.allow_test)
+    options, tag = _prompt_options(args)
+    linker = EntityLinker(
+        load_resources(args.db, args.knowledge_base_dir, memory_limit=args.memory_limit)
+    )
+    builder = PromptBuilder(linker, load_schema(args.db))
+    prompts = [builder.build(r, options) for r in records]
+    out = args.output or DEFAULT_PROMPTS_DIR / f"{args.input.stem}.{tag}.jsonl"
+    write_records(out, prompts)
+    meta = {
+        "input": str(args.input),
+        "options": vars(options),
+        "knowledge_base_version": knowledge_base_version(
+            args.knowledge_base_dir, args.property_senses_dir
+        ),
+    }
+    out.with_name(out.name + ".meta.json").write_text(json.dumps(meta, indent=2) + "\n")
+    decisions = Counter(p["decision"] for p in prompts)
+    chars = sorted(p["chars"] for p in prompts if p["decision"] == "sql")
+    print(f"wrote {len(prompts)} prompts into {out}: {dict(decisions)}")
+    if chars:
+        print(f"  prompt chars: min {chars[0]:,}, median {chars[len(chars) // 2]:,}, "
+              f"max {chars[-1]:,}")  # fmt: skip
+    return 0
+
+
+def _evaluate_sql(args: argparse.Namespace) -> int:
+    """EX of generated SQL; --self-check scores the gold SQL itself (must be 1.0)."""
+    gold = read_records(args.gold, allow_test=args.allow_test)
+    excluded = None
+    if args.self_check:
+        predictions, linking = gold_as_predictions(gold), gold
+    elif args.predictions:
+        predictions = read_records(args.predictions, allow_test=args.allow_test)
+        linking_path = args.linking or DEFAULT_LINKING_DIR / f"{args.gold.stem}.predictions.jsonl"
+        linking = read_records(linking_path, allow_test=args.allow_test)
+        if args.only_predicted:
+            scored = {p["question_id"] for p in predictions if "skipped" not in p}
+            excluded = sum(g["question_id"] not in scored for g in gold)
+            gold = [g for g in gold if g["question_id"] in scored]
+            print(f"--only-predicted: {len(gold)} questions scored, {excluded} left out")
+    else:
+        print("error: give --predictions or --self-check", file=sys.stderr)
+        return 2
+    linker = EntityLinker(
+        load_resources(args.db, args.knowledge_base_dir, memory_limit=args.memory_limit)
+    )
+    with SqlRunner(args.db, timeout=args.timeout, memory_limit=args.memory_limit) as runner:
+        results = run_questions(gold, predictions, linking, linker, runner)
+    manifest = json.loads(args.manifest.read_text()) if args.manifest.is_file() else None
+    rep = report(results, gold, manifest)
+    if excluded is not None:
+        rep["excluded"] = excluded
+    print(format_ex_report(rep))
+    if args.report:
+        args.report.parent.mkdir(parents=True, exist_ok=True)
+        args.report.write_text(json.dumps(rep, indent=2) + "\n")
+    if args.details:
+        write_records(args.details, results)
+    return 0
+
+
+def _sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as f:
+        while chunk := f.read(1 << 24):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _spread(records: list[dict], n: int) -> list[dict]:
+    """n records evenly spaced over the file, for a trial run on every template."""
+    if n >= len(records):
+        return records
+    return [records[i * len(records) // n] for i in range(n)]
+
+
+def _generate_sql(args: argparse.Namespace) -> int:
+    """The model of a running server on every prompt of --prompts, then B8 (one repair)."""
+    prompts = read_records(args.prompts, allow_test=args.allow_test)
+    prompt_meta_path = args.prompts.with_name(args.prompts.name + ".meta.json")
+    prompt_meta = json.loads(prompt_meta_path.read_text())
+    linking_path = args.linking or Path(prompt_meta["input"])
+    linking = {r["question_id"]: r for r in read_records(linking_path, allow_test=args.allow_test)}
+
+    client = OpenAICompatibleClient(
+        args.server, model=args.model, max_tokens=args.max_tokens, seed=args.seed
+    )
+    # Of the whole file, so that a trial run primes the same tokens as the full run.
+    prefix = [] if args.no_fixed_prefix else shared_prefix(client, prompts)
+    if args.limit:
+        prompts = _spread(prompts, args.limit)
+    server = client.server_info()
+    model_path = Path(server["model_path"]) if server["model_path"] else None
+    tag = model_path.stem if model_path else (server["models"] or ["model"])[0]
+    out = args.output or DEFAULT_PREDICTIONS_DIR / f"{args.prompts.stem}.{tag}.jsonl"
+    print(f"model {tag}, n_ctx {server['n_ctx']}, {len(prompts)} prompts, "
+          f"fixed prefix {len(prefix)} tokens -> {out}")  # fmt: skip
+
+    linker = EntityLinker(
+        load_resources(args.db, args.knowledge_base_dir, memory_limit=args.memory_limit)
+    )
+
+    def progress(i: int, p: dict) -> None:
+        kinds = [a["error_kind"] or "ran" for a in p["attempts"]]
+        seconds = sum(a["seconds"] for a in p["attempts"])
+        detail = p.get("skipped") or (f"{' -> '.join(kinds)} ({seconds:.1f} s)" if kinds else "")
+        print(f"  [{i}/{len(prompts)}] {p['question_id']} {p['decision']} {detail}", flush=True)
+
+    started = time.time()
+    predictions = []
+    out.parent.mkdir(parents=True, exist_ok=True)
+    tmp = out.with_name(out.name + ".tmp")
+    with SqlRunner(args.db, timeout=args.timeout, memory_limit=args.memory_limit) as runner, \
+            tmp.open("w", encoding="utf-8") as f:  # fmt: skip
+        for p in generate(prompts, linking, linker, runner, client, progress=progress,
+                          placeholder_check=not args.no_placeholder_check,
+                          prefix=prefix):  # fmt: skip
+            f.write(json.dumps(p, ensure_ascii=False) + "\n")
+            f.flush()
+            predictions.append(p)
+    tmp.replace(out)
+
+    stats = summary(predictions)
+    meta = {
+        "prompts": str(args.prompts),
+        "prompts_sha256": _sha256(args.prompts),
+        "prompt_options": prompt_meta.get("options"),
+        "linking": str(linking_path),
+        "linking_sha256": _sha256(linking_path),
+        "limit": args.limit,
+        "model": tag,
+        "model_sha256": _sha256(model_path) if model_path and model_path.is_file() else None,
+        "server": server,
+        "generation": client.generation_parameters()
+        | {
+            "max_attempts": 2,
+            "placeholder_check": not args.no_placeholder_check,
+            "fixed_prefix_tokens": len(prefix),
+        },
+        "sql_timeout": args.timeout,
+        "started": time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime(started)),
+        "wall_seconds": round(time.time() - started, 1),
+        "summary": stats,
+    }
+    out.with_name(out.name + ".meta.json").write_text(json.dumps(meta, indent=2) + "\n")
+    print(json.dumps(stats, indent=2))
+    return 0
+
+
+def _count_prompt_tokens(args: argparse.Namespace) -> int:
+    """Tokens of every sql prompt (chat template included) by the server's tokenizer."""
+    client = OpenAICompatibleClient(args.server, max_tokens=args.max_tokens)
+    n_ctx = client.context_size()
+    room = n_ctx - args.max_tokens if n_ctx else None
+    print(f"n_ctx {n_ctx}, reply budget {args.max_tokens}: a prompt fits up to {room} tokens")
+    report = {}
+    for path in args.prompts:
+        prompts = [p for p in read_records(path, allow_test=args.allow_test)
+                   if p["decision"] == "sql"]  # fmt: skip
+        tokens = sorted(client.prompt_tokens(p["messages"]) for p in prompts)
+        if None in tokens:
+            print("error: the server has no /tokenize", file=sys.stderr)
+            return 1
+        report[str(path)] = {
+            "prompts": len(tokens),
+            "min": tokens[0],
+            "median": statistics.median(tokens),
+            "max": tokens[-1],
+            "over_context": sum(t > room for t in tokens) if room else None,
+        }
+        r = report[str(path)]
+        print(
+            f"  {path.name:<48} {r['prompts']:>4} prompts  min {r['min']:>7,}  "
+            f"median {r['median']:>9,.1f}  max {r['max']:>7,}  over {r['over_context']}"
+        )
+    if args.report:
+        args.report.write_text(json.dumps({"n_ctx": n_ctx, "files": report}, indent=2) + "\n")
     return 0
 
 
@@ -214,6 +444,19 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--input", type=Path, help="JSON Lines with question (and question_id)")
     p.add_argument("--output", type=Path, help="default: data/linking/<input>.predictions.jsonl")
     p.add_argument("--expand", action="store_true", help="also list each placeholder's addresses")
+    p.add_argument("--prompt", action="store_true", help="also print the prompt of the question")
+
+    p = sub.add_parser(
+        "build-prompts", help="B6/B7: the SQL model's prompt for every record of a linking file"
+    )
+    p.add_argument(
+        "--input", type=Path, required=True,
+        help="linking records: data/linking/dev.predictions.jsonl, or gold for oracle linking",
+    )  # fmt: skip
+    p.add_argument("--output", type=Path, help="default: data/prompts/<input>.prompts[.tags].jsonl")
+    p.add_argument("--no-evidence", action="store_true", help="ablation: schema and question only")
+    p.add_argument("--literal", action="store_true", help="ablation: addresses instead of {E1}")
+    p.add_argument("--schema", choices=SCHEMA_MODES, default="full", help="B6 (default: full)")
 
     p = sub.add_parser(
         "evaluate-linking", help="score linking against gold (docs/linking-labels.md §9)"
@@ -222,7 +465,58 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--predictions", type=Path, help="default: link the gold questions now")
     p.add_argument("--output", type=Path, help="where to write predictions made now")
     p.add_argument("--report", type=Path, help="write the full report as JSON")
-    for name in ("link-question", "evaluate-linking"):
+    p = sub.add_parser("evaluate-sql", help="B8 + EX: run generated and gold SQL, compare results")
+    p.add_argument("--gold", type=Path, required=True, help="e.g. data/benchmark/dev.jsonl")
+    p.add_argument("--predictions", type=Path, help="JSON Lines {question_id, decision, sql}")
+    p.add_argument(
+        "--linking", type=Path,
+        help="linking records the prompts came from (default: data/linking/<gold>.predictions"
+        ".jsonl; the gold file for oracle linking)",
+    )  # fmt: skip
+    p.add_argument("--self-check", action="store_true", help="score the gold SQL itself")
+    p.add_argument(
+        "--only-predicted", action="store_true",
+        help="score only questions with a prediction that is not skipped (trial run, decision 7)",
+    )  # fmt: skip
+    p.add_argument("--manifest", type=Path, default=DEFAULT_MANIFEST)
+    p.add_argument("--timeout", type=float, default=30.0, help="seconds per query")
+    p.add_argument("--report", type=Path, help="write the report as JSON")
+    p.add_argument("--details", type=Path, help="write one scored line per question")
+    p = sub.add_parser(
+        "generate-sql", help="the SQL model of a running server on a prompt file, then B8"
+    )
+    p.add_argument("--prompts", type=Path, required=True, help="a file of data/prompts/")
+    p.add_argument(
+        "--linking", type=Path,
+        help="linking records the prompts came from (default: `input` of the prompts' meta)",
+    )  # fmt: skip
+    p.add_argument("--output", type=Path, help="default: data/predictions/<prompts>.<model>.jsonl")
+    p.add_argument("--server", default=DEFAULT_SERVER, help="OpenAI-compatible base URL")
+    p.add_argument("--model", help="model name to send (llama-server serves one model)")
+    p.add_argument("--max-tokens", type=int, default=512, help="tokens per reply")
+    p.add_argument("--seed", type=int, default=0)
+    p.add_argument("--limit", type=int, help="only N prompts, evenly spaced (trial run)")
+    p.add_argument(
+        "--no-placeholder-check", action="store_true",
+        help="accept a query that runs but leaves out a placeholder of the prompt (ablation)",
+    )  # fmt: skip
+    p.add_argument(
+        "--no-fixed-prefix", action="store_true",
+        help="let the prompt cache reuse what it shares with the question before",
+    )  # fmt: skip
+    p.add_argument("--timeout", type=float, default=30.0, help="seconds per query")
+
+    p = sub.add_parser(
+        "count-prompt-tokens", help="tokens of prompt files by the tokenizer of llama-server"
+    )
+    p.add_argument("prompts", type=Path, nargs="+")
+    p.add_argument("--server", default=DEFAULT_SERVER)
+    p.add_argument("--max-tokens", type=int, default=512, help="room left for the reply")
+    p.add_argument("--report", type=Path, help="write the counts as JSON")
+    p.add_argument("--allow-test", action="store_true", help="final evaluation only")
+
+    for name in ("link-question", "evaluate-linking", "build-prompts", "evaluate-sql",
+                 "generate-sql"):  # fmt: skip
         p = sub.choices[name]
         p.add_argument("--db", type=Path, default=DEFAULT_DB)
         p.add_argument("--knowledge-base-dir", type=Path, default=DEFAULT_KNOWLEDGE_BASE_DIR)
@@ -249,10 +543,18 @@ def main(argv: list[str] | None = None) -> int:
             print(f"error: {e}", file=sys.stderr)
             return 1
 
-    if args.command in ("link-question", "evaluate-linking"):
+    if args.command == "count-prompt-tokens":
+        try:
+            return _count_prompt_tokens(args)
+        except (EvaluationError, ClientError) as e:
+            print(f"error: {e}", file=sys.stderr)
+            return 1
+
+    if args.command in ("link-question", "evaluate-linking", "build-prompts", "evaluate-sql",
+                        "generate-sql"):  # fmt: skip
         try:
             return _linking(args)
-        except EvaluationError as e:
+        except (EvaluationError, GoldError, ClientError) as e:
             print(f"error: {e}", file=sys.stderr)
             return 1
 

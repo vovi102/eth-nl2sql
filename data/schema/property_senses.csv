@@ -1,37 +1,37 @@
-sense_id,kind,applies_to,table_name,expression,unit,description_vi,status,note
-eth_amount,measure,eth,transactions,value / 1e18,ETH,Lượng ETH chuyển trong giao dịch (chỉ ETH của lời gọi ngoài cùng),approved,Người dùng duyệt 2026-11-01. [Claude nháp] Không gồm ETH chuyển qua internal call (không có bảng traces)
-token_amount,measure,token,token_transfers,"CAST(value AS DECIMAL(38,0)) / 1e{decimals}",đơn vị token,"Lượng token chuyển, đã chia cho decimals",approved,"Người dùng duyệt 2026-11-01. [Claude nháp] 351 token có giá trị > 38 chữ số (chủ yếu NFT/token rác): biểu thức báo lỗi, template phải loại các token này"
-nft_transfer_count,aggregate,nft,token_transfers,COUNT(*),lượt,"Số lượt chuyển NFT (value là token id, không cộng được)",approved,Người dùng duyệt 2026-11-01. [Claude nháp] Token NFT: tokens.token_standard = 'ERC721' OR tokens.is_erc721 (hai cờ không nhất quán)
-tx_fee,measure,transaction,transactions,"CAST(receipt_gas_used AS DECIMAL(38,0)) * receipt_effective_gas_price / 1e18",ETH,Phí giao dịch thực trả (gas dùng × giá gas thực),approved,Người dùng duyệt 2026-11-01. [Claude nháp] Phải ép DECIMAL trước khi nhân: tích vượt BIGINT trên dữ liệu thật
-blob_fee,measure,transaction,transactions,"CAST(receipt_blob_gas_used AS DECIMAL(38,0)) * receipt_blob_gas_price / 1e18",ETH,Phí blob của giao dịch loại 3,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
-gas_price_paid,measure,transaction,transactions,receipt_effective_gas_price / 1e9,gwei,Giá gas thực trả cho mỗi đơn vị gas,approved,"Người dùng duyệt 2026-11-01. [Claude nháp] Không dùng gas_price: với giao dịch EIP-1559 đó là giá tối đa, không phải giá trả"
-gas_used,measure,transaction,transactions,receipt_gas_used,gas,Lượng gas giao dịch đã tiêu thụ,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
-gas_limit_tx,measure,transaction,transactions,gas,gas,Gas tối đa người gửi cho phép (gas limit của giao dịch),approved,Người dùng duyệt 2026-11-01. [Claude nháp]
-base_fee,measure,block,blocks,base_fee_per_gas / 1e9,gwei,Phí cơ sở (base fee) của block,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
-priority_fee_cap,measure,transaction,transactions,max_priority_fee_per_gas / 1e9,gwei,Tip tối đa người gửi đặt (EIP-1559),approved,"Người dùng duyệt 2026-11-01. [Claude nháp] Là mức tối đa, không phải tip thực trả"
-tx_success,filter,transaction,transactions,receipt_status = 1,,Giao dịch thành công,approved,Người dùng duyệt 2026-11-01. [Claude nháp] Mặc định cho các câu hỏi về lượng ETH nhận/gửi
-tx_failed,filter,transaction,transactions,receipt_status = 0,,Giao dịch thất bại (revert),approved,Người dùng duyệt 2026-11-01. [Claude nháp]
-contract_creation,filter,transaction,transactions,to_address IS NULL,,Giao dịch tạo contract,approved,Người dùng duyệt 2026-11-01. [Claude nháp] Tương đương receipt_contract_address IS NOT NULL (44.504 giao dịch)
-tx_legacy,filter,transaction,transactions,transaction_type = 0,,Giao dịch kiểu cũ (legacy),approved,Người dùng duyệt 2026-11-01. [Claude nháp]
-tx_eip1559,filter,transaction,transactions,transaction_type = 2,,Giao dịch EIP-1559,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
-tx_blob,filter,transaction,transactions,transaction_type = 3,,Giao dịch blob (EIP-4844),approved,Người dùng duyệt 2026-11-01. [Claude nháp]
-tx_eip7702,filter,transaction,transactions,transaction_type = 4,,Giao dịch EIP-7702 (ủy quyền code cho ví),approved,Người dùng duyệt 2026-11-01. [Claude nháp]
-received_by,filter,address,transactions|token_transfers,to_address IN {E},,Được nhận bởi thực thể/địa chỉ,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
-sent_by,filter,address,transactions|token_transfers,from_address IN {E},,Được gửi bởi thực thể/địa chỉ,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
-involving,filter,address,transactions|token_transfers,(from_address IN {E} OR to_address IN {E}),,Có liên quan tới thực thể/địa chỉ (gửi hoặc nhận),approved,Người dùng duyệt 2026-11-01. [Claude nháp]
-contract_called,filter,contract,transactions,to_address IN {E},,Giao dịch gọi trực tiếp contract,approved,Người dùng duyệt 2026-11-01. [Claude nháp] Không gồm lời gọi gián tiếp qua contract khác (không có traces)
-of_token,filter,token,token_transfers,token_address IN {E},,Transfer của token,approved,"Người dùng duyệt 2026-11-01. [Claude nháp] {E} là địa chỉ token đã phân giải, không lọc bằng symbol"
-tx_count,aggregate,transaction,transactions,COUNT(*),giao dịch,Số giao dịch,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
-transfer_count,aggregate,token,token_transfers,COUNT(*),lượt,Số lượt chuyển token,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
-distinct_senders,aggregate,address,transactions|token_transfers,COUNT(DISTINCT from_address),địa chỉ,"Số địa chỉ gửi khác nhau (""người dùng"", ""ví hoạt động"")",approved,"Người dùng duyệt 2026-11-01. [Claude nháp] ""Người dùng"" được hiểu là địa chỉ gửi"
-distinct_receivers,aggregate,address,transactions|token_transfers,COUNT(DISTINCT to_address),địa chỉ,Số địa chỉ nhận khác nhau,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
-block_count,aggregate,block,blocks,COUNT(*),block,Số block,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
-block_size,measure,block,blocks,size,byte,Kích thước block,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
-block_gas_used,measure,block,blocks,gas_used,gas,Tổng gas dùng trong block,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
-block_tx_count,measure,block,blocks,transaction_count,giao dịch,Số giao dịch trong block,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
-block_producer,dimension,block,blocks,miner,,Địa chỉ nhận phí của block (fee recipient),approved,"Người dùng duyệt 2026-11-01. [Claude nháp] Sau The Merge, cột miner là fee recipient, không phải thợ đào"
-day,dimension,any,transactions|token_transfers,CAST(block_timestamp AS DATE),,Theo ngày (UTC),approved,Người dùng duyệt 2026-11-01. [Claude nháp] blocks dùng cột timestamp
-hour,dimension,any,transactions|token_transfers,"date_trunc('hour', block_timestamp)",,Theo giờ (UTC),approved,Người dùng duyệt 2026-11-01. [Claude nháp] blocks dùng cột timestamp
-balance,unsupported,address,,,,Số dư của ví,approved,Người dùng duyệt 2026-11-01. [Claude nháp] Không trả lời được: không có bảng balances và không cộng dồn được từ một tháng (docs/data-scope.md)
-usd_value,unsupported,any,,,,Giá trị quy ra USD,approved,Người dùng duyệt 2026-11-01. [Claude nháp] Không trả lời được: không có dữ liệu giá
-internal_eth,unsupported,contract,,,,ETH chuyển qua internal call,approved,Người dùng duyệt 2026-11-01. [Claude nháp] Không trả lời được: không có bảng traces
+sense_id,kind,applies_to,table_name,expression,unit,evidence_hint,description_vi,status,note
+eth_amount,measure,eth,transactions,value / 1e18,ETH,,Lượng ETH chuyển trong giao dịch (chỉ ETH của lời gọi ngoài cùng),approved,Người dùng duyệt 2026-11-01. [Claude nháp] Không gồm ETH chuyển qua internal call (không có bảng traces)
+token_amount,measure,token,token_transfers,"CAST(value AS DECIMAL(38,0)) / 1e{decimals}",đơn vị token,per transfer; SUM it for a total,"Lượng token chuyển, đã chia cho decimals",approved,"Người dùng duyệt 2026-11-01. [Claude nháp] 351 token có giá trị > 38 chữ số (chủ yếu NFT/token rác): biểu thức báo lỗi, template phải loại các token này [Claude] evidence_hint thêm 2026-11-03 theo lỗi dev (proposed-method.md §8); người dùng duyệt câu chữ 2026-11-04"
+nft_transfer_count,aggregate,nft,token_transfers,COUNT(*),lượt,,"Số lượt chuyển NFT (value là token id, không cộng được)",approved,Người dùng duyệt 2026-11-01. [Claude nháp] Token NFT: tokens.token_standard = 'ERC721' OR tokens.is_erc721 (hai cờ không nhất quán)
+tx_fee,measure,transaction,transactions,"CAST(receipt_gas_used AS DECIMAL(38,0)) * receipt_effective_gas_price / 1e18",ETH,,Phí giao dịch thực trả (gas dùng × giá gas thực),approved,Người dùng duyệt 2026-11-01. [Claude nháp] Phải ép DECIMAL trước khi nhân: tích vượt BIGINT trên dữ liệu thật
+blob_fee,measure,transaction,transactions,"CAST(receipt_blob_gas_used AS DECIMAL(38,0)) * receipt_blob_gas_price / 1e18",ETH,,Phí blob của giao dịch loại 3,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+gas_price_paid,measure,transaction,transactions,receipt_effective_gas_price / 1e9,gwei,,Giá gas thực trả cho mỗi đơn vị gas,approved,"Người dùng duyệt 2026-11-01. [Claude nháp] Không dùng gas_price: với giao dịch EIP-1559 đó là giá tối đa, không phải giá trả"
+gas_used,measure,transaction,transactions,receipt_gas_used,gas,,Lượng gas giao dịch đã tiêu thụ,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+gas_limit_tx,measure,transaction,transactions,gas,gas,,Gas tối đa người gửi cho phép (gas limit của giao dịch),approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+base_fee,measure,block,blocks,base_fee_per_gas / 1e9,gwei,,Phí cơ sở (base fee) của block,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+priority_fee_cap,measure,transaction,transactions,max_priority_fee_per_gas / 1e9,gwei,,Tip tối đa người gửi đặt (EIP-1559),approved,"Người dùng duyệt 2026-11-01. [Claude nháp] Là mức tối đa, không phải tip thực trả"
+tx_success,filter,transaction,transactions,receipt_status = 1,,,Giao dịch thành công,approved,Người dùng duyệt 2026-11-01. [Claude nháp] Mặc định cho các câu hỏi về lượng ETH nhận/gửi
+tx_failed,filter,transaction,transactions,receipt_status = 0,,,Giao dịch thất bại (revert),approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+contract_creation,filter,transaction,transactions,to_address IS NULL,,,Giao dịch tạo contract,approved,Người dùng duyệt 2026-11-01. [Claude nháp] Tương đương receipt_contract_address IS NOT NULL (44.504 giao dịch)
+tx_legacy,filter,transaction,transactions,transaction_type = 0,,,Giao dịch kiểu cũ (legacy),approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+tx_eip1559,filter,transaction,transactions,transaction_type = 2,,,Giao dịch EIP-1559,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+tx_blob,filter,transaction,transactions,transaction_type = 3,,,Giao dịch blob (EIP-4844),approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+tx_eip7702,filter,transaction,transactions,transaction_type = 4,,,Giao dịch EIP-7702 (ủy quyền code cho ví),approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+received_by,filter,address,transactions|token_transfers,to_address IN {E},,,Được nhận bởi thực thể/địa chỉ,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+sent_by,filter,address,transactions|token_transfers,from_address IN {E},,,Được gửi bởi thực thể/địa chỉ,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+involving,filter,address,transactions|token_transfers,(from_address IN {E} OR to_address IN {E}),,,Có liên quan tới thực thể/địa chỉ (gửi hoặc nhận),approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+contract_called,filter,contract,transactions,to_address IN {E},,from_address is the caller; list or count callers by from_address,Giao dịch gọi trực tiếp contract,approved,"Người dùng duyệt 2026-11-01. [Claude nháp] Không gồm lời gọi gián tiếp qua contract khác (không có traces) [Claude] evidence_hint thêm 2026-11-03 theo lỗi dev (proposed-method.md §8); người dùng duyệt câu chữ 2026-11-04"
+of_token,filter,token,token_transfers,token_address IN {E},,,Transfer của token,approved,"Người dùng duyệt 2026-11-01. [Claude nháp] {E} là địa chỉ token đã phân giải, không lọc bằng symbol"
+tx_count,aggregate,transaction,transactions,COUNT(*),giao dịch,,Số giao dịch,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+transfer_count,aggregate,token,token_transfers,COUNT(*),lượt,,Số lượt chuyển token,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+distinct_senders,aggregate,address,transactions|token_transfers,COUNT(DISTINCT from_address),địa chỉ,,"Số địa chỉ gửi khác nhau (""người dùng"", ""ví hoạt động"")",approved,"Người dùng duyệt 2026-11-01. [Claude nháp] ""Người dùng"" được hiểu là địa chỉ gửi"
+distinct_receivers,aggregate,address,transactions|token_transfers,COUNT(DISTINCT to_address),địa chỉ,,Số địa chỉ nhận khác nhau,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+block_count,aggregate,block,blocks,COUNT(*),block,,Số block,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+block_size,measure,block,blocks,size,byte,,Kích thước block,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+block_gas_used,measure,block,blocks,gas_used,gas,,Tổng gas dùng trong block,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+block_tx_count,measure,block,blocks,transaction_count,giao dịch,,Số giao dịch trong block,approved,Người dùng duyệt 2026-11-01. [Claude nháp]
+block_producer,dimension,block,blocks,miner,,,Địa chỉ nhận phí của block (fee recipient),approved,"Người dùng duyệt 2026-11-01. [Claude nháp] Sau The Merge, cột miner là fee recipient, không phải thợ đào"
+day,dimension,any,transactions|token_transfers,CAST(block_timestamp AS DATE),,,Theo ngày (UTC),approved,Người dùng duyệt 2026-11-01. [Claude nháp] blocks dùng cột timestamp
+hour,dimension,any,transactions|token_transfers,"date_trunc('hour', block_timestamp)",,,Theo giờ (UTC),approved,Người dùng duyệt 2026-11-01. [Claude nháp] blocks dùng cột timestamp
+balance,unsupported,address,,,,,Số dư của ví,approved,Người dùng duyệt 2026-11-01. [Claude nháp] Không trả lời được: không có bảng balances và không cộng dồn được từ một tháng (docs/data-scope.md)
+usd_value,unsupported,any,,,,,Giá trị quy ra USD,approved,Người dùng duyệt 2026-11-01. [Claude nháp] Không trả lời được: không có dữ liệu giá
+internal_eth,unsupported,contract,,,,,ETH chuyển qua internal call,approved,Người dùng duyệt 2026-11-01. [Claude nháp] Không trả lời được: không có bảng traces

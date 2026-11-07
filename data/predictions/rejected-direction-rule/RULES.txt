@@ -1,0 +1,3 @@
+v2-long: "- from_address is the sender or caller, to_address the receiver or the contract called: the addresses that called or sent to X are the from_address of rows whose to_address is X."
+v3-short: "- from_address is the sender or caller; to_address is the receiver or the contract called."
+Both rules sat after the symbol/name rule of SYSTEM_PROMPT; rejected 2026-11-03 (proposed-method.md section 8). Their prompt files were not kept: prompts_sha256 in each meta.

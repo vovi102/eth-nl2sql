@@ -10,8 +10,10 @@ from eth_nl2sql.benchmark_validate import (
     check_record,
     check_sql,
     informative,
+    reversed_tie_break,
     run_sql,
     substitute_placeholders,
+    wrong_variants,
 )
 
 SENSES = {
@@ -145,3 +147,33 @@ def test_run_sql_reports_errors_and_timeouts() -> None:
         run_sql(con, "SELECT * FROM missing_table", timeout=5)
     with pytest.raises(GoldQueryError, match="slower than"):
         run_sql(con, "SELECT sum(i * i) FROM range(100000000000) t(i)", timeout=0.2)
+
+
+def test_wrong_variants() -> None:
+    week = {"start": "2026-09-01T00:00:00", "end": "2026-09-08T00:00:00"}
+    variants = wrong_variants({"gold_sql": GOLD, "time": week})
+    assert variants["status"] == GOLD.replace(" AND receipt_status = 1", "")
+    assert "WHERE from_address IN {E1} AND receipt_status = 1" in variants["direction"]
+    assert variants["time"].endswith("WHERE to_address IN {E1} AND receipt_status = 1")
+    month = {"start": "2026-09-01T00:00:00", "end": "2026-10-01T00:00:00"}
+    assert "time" not in wrong_variants({"gold_sql": GOLD, "time": month})  # the same query
+    blocks = (
+        "SELECT miner, COUNT(*) AS n FROM blocks WHERE timestamp >= TIMESTAMP "
+        "'2026-09-30 00:00:00' AND timestamp < TIMESTAMP '2026-10-01 00:00:00' GROUP BY miner"
+    )
+    only_time = wrong_variants(
+        {"gold_sql": blocks, "time": {"start": "2026-09-30T00:00:00", "end": "2026-10-01T00:00:00"}}
+    )
+    assert only_time == {"time": "SELECT miner, COUNT(*) AS n FROM blocks GROUP BY miner"}
+    literal = "SELECT COUNT(*) FROM transactions WHERE from_address = '0xab'"
+    assert wrong_variants({"gold_sql": literal, "time": None}) == {
+        "direction": "SELECT COUNT(*) FROM transactions WHERE to_address = '0xab'"
+    }
+
+
+def test_reversed_tie_break() -> None:
+    top = "SELECT a, n FROM t ORDER BY n DESC NULLS LAST, a ASC NULLS LAST LIMIT 5"
+    # NULLS LAST is DuckDB's default, so SQLGlot leaves it out.
+    assert reversed_tie_break(top) == "SELECT a, n FROM t ORDER BY n DESC, a DESC LIMIT 5"
+    assert reversed_tie_break("SELECT a, n FROM t ORDER BY n DESC, a") is None  # every row
+    assert reversed_tie_break("SELECT a FROM t ORDER BY a LIMIT 1") is None  # no tie-break

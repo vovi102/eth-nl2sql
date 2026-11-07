@@ -1,0 +1,12 @@
+{
+  "n_ctx": 8192,
+  "files": {
+    "data/train/sft.jsonl": {
+      "prompts": 1968,
+      "min": 4277,
+      "median": 4462.0,
+      "max": 4624,
+      "over_context": 0
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{"question_id": "q00001", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00018", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00036", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00054", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00071", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00089", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "q00107", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00124", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00142", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "q00160", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}

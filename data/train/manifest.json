@@ -1,0 +1,1062 @@
+{
+ "created": "2026-11-05",
+ "seed": 20261104,
+ "count_scale": 1.0,
+ "timeout": 10.0,
+ "memory_limit": "4GB",
+ "val_share": 0.05,
+ "knowledge_base_version": "851c5d93508956c48a539df8c91fe5ee593c2092db640e65eacf9785b3b0cebc",
+ "knowledge_base_files": {
+  "data/entity_knowledge_base/entities.csv": "5e478abf412926164c80ce5a3ce3b1be4c7f44e29a050a7d6ddaf2ce1029e526",
+  "data/entity_knowledge_base/entity_addresses.csv": "60038c74be60a7ff7113b891c1791095f17f4a51a297a1d5fa7fdd02898ff91a",
+  "data/entity_knowledge_base/entity_aliases.csv": "f27579fc7ca7200e200bfe7dc71d8cbccac7e450a613fee1f826458c56dcacb4",
+  "data/entity_knowledge_base/entity_classes.csv": "f9cf799365ecbda77f51e96b5dddff021a8bfba1faee96c75c29fe21b301301e",
+  "data/schema/property_phrases.csv": "84eb8c8c874ab23846ca1a9d905cce59ed22c7a82b069ede01141621fabb9fa3",
+  "data/schema/property_senses.csv": "a4cbea1cd16df35226671bcbfa3228fdd388761b5d07c09d3cb443a826908f93"
+ },
+ "benchmark_manifest_sha256": "d45232a74334015d3655b0c99f4f94a8a009200587b386f7ba6db4ba3d074c91",
+ "catalog_sha256": "7e50ca907daf99c1e8c0ba24b6b7682c11d83226a3bf68e0ac73971abefadf77",
+ "holdout_entities": [
+  "ambient-finance",
+  "axelar",
+  "beacon-deposit-contract",
+  "celer-network",
+  "chainlink",
+  "convex-finance",
+  "debridge",
+  "ether-fi",
+  "gearbox-protocol",
+  "livepeer",
+  "odos",
+  "openocean",
+  "opensea",
+  "optimism",
+  "paxos-gold",
+  "ring-protocol",
+  "shiba-inu",
+  "stargate",
+  "wormhole",
+  "yearn"
+ ],
+ "holdout": {
+  "candidates": [
+   "ambient-finance",
+   "axelar",
+   "bancor",
+   "beacon-deposit-contract",
+   "celer-network",
+   "chainlink",
+   "convex-finance",
+   "debridge",
+   "eigenlayer",
+   "ens",
+   "ethena",
+   "ether-fi",
+   "frax-finance",
+   "gearbox-protocol",
+   "jaredfromsubway",
+   "lido",
+   "livepeer",
+   "mantle",
+   "maverick-v2",
+   "metis-andromeda",
+   "odos",
+   "ondo-finance",
+   "openocean",
+   "opensea",
+   "optimism",
+   "paxos-gold",
+   "pendle",
+   "privacy-pools",
+   "quasarbuilder",
+   "ring-protocol",
+   "rizzolver",
+   "shiba-inu",
+   "stargate",
+   "taiko",
+   "tokenlon",
+   "tornado-cash",
+   "usdt0",
+   "wormhole",
+   "wrapped-btc",
+   "yearn",
+   "zksync-era"
+  ],
+  "names": [
+   "ambient",
+   "ambient finance",
+   "axelar",
+   "beacon chain deposit contract",
+   "beacon deposit contract",
+   "cbridge",
+   "celer",
+   "celer network",
+   "chainlink",
+   "convex",
+   "convex finance",
+   "debridge",
+   "debridge finance",
+   "debridgegate",
+   "dln",
+   "eth2 deposit contract",
+   "ether fi",
+   "etherfi",
+   "gearbox",
+   "gearbox protocol",
+   "hop dong nap staking eth",
+   "livepeer",
+   "odos",
+   "op mainnet",
+   "openocean",
+   "opensea",
+   "optimism",
+   "pax gold",
+   "paxos gold",
+   "ring protocol",
+   "shiba",
+   "shiba inu",
+   "shibaswap",
+   "stargate",
+   "stargate finance",
+   "wormhole",
+   "wormhole portal",
+   "yearn",
+   "yearn finance",
+   "ygov finance"
+  ],
+  "removed": {
+   "entities": [
+    "ambient-finance",
+    "axelar",
+    "beacon-deposit-contract",
+    "celer-network",
+    "chainlink",
+    "convex-finance",
+    "debridge",
+    "ether-fi",
+    "gearbox-protocol",
+    "livepeer",
+    "odos",
+    "openocean",
+    "opensea",
+    "optimism",
+    "paxos-gold",
+    "ring-protocol",
+    "shiba-inu",
+    "stargate",
+    "wormhole",
+    "yearn"
+   ],
+   "addresses": [
+    "0x0000000000c2d145a2526bd8c716263bfebe1a72",
+    "0x03f7724180aa6b939894b5ca4314783b0b36b329",
+    "0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e",
+    "0x0ec68c5b10f21effb74f2a5c61dfe6b08c0db6cb",
+    "0x2102c32a09cbced4146c3db2d27ae21a185bda43",
+    "0x26ff577818a40d1333944b7492e23619303f5d84",
+    "0x27428dd2d3dd32a4d7f7c497eaaa23130d894911",
+    "0x27c70cd1946795b66be9d954418546998b546634",
+    "0x3e368b6c95c6fefb7a16dcc0d756389f3c658a06",
+    "0x3ee18b2214aff97000d974cf647e7c347e8fa585",
+    "0x3f29cb4111cbda8081642da1f75b3c12decf2516",
+    "0x418d75f65a02b3d53b2418fb8e1fe493759c7605",
+    "0x45804880de22913dafe09f4980848ece6ecbaf78",
+    "0x473300df21d047806a082244b417f96b32f13a33",
+    "0x495f947276749ce646f68ac8c248420045cb7b5e",
+    "0x4de413a26fc24c3fc27cc983be70aa9c5c299387",
+    "0x4e3fbd56cd56c3e72c1403e103b45db9da5b9d2b",
+    "0x4f9254c83eb525f9fcf346490bbb3ed28a81c667",
+    "0x514910771af9ca656af840dff83e8264ecf986ca",
+    "0x51a3c407f130163b28b762513864e596a1de1bd9",
+    "0x52b35406cb2fb5e0038edecfc129a152a1f74087",
+    "0x5427fefa711eff984124bfbb1ab6fbf5e3da1820",
+    "0x58b6a8a3302369daec383334672404ee733ab239",
+    "0x5d66c1782664115999c47c9fa5cd031f495d3e4f",
+    "0x6352a56caadc4f1e25cd6c75970fa768a3304e64",
+    "0x657e8c867d8b37dcc18fa4caead9c45eb088c642",
+    "0x663dc15d3c1ac63ff12e45ab68fea3f0a883c251",
+    "0x66598216d8e4d9afe0f06d525b335b762229842f",
+    "0x6887246668a3b87f54deb3b94ba47a6f63f32985",
+    "0x6d6620efa72948c5f68a3c8646d58c00d3f4a980",
+    "0x72a19342e8f1838460ebfccef09f6585e32db86e",
+    "0x77b2043768d28e9c9ab44e1abfc95944bce57931",
+    "0x80226fc0ee2b096224eeac085bb9a8cba1146f7d",
+    "0x85f138bfee4ef8e540890cfb48f620571d67eda3",
+    "0x86b5780b606940eb59a062aa85a07959518c0161",
+    "0x8dbee8f3917049bc30fef01924a7ac79d16cf2b9",
+    "0x933597a323eb81cae705c5bc29985172fd5a3973",
+    "0x95ad61b0a150d79219dcf64e1e6cc01f0b64c4ce",
+    "0x99c9fc46f92e8a1c0dec1b1747d010903e884be1",
+    "0xaa0c3f5f7dfd688c6e646f66cd2a6b66acdbe434",
+    "0xaf5191b0de278c7286d6c7cc6ab6bb8a73ba2cd6",
+    "0xb28837949e7a3f1ac862036e8a0ae392c9ff9bb4",
+    "0xb4a81261b16b92af0b9f7c4a83f1e885132d81e4",
+    "0xba3335588d9403515223f109edc4eb7269a9ab5d",
+    "0xbc10f2e862ed4502144c7d632a3459f49dfcdb5e",
+    "0xbd31ea8212119f94a611fa969881cba3ea06fa3d",
+    "0xbe53a109b494e5c9f97b9cd39fe969be68bf6204",
+    "0xbeb5fc579115071764c7423a4f12edde41f106ed",
+    "0xc026395860db2d07ee33e05fe50ed7bd583189c7",
+    "0xc77820eef59629fc8d88154977bc8de8a1b2f4ae",
+    "0xcf50b810e57ac33b91dcf525c6ddd9881b139332",
+    "0xcfc6d9bd7411962bfe7145451a7ef71a24b6a7a2",
+    "0xd31a59c85ae9d8edefec411d448f90841571b89c",
+    "0xe171afcd1e0394b3312e68ca823d5bc87f3db311",
+    "0xe7351fd770a37282b91d153ee690b63579d6dd7f",
+    "0xf403c135812408bfbe8713b5a23a04b3d48aae31",
+    "0xfe0c30065b384f05761f15d0cc899d4f9f9cc0eb"
+   ],
+   "tokens": [
+    "0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e",
+    "0x45804880de22913dafe09f4980848ece6ecbaf78",
+    "0x4e3fbd56cd56c3e72c1403e103b45db9da5b9d2b",
+    "0x514910771af9ca656af840dff83e8264ecf986ca",
+    "0x58b6a8a3302369daec383334672404ee733ab239",
+    "0x95ad61b0a150d79219dcf64e1e6cc01f0b64c4ce",
+    "0x9813037ee2218799597d83d4a5b6f3b6778218d9",
+    "0xf280b16ef293d8e534e370794ef26bf312694126",
+    "0xfe0c30065b384f05761f15d0cc899d4f9f9cc0eb"
+   ]
+  }
+ },
+ "leakage": {
+  "violations": 0,
+  "near": {
+   "entity_avg_gas_price": [],
+   "entity_gas_used": [],
+   "entity_avg_gas_limit": [],
+   "entity_token_sends_count": [],
+   "entity_involving_tx_count": [],
+   "entity_token_recipients": [],
+   "entity_top_tokens_received": [],
+   "address_daily_eth_received": [
+    "dev:ambiguous_value_received:dimension",
+    "dev:class_eth_received:dimension",
+    "test:address_eth_received:dimension",
+    "test:ambiguous_volume:dimension",
+    "test:entity_eth_received:dimension",
+    "test:literal_eth_received:dimension"
+   ],
+   "address_fees_spent": [
+    "dev:entity_fees_paid:direction"
+   ],
+   "address_token_sent": [
+    "dev:address_token_received:direction",
+    "dev:ambiguous_value_received:direction",
+    "dev:class_token_received:direction",
+    "test:entity_token_received:direction"
+   ],
+   "address_failed_send_fees": [],
+   "token_daily_amount": [
+    "test:ambiguous_volume:dimension",
+    "test:token_amount_total:dimension"
+   ],
+   "token_transfers_to_address": [],
+   "token_involving_transfers": [],
+   "token_daily_receivers": [],
+   "token_distinct_receivers": [
+    "dev:token_distinct_senders:direction",
+    "test:ambiguous_users:direction"
+   ],
+   "class_daily_callers": [
+    "dev:entity_distinct_callers:dimension",
+    "test:class_distinct_callers:dimension"
+   ],
+   "class_avg_gas_price": [],
+   "class_token_recipients": [],
+   "class_gas_used": [],
+   "ambiguous_daily_volume": [
+    "dev:ambiguous_value_received:dimension",
+    "dev:class_eth_received:dimension",
+    "test:address_eth_received:dimension",
+    "test:ambiguous_volume:dimension",
+    "test:entity_eth_received:dimension",
+    "test:literal_eth_received:dimension",
+    "test:token_amount_total:dimension"
+   ],
+   "ambiguous_hourly_times": [
+    "dev:token_daily_transfers:grain",
+    "test:ambiguous_times:dimension",
+    "test:class_call_count:dimension",
+    "test:entity_call_count:dimension",
+    "test:entity_daily_calls:grain",
+    "test:token_transfer_count:dimension"
+   ],
+   "ambiguous_value_sent": [
+    "dev:address_eth_sent:mention",
+    "dev:address_token_received:direction",
+    "dev:ambiguous_value_received:direction",
+    "dev:class_eth_received:direction",
+    "dev:class_token_received:direction",
+    "test:address_eth_received:direction",
+    "test:ambiguous_volume:direction",
+    "test:entity_eth_received:direction",
+    "test:entity_token_received:direction",
+    "test:literal_eth_received:direction"
+   ],
+   "ambiguous_daily_users": [
+    "dev:token_distinct_senders:dimension",
+    "test:ambiguous_users:dimension"
+   ],
+   "hourly_tx_count": [],
+   "eip1559_avg_priority_fee": [],
+   "literal_fees_spent": [
+    "dev:entity_fees_paid:direction"
+   ],
+   "avg_base_fee": [],
+   "top_blocks_by_tx_count": [],
+   "total_blob_fee": []
+  },
+  "similar_wording": {
+   "entity_avg_gas_price": [],
+   "entity_gas_used": [
+    "dev:entity_fees_paid:0.87"
+   ],
+   "entity_avg_gas_limit": [],
+   "entity_token_sends_count": [],
+   "entity_involving_tx_count": [],
+   "entity_token_recipients": [],
+   "entity_top_tokens_received": [],
+   "address_daily_eth_received": [],
+   "address_fees_spent": [],
+   "address_token_sent": [
+    "dev:address_eth_sent:0.91"
+   ],
+   "address_failed_send_fees": [],
+   "token_daily_amount": [],
+   "token_transfers_to_address": [],
+   "token_involving_transfers": [],
+   "token_daily_receivers": [],
+   "token_distinct_receivers": [],
+   "class_daily_callers": [
+    "dev:entity_distinct_callers:0.83"
+   ],
+   "class_avg_gas_price": [],
+   "class_token_recipients": [],
+   "class_gas_used": [
+    "dev:entity_fees_paid:0.87"
+   ],
+   "ambiguous_daily_volume": [],
+   "ambiguous_hourly_times": [],
+   "ambiguous_value_sent": [],
+   "ambiguous_daily_users": [],
+   "hourly_tx_count": [],
+   "eip1559_avg_priority_fee": [],
+   "literal_fees_spent": [],
+   "avg_base_fee": [],
+   "top_blocks_by_tx_count": [],
+   "total_blob_fee": []
+  },
+  "held_out": {
+   "address_eth_received": {
+    "split": "test",
+    "near": [
+     "address_daily_eth_received:dimension",
+     "ambiguous_daily_volume:dimension",
+     "ambiguous_value_sent:direction"
+    ],
+    "questions": 13
+   },
+   "address_eth_sent": {
+    "split": "dev",
+    "near": [
+     "ambiguous_value_sent:mention"
+    ],
+    "questions": 13
+   },
+   "address_largest_eth_sent": {
+    "split": "test",
+    "near": [],
+    "questions": 13
+   },
+   "address_token_received": {
+    "split": "dev",
+    "near": [
+     "address_token_sent:direction",
+     "ambiguous_value_sent:direction"
+    ],
+    "questions": 13
+   },
+   "address_tx_sent_count": {
+    "split": "test",
+    "near": [],
+    "questions": 13
+   },
+   "ambiguous_times": {
+    "split": "test",
+    "near": [
+     "ambiguous_hourly_times:dimension"
+    ],
+    "questions": 15
+   },
+   "ambiguous_users": {
+    "split": "test",
+    "near": [
+     "ambiguous_daily_users:dimension",
+     "token_distinct_receivers:direction"
+    ],
+    "questions": 15
+   },
+   "ambiguous_value_received": {
+    "split": "dev",
+    "near": [
+     "address_daily_eth_received:dimension",
+     "address_token_sent:direction",
+     "ambiguous_daily_volume:dimension",
+     "ambiguous_value_sent:direction"
+    ],
+    "questions": 15
+   },
+   "ambiguous_volume": {
+    "split": "test",
+    "near": [
+     "address_daily_eth_received:dimension",
+     "ambiguous_daily_volume:dimension",
+     "ambiguous_value_sent:direction",
+     "token_daily_amount:dimension"
+    ],
+    "questions": 15
+   },
+   "blob_tx_count": {
+    "split": "test",
+    "near": [],
+    "questions": 12
+   },
+   "class_call_count": {
+    "split": "test",
+    "near": [
+     "ambiguous_hourly_times:dimension"
+    ],
+    "questions": 14
+   },
+   "class_distinct_callers": {
+    "split": "test",
+    "near": [
+     "class_daily_callers:dimension"
+    ],
+    "questions": 14
+   },
+   "class_eth_received": {
+    "split": "dev",
+    "near": [
+     "address_daily_eth_received:dimension",
+     "ambiguous_daily_volume:dimension",
+     "ambiguous_value_sent:direction"
+    ],
+    "questions": 14
+   },
+   "class_token_received": {
+    "split": "dev",
+    "near": [
+     "address_token_sent:direction",
+     "ambiguous_value_sent:direction"
+    ],
+    "questions": 14
+   },
+   "class_top_contracts": {
+    "split": "test",
+    "near": [],
+    "questions": 14
+   },
+   "contract_creation_count": {
+    "split": "test",
+    "near": [],
+    "questions": 12
+   },
+   "daily_avg_gas_price": {
+    "split": "test",
+    "near": [],
+    "questions": 12
+   },
+   "entity_call_count": {
+    "split": "test",
+    "near": [
+     "ambiguous_hourly_times:dimension"
+    ],
+    "questions": 14
+   },
+   "entity_daily_calls": {
+    "split": "test",
+    "near": [
+     "ambiguous_hourly_times:grain"
+    ],
+    "questions": 14
+   },
+   "entity_distinct_callers": {
+    "split": "dev",
+    "near": [
+     "class_daily_callers:dimension"
+    ],
+    "questions": 14
+   },
+   "entity_eth_received": {
+    "split": "test",
+    "near": [
+     "address_daily_eth_received:dimension",
+     "ambiguous_daily_volume:dimension",
+     "ambiguous_value_sent:direction"
+    ],
+    "questions": 14
+   },
+   "entity_failed_calls": {
+    "split": "test",
+    "near": [],
+    "questions": 14
+   },
+   "entity_fees_paid": {
+    "split": "dev",
+    "near": [
+     "address_fees_spent:direction",
+     "literal_fees_spent:direction"
+    ],
+    "questions": 14
+   },
+   "entity_token_received": {
+    "split": "test",
+    "near": [
+     "address_token_sent:direction",
+     "ambiguous_value_sent:direction"
+    ],
+    "questions": 14
+   },
+   "entity_top_callers": {
+    "split": "dev",
+    "near": [],
+    "questions": 14
+   },
+   "literal_eth_received": {
+    "split": "test",
+    "near": [
+     "address_daily_eth_received:dimension",
+     "ambiguous_daily_volume:dimension",
+     "ambiguous_value_sent:direction"
+    ],
+    "questions": 12
+   },
+   "literal_tx_sent_count": {
+    "split": "dev",
+    "near": [],
+    "questions": 12
+   },
+   "token_amount_total": {
+    "split": "test",
+    "near": [
+     "ambiguous_daily_volume:dimension",
+     "token_daily_amount:dimension"
+    ],
+    "questions": 13
+   },
+   "token_daily_transfers": {
+    "split": "dev",
+    "near": [
+     "ambiguous_hourly_times:grain"
+    ],
+    "questions": 13
+   },
+   "token_distinct_senders": {
+    "split": "dev",
+    "near": [
+     "ambiguous_daily_users:dimension",
+     "token_distinct_receivers:direction"
+    ],
+    "questions": 13
+   },
+   "token_largest_transfer": {
+    "split": "test",
+    "near": [],
+    "questions": 13
+   },
+   "token_top_receivers": {
+    "split": "test",
+    "near": [],
+    "questions": 13
+   },
+   "token_transfer_count": {
+    "split": "test",
+    "near": [
+     "ambiguous_hourly_times:dimension"
+    ],
+    "questions": 13
+   },
+   "top_block_producers": {
+    "split": "dev",
+    "near": [],
+    "questions": 12
+   }
+  }
+ },
+ "totals": {
+  "target": 2000,
+  "generated": 2000,
+  "kept": 1968,
+  "val": 98,
+  "senses_mismatch": 0
+ },
+ "by_lang": {
+  "train/vi": 932,
+  "train/en": 938,
+  "val/vi": 49,
+  "val/en": 49
+ },
+ "by_group": {
+  "entity": 467,
+  "address": 275,
+  "token": 338,
+  "class": 300,
+  "ambiguous": 248,
+  "plain": 340
+ },
+ "dropped": {
+  "placeholders differ": 21,
+  "decision nil": 11
+ },
+ "known_losses": {
+  "entity read as token": 20
+ },
+ "example_chars": {
+  "min": 10757,
+  "median": 11270.5,
+  "max": 11527
+ },
+ "templates": {
+  "entity_avg_gas_price": {
+   "group": "entity",
+   "target": 70,
+   "generated": 70,
+   "rejected": {},
+   "dropped": {},
+   "known_losses": {},
+   "kept": 70,
+   "val": 4,
+   "senses_mismatch": 0
+  },
+  "entity_gas_used": {
+   "group": "entity",
+   "target": 70,
+   "generated": 70,
+   "rejected": {
+    "duplicate question": 1
+   },
+   "dropped": {},
+   "known_losses": {},
+   "kept": 70,
+   "val": 4,
+   "senses_mismatch": 0
+  },
+  "entity_avg_gas_limit": {
+   "group": "entity",
+   "target": 68,
+   "generated": 68,
+   "rejected": {
+    "duplicate question": 1
+   },
+   "dropped": {},
+   "known_losses": {},
+   "kept": 68,
+   "val": 3,
+   "senses_mismatch": 0
+  },
+  "entity_token_sends_count": {
+   "group": "entity",
+   "target": 68,
+   "generated": 68,
+   "rejected": {
+    "empty result": 25,
+    "duplicate question": 1,
+    "no token sent by this target": 7
+   },
+   "dropped": {
+    "placeholders differ": 3
+   },
+   "known_losses": {
+    "entity read as token": 3
+   },
+   "kept": 65,
+   "val": 3,
+   "senses_mismatch": 0
+  },
+  "entity_involving_tx_count": {
+   "group": "entity",
+   "target": 68,
+   "generated": 68,
+   "rejected": {},
+   "dropped": {},
+   "known_losses": {},
+   "kept": 68,
+   "val": 3,
+   "senses_mismatch": 0
+  },
+  "entity_token_recipients": {
+   "group": "entity",
+   "target": 68,
+   "generated": 68,
+   "rejected": {
+    "empty result": 15,
+    "no token sent by this target": 10
+   },
+   "dropped": {
+    "decision nil": 2
+   },
+   "known_losses": {},
+   "kept": 66,
+   "val": 3,
+   "senses_mismatch": 0
+  },
+  "entity_top_tokens_received": {
+   "group": "entity",
+   "target": 68,
+   "generated": 68,
+   "rejected": {
+    "empty result": 9,
+    "duplicate question": 1
+   },
+   "dropped": {
+    "placeholders differ": 8
+   },
+   "known_losses": {
+    "entity read as token": 8
+   },
+   "kept": 60,
+   "val": 3,
+   "senses_mismatch": 0
+  },
+  "address_daily_eth_received": {
+   "group": "address",
+   "target": 70,
+   "generated": 70,
+   "rejected": {
+    "empty result": 8
+   },
+   "dropped": {
+    "decision nil": 4
+   },
+   "known_losses": {},
+   "kept": 66,
+   "val": 3,
+   "senses_mismatch": 0
+  },
+  "address_fees_spent": {
+   "group": "address",
+   "target": 70,
+   "generated": 70,
+   "rejected": {
+    "duplicate question": 2,
+    "empty result": 4
+   },
+   "dropped": {},
+   "known_losses": {},
+   "kept": 70,
+   "val": 4,
+   "senses_mismatch": 0
+  },
+  "address_token_sent": {
+   "group": "address",
+   "target": 70,
+   "generated": 70,
+   "rejected": {
+    "empty result": 13,
+    "no token sent by this target": 100
+   },
+   "dropped": {
+    "placeholders differ": 1
+   },
+   "known_losses": {
+    "entity read as token": 1
+   },
+   "kept": 69,
+   "val": 3,
+   "senses_mismatch": 0
+  },
+  "address_failed_send_fees": {
+   "group": "address",
+   "target": 70,
+   "generated": 70,
+   "rejected": {
+    "empty result": 244,
+    "duplicate question": 2
+   },
+   "dropped": {},
+   "known_losses": {},
+   "kept": 70,
+   "val": 4,
+   "senses_mismatch": 0
+  },
+  "token_daily_amount": {
+   "group": "token",
+   "target": 68,
+   "generated": 68,
+   "rejected": {
+    "empty result": 1
+   },
+   "dropped": {},
+   "known_losses": {},
+   "kept": 68,
+   "val": 3,
+   "senses_mismatch": 0
+  },
+  "token_transfers_to_address": {
+   "group": "token",
+   "target": 68,
+   "generated": 68,
+   "rejected": {
+    "no token received by this target": 101,
+    "empty result": 22
+   },
+   "dropped": {
+    "decision nil": 1
+   },
+   "known_losses": {},
+   "kept": 67,
+   "val": 3,
+   "senses_mismatch": 0
+  },
+  "token_involving_transfers": {
+   "group": "token",
+   "target": 68,
+   "generated": 68,
+   "rejected": {
+    "no token received by this target": 94,
+    "empty result": 18
+   },
+   "dropped": {},
+   "known_losses": {},
+   "kept": 68,
+   "val": 3,
+   "senses_mismatch": 0
+  },
+  "token_daily_receivers": {
+   "group": "token",
+   "target": 68,
+   "generated": 68,
+   "rejected": {
+    "duplicate question": 2
+   },
+   "dropped": {
+    "decision nil": 1
+   },
+   "known_losses": {},
+   "kept": 67,
+   "val": 3,
+   "senses_mismatch": 0
+  },
+  "token_distinct_receivers": {
+   "group": "token",
+   "target": 68,
+   "generated": 68,
+   "rejected": {
+    "empty result": 3
+   },
+   "dropped": {},
+   "known_losses": {},
+   "kept": 68,
+   "val": 3,
+   "senses_mismatch": 0
+  },
+  "class_daily_callers": {
+   "group": "class",
+   "target": 76,
+   "generated": 76,
+   "rejected": {
+    "duplicate question": 1
+   },
+   "dropped": {},
+   "known_losses": {},
+   "kept": 76,
+   "val": 4,
+   "senses_mismatch": 0
+  },
+  "class_avg_gas_price": {
+   "group": "class",
+   "target": 76,
+   "generated": 76,
+   "rejected": {
+    "duplicate question": 5
+   },
+   "dropped": {},
+   "known_losses": {},
+   "kept": 76,
+   "val": 4,
+   "senses_mismatch": 0
+  },
+  "class_token_recipients": {
+   "group": "class",
+   "target": 74,
+   "generated": 74,
+   "rejected": {
+    "empty result": 7
+   },
+   "dropped": {},
+   "known_losses": {},
+   "kept": 74,
+   "val": 4,
+   "senses_mismatch": 0
+  },
+  "class_gas_used": {
+   "group": "class",
+   "target": 74,
+   "generated": 74,
+   "rejected": {
+    "duplicate question": 7
+   },
+   "dropped": {},
+   "known_losses": {},
+   "kept": 74,
+   "val": 4,
+   "senses_mismatch": 0
+  },
+  "ambiguous_daily_volume": {
+   "group": "ambiguous",
+   "target": 66,
+   "generated": 66,
+   "rejected": {
+    "duplicate question": 1
+   },
+   "dropped": {
+    "placeholders differ": 3
+   },
+   "known_losses": {
+    "entity read as token": 3
+   },
+   "kept": 63,
+   "val": 3,
+   "senses_mismatch": 0
+  },
+  "ambiguous_hourly_times": {
+   "group": "ambiguous",
+   "target": 66,
+   "generated": 66,
+   "rejected": {},
+   "dropped": {
+    "placeholders differ": 5
+   },
+   "known_losses": {
+    "entity read as token": 5
+   },
+   "kept": 61,
+   "val": 3,
+   "senses_mismatch": 0
+  },
+  "ambiguous_value_sent": {
+   "group": "ambiguous",
+   "target": 64,
+   "generated": 64,
+   "rejected": {
+    "empty result": 15,
+    "no token sent by this target": 53
+   },
+   "dropped": {
+    "decision nil": 2
+   },
+   "known_losses": {},
+   "kept": 62,
+   "val": 3,
+   "senses_mismatch": 0
+  },
+  "ambiguous_daily_users": {
+   "group": "ambiguous",
+   "target": 64,
+   "generated": 64,
+   "rejected": {},
+   "dropped": {
+    "decision nil": 1,
+    "placeholders differ": 1
+   },
+   "known_losses": {},
+   "kept": 62,
+   "val": 3,
+   "senses_mismatch": 0
+  },
+  "hourly_tx_count": {
+   "group": "plain",
+   "target": 58,
+   "generated": 58,
+   "rejected": {
+    "duplicate question": 17
+   },
+   "dropped": {},
+   "known_losses": {},
+   "kept": 58,
+   "val": 3,
+   "senses_mismatch": 0
+  },
+  "eip1559_avg_priority_fee": {
+   "group": "plain",
+   "target": 58,
+   "generated": 58,
+   "rejected": {
+    "duplicate question": 58
+   },
+   "dropped": {},
+   "known_losses": {},
+   "kept": 58,
+   "val": 3,
+   "senses_mismatch": 0
+  },
+  "literal_fees_spent": {
+   "group": "plain",
+   "target": 56,
+   "generated": 56,
+   "rejected": {
+    "empty result": 1
+   },
+   "dropped": {},
+   "known_losses": {},
+   "kept": 56,
+   "val": 3,
+   "senses_mismatch": 0
+  },
+  "avg_base_fee": {
+   "group": "plain",
+   "target": 56,
+   "generated": 56,
+   "rejected": {
+    "duplicate question": 55
+   },
+   "dropped": {},
+   "known_losses": {},
+   "kept": 56,
+   "val": 3,
+   "senses_mismatch": 0
+  },
+  "top_blocks_by_tx_count": {
+   "group": "plain",
+   "target": 56,
+   "generated": 56,
+   "rejected": {
+    "duplicate question": 64
+   },
+   "dropped": {},
+   "known_losses": {},
+   "kept": 56,
+   "val": 3,
+   "senses_mismatch": 0
+  },
+  "total_blob_fee": {
+   "group": "plain",
+   "target": 56,
+   "generated": 56,
+   "rejected": {
+    "duplicate question": 25
+   },
+   "dropped": {},
+   "known_losses": {},
+   "kept": 56,
+   "val": 3,
+   "senses_mismatch": 0
+  }
+ },
+ "files": {
+  "train.jsonl": {
+   "sha256": "bf25c8ad2d1f4a115c0a4dba5666d45c822462eb0d5e08f03d0296c860d231bf",
+   "lines": 1968
+  },
+  "dropped.jsonl": {
+   "sha256": "d202818b6873b8a4c1537a3b580d4c6142418b35fe72c54872dd1483c4e1ca3f",
+   "lines": 32
+  },
+  "sft.jsonl": {
+   "sha256": "c9d2e3f3d7acf2dd3727b380eabbc740f6797b1236975b51519f25d06e512dcf",
+   "lines": 1968
+  }
+ }
+}

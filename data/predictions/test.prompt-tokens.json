@@ -1,0 +1,40 @@
+{
+  "n_ctx": 8192,
+  "files": {
+    "data/prompts/test.predictions.prompts.jsonl": {
+      "prompts": 291,
+      "min": 4243,
+      "median": 4351,
+      "max": 4461,
+      "over_context": 0
+    },
+    "data/prompts/test.predictions.prompts.linked-schema.jsonl": {
+      "prompts": 291,
+      "min": 873,
+      "median": 1443,
+      "max": 2054,
+      "over_context": 0
+    },
+    "data/prompts/test.predictions.prompts.no-evidence.jsonl": {
+      "prompts": 328,
+      "min": 4164,
+      "median": 4175.0,
+      "max": 4215,
+      "over_context": 0
+    },
+    "data/prompts/test.predictions.prompts.literal.jsonl": {
+      "prompts": 291,
+      "min": 4203,
+      "median": 4404,
+      "max": 364490,
+      "over_context": 67
+    },
+    "data/prompts/test.prompts.jsonl": {
+      "prompts": 296,
+      "min": 4251,
+      "median": 4352.0,
+      "max": 4461,
+      "over_context": 0
+    }
+  }
+}

@@ -3,6 +3,9 @@ data/db/
 *.duckdb
 *.parquet
 
+# Model weights (1-2 GB each): re-download the pinned revisions; README keeps their SHA256
+models/*.gguf
+
 # Python
 .venv/
 __pycache__/

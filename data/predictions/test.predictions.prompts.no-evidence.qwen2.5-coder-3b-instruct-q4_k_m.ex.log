@@ -1,0 +1,25 @@
+  overall                EX 0.015  (+extra columns 0.015)  5/328
+  answerable             EX 0.017  (+extra columns 0.017)  5/296
+  unanswerable           EX 0.000  (+extra columns 0.000)  0/32
+  kinds: {'wrong_result': 206, 'execution': 61, 'wrong_decision': 32, 'not_a_query': 18, 'parse': 5, 'correct': 5, 'timeout': 1}
+  by_lang:
+    en                     EX 0.031  (+extra columns 0.031)  5/159
+    vi                     EX 0.000  (+extra columns 0.000)  0/169
+  by_group:
+    address                EX 0.000  (+extra columns 0.000)  0/39
+    ambiguous              EX 0.000  (+extra columns 0.000)  0/45
+    class                  EX 0.000  (+extra columns 0.000)  0/42
+    entity                 EX 0.000  (+extra columns 0.000)  0/70
+    nil                    EX 0.000  (+extra columns 0.000)  0/16
+    plain                  EX 0.104  (+extra columns 0.104)  5/48
+    token                  EX 0.000  (+extra columns 0.000)  0/52
+    unsupported            EX 0.000  (+extra columns 0.000)  0/16
+  by_phenomenon:
+    alias                  EX 0.000  (+extra columns 0.000)  0/99
+    ambiguous_property     EX 0.000  (+extra columns 0.000)  0/45
+    class                  EX 0.000  (+extra columns 0.000)  0/42
+    multi_address          EX 0.000  (+extra columns 0.000)  0/90
+  discriminating:
+    direction              EX 0.000  (+extra columns 0.000)  0/185
+    status                 EX 0.000  (+extra columns 0.000)  0/72
+    time                   EX 0.021  (+extra columns 0.021)  4/195
