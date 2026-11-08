@@ -5,6 +5,12 @@ data/db/
 
 # Model weights (1-2 GB each): re-download the pinned revisions; README keeps their SHA256
 models/*.gguf
+# Tokenizer/config of the pinned HF revisions (re-download, see kaggle/phase2-train/), and the
+# phase-2 LoRA adapters (Kaggle output, SHA256 in docs/phase2-plan.md and the run's run.json)
+models/hf/
+models/lora/
+# Folders pushed to Kaggle, rebuilt by train_lora.py prepare / prepare-dataset
+kaggle/phase2-train/build/
 
 # Python
 .venv/

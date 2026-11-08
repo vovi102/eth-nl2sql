@@ -1,0 +1,44 @@
+# The training environment of phase 2 (docs/phase2-plan.md §4), apart from the main project:
+# TRL needs Python >= 3.11 and Kaggle's image runs Python 3.13 with torch 2.11.0.
+#
+# - Locally (CPU torch) it runs the checks of tests/ and a short CPU training on a tiny model:
+#     uv run --project kaggle/phase2-train pytest kaggle/phase2-train/tests
+# - On Kaggle the kernel keeps the image's CUDA torch and installs requirements.lock, exported
+#   from uv.lock without torch:
+#     uv export --project kaggle/phase2-train --frozen --no-dev --no-emit-project \
+#         --no-emit-package torch ... > kaggle/phase2-train/requirements.lock
+[project]
+name = "eth-nl2sql-phase2-train"
+version = "0.1.0"
+description = "LoRA fine-tuning of Qwen2.5-Coder on Kaggle (phase 2), and its local checks"
+requires-python = "==3.13.*"
+dependencies = [
+    "trl==1.17.1",
+    "peft==0.21.2",
+    "transformers==5.22.1",
+    "accelerate==1.15.0",
+    "datasets==5.1.0",
+    "huggingface-hub",
+    "safetensors",
+    # convert_lora_to_gguf.py of llama.cpp b12032; gguf-py itself comes from the llama.cpp tree
+    "numpy",
+    "tqdm",
+    "pyyaml",
+    "requests",
+    # Kaggle image: torch 2.11.0 (CUDA); locally the CPU build of the same version
+    "torch==2.11.0",
+]
+
+[dependency-groups]
+dev = ["pytest>=8"]
+
+[tool.uv]
+package = false
+
+[tool.uv.sources]
+torch = [{ index = "pytorch-cpu" }]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true

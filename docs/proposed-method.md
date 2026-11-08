@@ -288,7 +288,7 @@ Mỗi cấu hình chạy cho cả phase 1 và phase 2. Ngoại lệ (quyết đ�
 `--no-evidence`, `--literal` và `--schema linked`, vì adapter chỉ được train trên định dạng mặc
 định.
 
-## 8. Tiến độ (2026-11-06)
+## 8. Tiến độ (2026-11-08)
 
 | Hạng mục | Trạng thái |
 |---|---|
@@ -305,7 +305,7 @@ Mỗi cấu hình chạy cho cả phase 1 và phase 2. Ngoại lệ (quyết đ�
 | Sinh SQL + B8 (`generate-sql`, `src/eth_nl2sql/sql_generation.py`) | Xong; client tách riêng để phase 2 dùng lại. Kết quả dev ở bảng dưới |
 | Định dạng nhãn linking (gold và đầu ra bộ linking) | Xong: [linking-labels.md](linking-labels.md) |
 | Benchmark (template, nhãn gold) | Xong: 505 câu, 40 template đã duyệt, dev 177 / test 328 chia theo template (`data/benchmark/`, [benchmark.md](benchmark.md)); tập 169 thực thể sau đợt duyệt 3–4; sinh lại 2026-11-03 để bỏ câu hoà ở `LIMIT` (thay 4 câu dev, 2 câu test) |
-| Phase 2 (LoRA) | Đã lập kế hoạch và chốt quyết định 14–23 (2026-11-04, [phase2-plan.md](phase2-plan.md)). S0 xong: phase 1 được chốt trong `data/predictions/phase1-freeze.json` (SHA256 của KB, model, code, prompt/linking và 7 lần chạy dev). `property_senses.csv` đã đổi lúc 2026-11-04 19:53, sau benchmark và prompt dev, nhưng chỉ ở các cột không nạp vào `link`: link lại dev và dựng lại 5 file prompt dev cho file giống hệt từng byte. S1 xong, người dùng duyệt 2026-11-05 (quyết định 24–27): 30 template train-only (`train_templates.py`) và bộ kiểm tra rò rỉ (`template_signature.py`), 0 vi phạm ([phase2-plan.md](phase2-plan.md) §2.1, §2.5). S2 xong (2026-11-05): `data/train/`, 1.968 ví dụ (98 val), 4.277–4.624 token mỗi ví dụ, 20 thực thể giữ riêng không bị nêu tên ([phase2-plan.md](phase2-plan.md) §2.6). S3 xong (2026-11-05 22:42): đóng băng dữ liệu train và cấu hình huấn luyện (`data/train/freeze.json`). S4 xong (2026-11-06): test phase 1, kết quả ở bảng dưới. Chưa huấn luyện |
+| Phase 2 (LoRA) | Đã lập kế hoạch và chốt quyết định 14–23 (2026-11-04, [phase2-plan.md](phase2-plan.md)). S0 xong: phase 1 được chốt trong `data/predictions/phase1-freeze.json` (SHA256 của KB, model, code, prompt/linking và 7 lần chạy dev). `property_senses.csv` đã đổi lúc 2026-11-04 19:53, sau benchmark và prompt dev, nhưng chỉ ở các cột không nạp vào `link`: link lại dev và dựng lại 5 file prompt dev cho file giống hệt từng byte. S1 xong, người dùng duyệt 2026-11-05 (quyết định 24–27): 30 template train-only (`train_templates.py`) và bộ kiểm tra rò rỉ (`template_signature.py`), 0 vi phạm ([phase2-plan.md](phase2-plan.md) §2.1, §2.5). S2 xong (2026-11-05): `data/train/`, 1.968 ví dụ (98 val), 4.277–4.624 token mỗi ví dụ, 20 thực thể giữ riêng không bị nêu tên ([phase2-plan.md](phase2-plan.md) §2.6). S3 xong (2026-11-05 22:42): đóng băng dữ liệu train và cấu hình huấn luyện (`data/train/freeze.json`). S4 xong (2026-11-06): test phase 1, kết quả ở bảng dưới. S5 xong (2026-11-08, sau khi thấy test phase 1): LoRA cho 1.5B trên Kaggle (2 epoch, 4,46 giờ trên một T4), chọn checkpoint `1.5b-e2`, EX dev 0,960 (kết quả ở dưới; [phase2-plan.md](phase2-plan.md) §4, §5.6). S6 xong (2026-11-08): LoRA cho 3B (7,79 giờ trên một T4), chọn `3b-e2`, EX dev 0,977 ([phase2-plan.md](phase2-plan.md) §5.7). Chưa chạy S7 (ablation lượng tử hoá) và S8 (test phase 2) |
 
 **Kết quả phase 1 trên dev (2026-11-04).** Benchmark sau khi bỏ câu hoà ở `LIMIT`
 ([benchmark.md](benchmark.md) §6, bước 6). Zero-shot, giải mã tham lam, kiểm tra placeholder và
@@ -478,6 +478,56 @@ Chia theo nhóm, ngôn ngữ và `discriminating` (số câu đúng / tổng):
   (3B chỉ có 13 câu lỗi `execution`). Nhóm lớp chỉ đúng 12/42.
 - Theo [phase2-plan.md](phase2-plan.md) §7, mọi thay đổi kế hoạch phase 2 từ đây phải ghi rõ là
   "sau khi thấy test phase 1".
+
+**Kết quả phase 2 trên dev (S5 và S6, 2026-11-08, sau khi thấy test phase 1).** LoRA r16 trên
+Qwen2.5-Coder-1.5B-Instruct và 3B-Instruct, train 2 epoch trên 1.870 câu của `data/train/` bằng
+một T4 của Kaggle (1.5B: 65,9 s/bước, 4,46 giờ; 3B: 116,0 s/bước, 7,79 giờ). Adapter được
+chuyển sang GGUF và chạy bằng `llama-server --lora` trên đúng file Q4_K_M của phase 1. Prompt,
+bộ linking và `generate-sql` giữ nguyên.
+
+Trước khi chấm, adapter của mỗi model được nạp ở hệ số 0: cả 177/177 câu trả lời giống hệt phase
+1 của model đó. Vậy mọi khác biệt ở dưới đến từ adapter, không từ runtime.
+
+Nguồn: `data/predictions/dev-phase2-{1.5b,3b}.summary.json` và các file
+`dev.*.{1.5b,3b}-{e1,e2}.ex.json` (**đo**); chi tiết ở [phase2-plan.md](phase2-plan.md) §5.6,
+§5.7.
+
+| Cấu hình | EX dev (177) | Template gần (123) | Template xa (38) | VI / EN | Giây/câu `sql` |
+|---|---|---|---|---|---|
+| 1.5B phase 1 | 0,599 | 67 | 23 | 50/91, 56/86 | 3,3 |
+| 1.5B + LoRA, epoch 1 | 0,955 | 123 | 30 | 83/91, 86/86 | 2,6 |
+| **1.5B + LoRA, epoch 2 (chọn)** | **0,960** | 123 | 31 | 84/91, 86/86 | 2,6 |
+| 3B phase 1 | 0,898 | 106 | 37 | 81/91, 78/86 | 4,2 |
+| 3B + LoRA, epoch 1 | 0,977 | 123 | 34 | 87/91, 86/86 | 4,3 |
+| **3B + LoRA, epoch 2 (chọn)** | **0,977** | 123 | 34 | 87/91, 86/86 | 4,2 |
+
+- **1.5B:** so với 1.5B phase 1, e2 đúng thêm 64 câu và không sai thêm câu nào (McNemar
+  p ≈ 1e-19). So với 3B phase 1, e2 đúng thêm 18 câu và sai 7 câu mà 3B đúng (p = 0,043).
+- **3B:** e1 và e2 hoà (173), nên chọn e2 theo luật đã chốt. So với 3B phase 1, e2 đúng thêm 18
+  câu và sai 4 câu (p = 0,0043). So với 1.5B + e2: 4 câu tốt hơn, 1 câu xấu hơn (p = 0,375). Mức
+  chênh +3 câu nằm trong ngưỡng ±9 câu của tiêu chí dừng, nên trên dev chưa phân biệt được hai
+  model sau fine-tune.
+- Con số dev này lạc quan:
+  - template train được viết khi đã thấy dev (biến thể gần được phép, quyết định 14);
+  - dev được dùng để chọn checkpoint;
+  - mức tăng nằm gần như hết ở 9 template dev có template train gần (1.5B: 67 → 123/123; 3B:
+    106 → 123/123).
+
+  Phép đo đáng tin là test (S8).
+- 7 câu 1.5B + e2 còn sai đều là câu tiếng Việt thuộc hai template xa.
+  - 4 câu "Liệt kê 5 ví gọi X nhiều nhất …" nhóm theo `token_address`: model chép khung SQL của
+    template train `entity_top_tokens_received` ("Liệt kê 5 token mà X nhận nhiều nhất …").
+  - 3 câu "5 fee recipient nào … nhiều nhất" dùng `LIMIT 1`, giống phase 1.
+
+  3B phase 1 đúng cả 7 câu.
+- 4 câu 3B + e2 còn sai cũng là câu "Liệt kê 5 ví gọi X nhiều nhất …" tiếng Việt. Model nhóm theo
+  `to_address`, trong khi 3B phase 1 đúng cả 4 câu. Đây là các câu duy nhất 3B xấu đi so với phase
+  1: ở template xa này, adapter làm mất một kỹ năng mà model gốc đã có. Template xa của 3B vì vậy
+  giảm từ 37 xuống 34/38.
+- 20 thực thể giữ riêng khỏi train: 19/19 câu dev nhắc tới chúng đều đúng với cả hai model
+  (phase 1: 1.5B 7/19, 3B 17/19).
+- Không còn câu nào thiếu placeholder ở lần thử đầu (phase 1: 1.5B 40 câu, 3B 26 câu), nên hỏi
+  lại gần như không còn tác dụng.
 
 ## 9. Các quyết định (chốt ngày 2026-11-01, bổ sung 2026-11-03 và 2026-11-04)
 

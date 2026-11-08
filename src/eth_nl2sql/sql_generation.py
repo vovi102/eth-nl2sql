@@ -23,7 +23,9 @@ still with placeholders, the format `evaluate-sql` reads. A prompt longer than t
 the server is not sent (decision 7 of proposed-method.md §9): its line has `skipped`.
 
 The client is apart from the loop, so that phase 2 (LoRA) runs through the same code with
-another server: anything that speaks the OpenAI chat API.
+another server: anything that speaks the OpenAI chat API. A LoRA adapter is loaded by
+llama-server itself (`--lora`, `--lora-scaled`); `served_adapter` checks that the server applies
+the adapter the run is named after, and no other one.
 """
 
 from __future__ import annotations
@@ -34,6 +36,7 @@ import urllib.error
 import urllib.request
 from collections import Counter
 from collections.abc import Callable, Iterable, Iterator
+from pathlib import Path
 from typing import Protocol
 
 from eth_nl2sql.benchmark_validate import PLACEHOLDER_RE
@@ -150,6 +153,14 @@ class OpenAICompatibleClient:
         props = self.props() or {}
         return (props.get("default_generation_settings") or {}).get("n_ctx")
 
+    def lora_adapters(self) -> list[dict] | None:
+        """[{id, path, scale}] of llama-server's GET /lora-adapters; None without the endpoint."""
+        try:
+            adapters = self._request("/lora-adapters")
+        except ClientError:
+            return None
+        return adapters if isinstance(adapters, list) else None
+
     def server_info(self) -> dict:
         """What the run's meta file records about the model and the runtime."""
         props = self.props() or {}
@@ -164,7 +175,43 @@ class OpenAICompatibleClient:
             "build_info": props.get("build_info"),
             "n_ctx": self.context_size(),
             "chat_template": props.get("chat_template"),
+            "lora_adapters": self.lora_adapters(),
         }
+
+
+def _same_file(served: str, adapter: Path) -> bool:
+    """A path of /lora-adapters names `adapter`: the same absolute path, or the same file name
+    when the server got a relative path (relative to its own working directory)."""
+    path = Path(served)
+    if path.is_absolute():
+        return path.resolve() == adapter.resolve()
+    return path.name == adapter.name
+
+
+def served_adapter(adapters: list[dict] | None, adapter: Path | None) -> dict | None:
+    """The /lora-adapters entry of `adapter`, or None for a run without adapter.
+
+    Raises ClientError when the run would be named wrong: an adapter the server does not load,
+    another adapter loaded beside it, or a loaded adapter that the run does not name (even at
+    scale 0, so that the runtime check of phase2-plan.md §5.2 is named after its adapter).
+    """
+    if adapter is None:
+        if adapters:
+            paths = ", ".join(f"{a.get('path')} (scale {a.get('scale')})" for a in adapters)
+            raise ClientError(f"the server loads LoRA adapters: {paths}; name it with --adapter")
+        return None
+    if adapters is None:
+        raise ClientError("the server cannot list its LoRA adapters (GET /lora-adapters)")
+    match = [a for a in adapters if _same_file(str(a.get("path", "")), adapter)]
+    if len(match) != 1 or len(adapters) != 1:
+        paths = ", ".join(str(a.get("path")) for a in adapters) or "none"
+        raise ClientError(f"the server must load exactly {adapter}, it loads: {paths}")
+    return match[0]
+
+
+def adapter_tag(adapter: Path, scale: float) -> str:
+    """The adapter's part of a prediction file name: its stem, and the scale unless it is 1."""
+    return adapter.stem if scale == 1 else f"{adapter.stem}.scale{scale:g}"
 
 
 def _fits(client: ChatClient, messages: list[dict], n_ctx: int | None) -> tuple[bool, int | None]:
@@ -219,15 +266,17 @@ def generate_one(
     *,
     placeholder_check: bool = True,
     prefix: list[int] | None = None,
+    max_attempts: int = MAX_ATTEMPTS,
 ) -> dict:
     """{question_id, decision, sql, attempts} of one line of a prompt file; `prefix` is primed
-    in the cache before the first attempt (a repair goes on from the attempt it repairs)."""
+    in the cache before the first attempt (a repair goes on from the attempt it repairs).
+    `max_attempts` 1 is the reply alone, without repair (`generate-sql --no-repair`)."""
     out = {"question_id": prompt["question_id"], "decision": prompt["decision"], "sql": None,
            "attempts": []}  # fmt: skip
     if prompt["decision"] != "sql":
         return out
     messages = prompt["messages"]
-    for _ in range(MAX_ATTEMPTS):
+    for _ in range(max_attempts):
         fits, tokens = _fits(client, messages, n_ctx)
         if not fits:
             if not out["attempts"]:
@@ -274,6 +323,7 @@ def generate(
     progress: Callable[[int, dict], None] | None = None,
     placeholder_check: bool = True,
     prefix: list[int] | None = None,
+    max_attempts: int = MAX_ATTEMPTS,
 ) -> Iterator[dict]:
     """Predictions for every prompt, in order; `linking` maps question_id to its record.
 
@@ -293,7 +343,7 @@ def generate(
             addresses = linker.placeholder_addresses(record)
         prediction = generate_one(
             prompt, client, runner, addresses, n_ctx,
-            placeholder_check=placeholder_check, prefix=prefix,
+            placeholder_check=placeholder_check, prefix=prefix, max_attempts=max_attempts,
         )  # fmt: skip
         if progress:
             progress(i, prediction)

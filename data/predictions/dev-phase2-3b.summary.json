@@ -1,0 +1,84 @@
+{
+ "model": "qwen2.5-coder-3b-instruct-q4_k_m",
+ "phase1": {
+  "ex": 0.8983050847457628,
+  "correct": 159
+ },
+ "scale0_check": {
+  "ex": 0.8983050847457628,
+  "correct": 159,
+  "questions": 177,
+  "by_train_exposure": {
+   "held_out": {
+    "ex": 0.8947368421052632,
+    "ex_extra_columns_ok": 0.8947368421052632,
+    "correct": 17,
+    "questions": 19
+   },
+   "no_named_target": {
+    "ex": 1.0,
+    "ex_extra_columns_ok": 1.0,
+    "correct": 32,
+    "questions": 32
+   },
+   "not_held_out": {
+    "ex": 0.873015873015873,
+    "ex_extra_columns_ok": 0.873015873015873,
+    "correct": 110,
+    "questions": 126
+   }
+  }
+ },
+ "e1": {
+  "ex": 0.9774011299435028,
+  "correct": 173,
+  "questions": 177,
+  "by_train_exposure": {
+   "held_out": {
+    "ex": 1.0,
+    "ex_extra_columns_ok": 1.0,
+    "correct": 19,
+    "questions": 19
+   },
+   "no_named_target": {
+    "ex": 1.0,
+    "ex_extra_columns_ok": 1.0,
+    "correct": 32,
+    "questions": 32
+   },
+   "not_held_out": {
+    "ex": 0.9682539682539683,
+    "ex_extra_columns_ok": 0.9682539682539683,
+    "correct": 122,
+    "questions": 126
+   }
+  }
+ },
+ "e2": {
+  "ex": 0.9774011299435028,
+  "correct": 173,
+  "questions": 177,
+  "by_train_exposure": {
+   "held_out": {
+    "ex": 1.0,
+    "ex_extra_columns_ok": 1.0,
+    "correct": 19,
+    "questions": 19
+   },
+   "no_named_target": {
+    "ex": 1.0,
+    "ex_extra_columns_ok": 1.0,
+    "correct": 32,
+    "questions": 32
+   },
+   "not_held_out": {
+    "ex": 0.9682539682539683,
+    "ex_extra_columns_ok": 0.9682539682539683,
+    "correct": 122,
+    "questions": 126
+   }
+  }
+ },
+ "chosen": "3b-e2",
+ "rule": "higher dev EX, epoch 2 on a tie (phase2-plan \u00a75.3)"
+}

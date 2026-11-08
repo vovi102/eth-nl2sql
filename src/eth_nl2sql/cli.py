@@ -33,17 +33,22 @@ from eth_nl2sql.entity_linking_resources import load_resources
 from eth_nl2sql.execution_evaluation import (
     GoldError,
     gold_as_predictions,
+    held_out_targets,
     report,
     run_questions,
+    train_exposure,
 )
 from eth_nl2sql.execution_evaluation import format_report as format_ex_report
 from eth_nl2sql.extract_bigquery import ExtractError, Extractor, Window, verify_extract
 from eth_nl2sql.prompt_builder import SCHEMA_MODES, PromptBuilder, PromptOptions, load_schema
 from eth_nl2sql.sql_execution import SqlRunner
 from eth_nl2sql.sql_generation import (
+    MAX_ATTEMPTS,
     ClientError,
     OpenAICompatibleClient,
+    adapter_tag,
     generate,
+    served_adapter,
     shared_prefix,
     summary,
 )
@@ -212,7 +217,15 @@ def _evaluate_sql(args: argparse.Namespace) -> int:
     with SqlRunner(args.db, timeout=args.timeout, memory_limit=args.memory_limit) as runner:
         results = run_questions(gold, predictions, linking, linker, runner)
     manifest = json.loads(args.manifest.read_text()) if args.manifest.is_file() else None
-    rep = report(results, gold, manifest)
+    exposure = None
+    if args.train_manifest:
+        held_out = held_out_targets(json.loads(args.train_manifest.read_text()))
+        exposure = {g["question_id"]: train_exposure(g, held_out, linker.class_members)
+                    for g in gold}  # fmt: skip
+    rep = report(results, gold, manifest, exposure)
+    if exposure is not None:
+        rep["train_manifest"] = str(args.train_manifest)
+        rep["train_manifest_sha256"] = _sha256(args.train_manifest)
     if excluded is not None:
         rep["excluded"] = excluded
     print(format_ex_report(rep))
@@ -257,8 +270,12 @@ def _generate_sql(args: argparse.Namespace) -> int:
     server = client.server_info()
     model_path = Path(server["model_path"]) if server["model_path"] else None
     tag = model_path.stem if model_path else (server["models"] or ["model"])[0]
-    out = args.output or DEFAULT_PREDICTIONS_DIR / f"{args.prompts.stem}.{tag}.jsonl"
-    print(f"model {tag}, n_ctx {server['n_ctx']}, {len(prompts)} prompts, "
+    served = served_adapter(server["lora_adapters"], args.adapter)
+    file_tag = tag if served is None else f"{tag}.{adapter_tag(args.adapter, served['scale'])}"
+    out = args.output or DEFAULT_PREDICTIONS_DIR / f"{args.prompts.stem}.{file_tag}.jsonl"
+    max_attempts = 1 if args.no_repair else MAX_ATTEMPTS
+    adapter = "" if served is None else f", LoRA {args.adapter.name} at scale {served['scale']}"
+    print(f"model {tag}{adapter}, n_ctx {server['n_ctx']}, {len(prompts)} prompts, "
           f"fixed prefix {len(prefix)} tokens -> {out}")  # fmt: skip
 
     linker = EntityLinker(
@@ -279,7 +296,7 @@ def _generate_sql(args: argparse.Namespace) -> int:
             tmp.open("w", encoding="utf-8") as f:  # fmt: skip
         for p in generate(prompts, linking, linker, runner, client, progress=progress,
                           placeholder_check=not args.no_placeholder_check,
-                          prefix=prefix):  # fmt: skip
+                          prefix=prefix, max_attempts=max_attempts):  # fmt: skip
             f.write(json.dumps(p, ensure_ascii=False) + "\n")
             f.flush()
             predictions.append(p)
@@ -295,10 +312,18 @@ def _generate_sql(args: argparse.Namespace) -> int:
         "limit": args.limit,
         "model": tag,
         "model_sha256": _sha256(model_path) if model_path and model_path.is_file() else None,
+        "adapter": None
+        if served is None
+        else {
+            "path": str(args.adapter),
+            "sha256": _sha256(args.adapter),
+            "scale": served["scale"],
+            "served": served,
+        },
         "server": server,
         "generation": client.generation_parameters()
         | {
-            "max_attempts": 2,
+            "max_attempts": max_attempts,
             "placeholder_check": not args.no_placeholder_check,
             "fixed_prefix_tokens": len(prefix),
         },
@@ -479,6 +504,10 @@ def main(argv: list[str] | None = None) -> int:
         help="score only questions with a prediction that is not skipped (trial run, decision 7)",
     )  # fmt: skip
     p.add_argument("--manifest", type=Path, default=DEFAULT_MANIFEST)
+    p.add_argument(
+        "--train-manifest", type=Path,
+        help="data/train/manifest.json: also split EX by targets held out of training (R8)",
+    )  # fmt: skip
     p.add_argument("--timeout", type=float, default=30.0, help="seconds per query")
     p.add_argument("--report", type=Path, help="write the report as JSON")
     p.add_argument("--details", type=Path, help="write one scored line per question")
@@ -504,6 +533,14 @@ def main(argv: list[str] | None = None) -> int:
         "--no-fixed-prefix", action="store_true",
         help="let the prompt cache reuse what it shares with the question before",
     )  # fmt: skip
+    p.add_argument(
+        "--adapter", type=Path,
+        help="the GGUF LoRA adapter the server loads (--lora/--lora-scaled): checked against "
+        "/lora-adapters, hashed into the meta file and named in the output file",
+    )  # fmt: skip
+    p.add_argument(
+        "--no-repair", action="store_true", help="one attempt per question, no repair (ablation)"
+    )
     p.add_argument("--timeout", type=float, default=30.0, help="seconds per query")
 
     p = sub.add_parser(

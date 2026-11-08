@@ -11,9 +11,11 @@ from conftest import ALICE, BOB, TOKEN
 
 from eth_nl2sql.execution_evaluation import (
     expected_decision,
+    held_out_targets,
     report,
     results_match,
     score,
+    train_exposure,
 )
 from eth_nl2sql.sql_execution import Execution, SqlRunner, extract_sql, repair_messages
 
@@ -168,3 +170,40 @@ def test_report_slices() -> None:
     assert rep["by_group"]["entity"]["questions"] == 2
     assert rep["by_phenomenon"] == {"alias": rep["answerable"]}
     assert rep["kinds"] == {"correct": 1, "wrong_decision": 1}
+
+
+def test_train_exposure() -> None:
+    manifest = {"holdout_entities": ["wormhole"],
+                "holdout": {"removed": {"addresses": ["0xw1"], "tokens": ["0xwt"]}}}  # fmt: skip
+    held = held_out_targets(manifest)
+    members = {("bridge", 5): [("axelar", ["0xa"]), ("across", ["0xb"])],
+               ("bridge", 7): [("axelar", ["0xa"]), ("wormhole", ["0xw1"])]}  # fmt: skip
+
+    def exposure(*mentions: dict) -> str:
+        gold = {"mentions": list(mentions)}
+        return train_exposure(gold, held, lambda c, n: members[(c, n)])
+
+    assert exposure({"type": "entity", "target": "wormhole"}) == "held_out"
+    assert exposure({"type": "address", "target": "0xw1"}) == "held_out"
+    assert exposure({"type": "token", "target": "0xwt"}) == "held_out"
+    # a token that is not held out does not hide a held-out entity next to it
+    assert exposure({"type": "entity", "target": "wormhole"},
+                    {"type": "token", "target": "0xusdt"}) == "held_out"  # fmt: skip
+    assert exposure({"type": "class", "target": "bridge", "top_n": 5}) == "not_held_out"
+    assert exposure({"type": "class", "target": "bridge", "top_n": 7}) == "held_out"
+    assert exposure({"type": "entity", "target": "lido"}) == "not_held_out"
+    assert exposure({"type": "literal_address", "target": "0xw1"}) == "no_named_target"
+    assert exposure({"type": "nil"}) == "no_named_target" and exposure() == "no_named_target"
+
+
+def test_report_by_train_exposure() -> None:
+    golds = [gold_record("q1"), gold_record("q2"), gold_record("q3", nil=True)]
+    results = [score(golds[0], {"decision": "sql"}, GOLD, GOLD),
+               score(golds[1], {"decision": "nil"}, None, None),
+               score(golds[2], {"decision": "nil"}, None, None)]  # fmt: skip
+    exposure = {"q1": "held_out", "q2": "held_out", "q3": "no_named_target"}
+    rep = report(results, golds, None, exposure)
+    assert rep["by_train_exposure"]["held_out"] == {
+        "ex": 0.5, "ex_extra_columns_ok": 0.5, "correct": 1, "questions": 2}  # fmt: skip
+    assert rep["by_train_exposure"]["no_named_target"]["correct"] == 1
+    assert "by_train_exposure" not in report(results, golds, None)

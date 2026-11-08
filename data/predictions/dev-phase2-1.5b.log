@@ -1,0 +1,17 @@
+2026-11-08 06:18:18 phase 2 on dev (1.5b): preconditions
+2026-11-08 06:18:19 preconditions hold (--check: stopping here)
+2026-11-08 06:18:37 phase 2 on dev (1.5b): preconditions
+2026-11-08 06:18:41 llama-server ready: qwen2.5-coder-1.5b-instruct-q4_k_m --lora-scaled /home/khoavd/WORKSPACE/thesis/eth-nl2sql/models/lora/1.5b-run/gguf/1.5b-e2.gguf:0
+2026-11-08 06:18:41 runtime check: 1.5b-e2 at scale 0 on dev
+runtime check passed: the 177 replies at scale 0 are identical to phase 1
+2026-11-08 06:30:27 llama-server ready: qwen2.5-coder-1.5b-instruct-q4_k_m --lora /home/khoavd/WORKSPACE/thesis/eth-nl2sql/models/lora/1.5b-run/gguf/1.5b-e1.gguf
+2026-11-08 06:30:27 1.5b-e1: generating -> data/predictions/dev.predictions.prompts.qwen2.5-coder-1.5b-instruct-q4_k_m.1.5b-e1.jsonl
+2026-11-08 06:38:08 1.5b-e1: done
+2026-11-08 06:38:11 llama-server ready: qwen2.5-coder-1.5b-instruct-q4_k_m --lora /home/khoavd/WORKSPACE/thesis/eth-nl2sql/models/lora/1.5b-run/gguf/1.5b-e2.gguf
+2026-11-08 06:38:11 1.5b-e2: generating -> data/predictions/dev.predictions.prompts.qwen2.5-coder-1.5b-instruct-q4_k_m.1.5b-e2.jsonl
+2026-11-08 06:45:47 1.5b-e2: done
+2026-11-08 06:45:48 score: data/predictions/dev.predictions.prompts.qwen2.5-coder-1.5b-instruct-q4_k_m.1.5b-e2.scale0.jsonl
+2026-11-08 06:47:14 score: data/predictions/dev.predictions.prompts.qwen2.5-coder-1.5b-instruct-q4_k_m.1.5b-e1.jsonl
+2026-11-08 06:48:30 score: data/predictions/dev.predictions.prompts.qwen2.5-coder-1.5b-instruct-q4_k_m.1.5b-e2.jsonl
+phase 1 106/177, scale 0 106/177, e1 169/177, e2 170/177 -> 1.5b-e2
+2026-11-08 06:49:50 finished in 31 min

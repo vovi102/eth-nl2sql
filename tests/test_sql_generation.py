@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import threading
 from http.server import BaseHTTPRequestHandler, HTTPServer
@@ -16,10 +17,13 @@ from eth_nl2sql.execution_evaluation import score
 from eth_nl2sql.prompt_builder import PromptBuilder, load_schema
 from eth_nl2sql.sql_execution import SqlRunner
 from eth_nl2sql.sql_generation import (
+    ClientError,
     OpenAICompatibleClient,
+    adapter_tag,
     generate,
     generate_one,
     missing_placeholders,
+    served_adapter,
     shared_prefix,
     summary,
 )
@@ -91,6 +95,41 @@ def test_a_failed_query_is_repaired_once(case, linker: EntityLinker) -> None:
     assert repair[:2] == prompt["messages"] and repair[2] == {"role": "assistant",
                                                               "content": WRONG}  # fmt: skip
     assert "nope" in repair[3]["content"]
+
+
+def test_without_repair_a_failed_query_is_asked_once(case, linker: EntityLinker) -> None:
+    prompt, record, runner = case
+    addresses = linker.placeholder_addresses(record)
+    for first in (WRONG, OWN_ADDRESS):
+        client = FakeClient([first, RIGHT])
+        out = generate_one(prompt, client, runner, addresses, max_attempts=1)
+        assert len(client.calls) == 1 and out["sql"] == extract(first)
+        assert [a["error_kind"] for a in out["attempts"]] in (["execution"],
+                                                              ["missing_placeholder"])  # fmt: skip
+
+
+def extract(reply: str) -> str:
+    return reply.removeprefix("```sql\n").removesuffix("\n```")
+
+
+def test_served_adapter(tmp_path: Path) -> None:
+    adapter = tmp_path / "lora" / "1.5b-e1.gguf"
+    one = [{"id": 0, "path": str(adapter), "scale": 0.0}]
+    assert served_adapter(one, adapter) == one[0]
+    relative = [{"id": 0, "path": "models/lora/1.5b-e1.gguf", "scale": 1.0}]
+    assert served_adapter(relative, adapter) == relative[0]
+    assert served_adapter([], None) is None and served_adapter(None, None) is None
+    with pytest.raises(ClientError, match="name it with --adapter"):
+        served_adapter(one, None)  # a run on an adapter at scale 0 is still named after it
+    with pytest.raises(ClientError, match="cannot list"):
+        served_adapter(None, adapter)
+    with pytest.raises(ClientError, match="exactly"):
+        served_adapter([{"id": 0, "path": str(tmp_path / "other.gguf"), "scale": 1.0}], adapter)
+    with pytest.raises(ClientError, match="exactly"):
+        served_adapter(one + [{"id": 1, "path": "x.gguf", "scale": 0.0}], adapter)
+    assert adapter_tag(adapter, 1.0) == "1.5b-e1"
+    assert adapter_tag(adapter, 0.0) == "1.5b-e1.scale0"
+    assert adapter_tag(adapter, 0.5) == "1.5b-e1.scale0.5"
 
 
 def test_no_sql_twice_gives_up(case, linker: EntityLinker) -> None:
@@ -180,8 +219,9 @@ def test_a_skipped_prediction_scores_wrong() -> None:
 class StubServer(BaseHTTPRequestHandler):
     requests: list[tuple[str, dict]] = []
     replies: list[str] = []
+    adapters: list[dict] = []  # GET /lora-adapters
 
-    def _send(self, body: dict) -> None:
+    def _send(self, body: dict | list) -> None:
         data = json.dumps(body).encode()
         self.send_response(200)
         self.send_header("Content-Type", "application/json")
@@ -193,6 +233,8 @@ class StubServer(BaseHTTPRequestHandler):
         if self.path == "/props":
             self._send({"model_path": "/models/fake.gguf", "build_info": "b1-test",
                         "default_generation_settings": {"n_ctx": 8192}})  # fmt: skip
+        elif self.path == "/lora-adapters":
+            self._send(self.adapters)
         else:
             self._send({"data": [{"id": "fake.gguf"}]})
 
@@ -218,7 +260,7 @@ class StubServer(BaseHTTPRequestHandler):
 
 @pytest.fixture
 def server():
-    StubServer.requests, StubServer.replies = [], []
+    StubServer.requests, StubServer.replies, StubServer.adapters = [], [], []
     httpd = HTTPServer(("127.0.0.1", 0), StubServer)
     thread = threading.Thread(target=httpd.serve_forever, daemon=True)
     thread.start()
@@ -271,3 +313,52 @@ def test_generate_sql_command(server: str, case, db: Path, knowledge_base_dir: P
     assert run_meta["generation"]["fixed_prefix_tokens"] > 0
     assert [path for path, _ in StubServer.requests].count("/completion") == 2  # run, q1
     assert run_meta["summary"]["repair_ran"] == 1
+
+
+def _prompt_file(tmp_path: Path, case) -> Path:
+    prompt, record, _ = case
+    linking = tmp_path / "dev.linking.jsonl"
+    linking.write_text(json.dumps(record, ensure_ascii=False) + "\n")
+    prompts = tmp_path / "dev.prompts.jsonl"
+    prompts.write_text(json.dumps(prompt, ensure_ascii=False) + "\n")
+    meta = {"input": str(linking), "options": {"evidence": True}}
+    (tmp_path / "dev.prompts.jsonl.meta.json").write_text(json.dumps(meta))
+    return prompts
+
+
+def test_generate_sql_with_an_adapter_and_no_repair(
+    server: str, case, db: Path, knowledge_base_dir: Path, tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:  # fmt: skip
+    prompts = _prompt_file(tmp_path, case)
+    adapter = tmp_path / "lora" / "1.5b-e2.gguf"
+    adapter.parent.mkdir()
+    adapter.write_bytes(b"GGUF adapter")
+    StubServer.adapters = [{"id": 0, "path": str(adapter), "scale": 0.0}]
+    StubServer.replies = [WRONG, RIGHT]
+    monkeypatch.chdir(tmp_path)  # the default output goes to data/predictions/
+    argv = ["generate-sql", "--prompts", str(prompts), "--server", server, "--db", str(db),
+            "--knowledge-base-dir", str(knowledge_base_dir), "--adapter", str(adapter),
+            "--no-repair"]  # fmt: skip
+    assert main(argv) == 0
+    out = tmp_path / "data/predictions/dev.prompts.fake.1.5b-e2.scale0.jsonl"
+    lines = [json.loads(line) for line in out.read_text().splitlines()]
+    assert [len(p["attempts"]) for p in lines] == [1]  # the failed query is not repaired
+    meta = json.loads(out.with_name(out.name + ".meta.json").read_text())
+    assert meta["adapter"]["scale"] == 0.0 and meta["adapter"]["path"] == str(adapter)
+    assert meta["adapter"]["sha256"] == hashlib.sha256(b"GGUF adapter").hexdigest()
+    assert meta["server"]["lora_adapters"] == StubServer.adapters
+    assert meta["generation"]["max_attempts"] == 1
+
+
+def test_generate_sql_refuses_an_adapter_it_is_not_told_about(
+    server: str, case, db: Path, knowledge_base_dir: Path, tmp_path: Path
+) -> None:
+    prompts = _prompt_file(tmp_path, case)
+    StubServer.adapters = [{"id": 0, "path": "/models/lora/1.5b-e1.gguf", "scale": 1.0}]
+    base = ["generate-sql", "--prompts", str(prompts), "--output", str(tmp_path / "run.jsonl"),
+            "--server", server, "--db", str(db),
+            "--knowledge-base-dir", str(knowledge_base_dir)]  # fmt: skip
+    assert main(base) == 1  # the server applies an adapter the run is not named after
+    assert main([*base, "--adapter", str(tmp_path / "1.5b-e2.gguf")]) == 1
+    assert not (tmp_path / "run.jsonl").exists()

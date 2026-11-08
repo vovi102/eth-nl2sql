@@ -1,0 +1,75 @@
+{
+  "prompts": "data/prompts/dev.predictions.prompts.jsonl",
+  "prompts_sha256": "a61f00182f0ffa2f8883daa0a9ad371deffb6995805e27dd75b3206c6af0d7d3",
+  "prompt_options": {
+    "evidence": true,
+    "placeholders": true,
+    "schema": "full"
+  },
+  "linking": "data/linking/dev.predictions.jsonl",
+  "linking_sha256": "54c57fb0744223e45bd08a6a98732deb75cf3b6dd3422268d65aebe22c3d9d3a",
+  "limit": 5,
+  "model": "qwen2.5-coder-1.5b-instruct-q4_k_m",
+  "model_sha256": "cc324af070c2ecbfd324a30884d2f951a7ff756aba85cb811a6ec436933bb046",
+  "adapter": {
+    "path": "/tmp/claude-1000/-home-khoavd-WORKSPACE-thesis/455df74b-1819-4a4e-95fa-50b585678a24/scratchpad/gguf/random-1.5b.gguf",
+    "sha256": "ae4289dc2a74237ff344ae56e9efcc84eee74d4c3c3e2a9229e0aded610fe450",
+    "scale": 1.0,
+    "served": {
+      "id": 0,
+      "path": "/tmp/claude-1000/-home-khoavd-WORKSPACE-thesis/455df74b-1819-4a4e-95fa-50b585678a24/scratchpad/gguf/random-1.5b.gguf",
+      "scale": 1.0,
+      "task_name": "",
+      "prompt_prefix": ""
+    }
+  },
+  "server": {
+    "base_url": "http://127.0.0.1:8080",
+    "models": [
+      "/home/khoavd/WORKSPACE/thesis/eth-nl2sql/models/qwen2.5-coder-1.5b-instruct-q4_k_m.gguf"
+    ],
+    "model_path": "/home/khoavd/WORKSPACE/thesis/eth-nl2sql/models/qwen2.5-coder-1.5b-instruct-q4_k_m.gguf",
+    "build_info": "b1-dde879b",
+    "n_ctx": 8192,
+    "chat_template": "{%- if tools %}\n    {{- '<|im_start|>system\\n' }}\n    {%- if messages[0]['role'] == 'system' %}\n        {{- messages[0]['content'] }}\n    {%- else %}\n        {{- 'You are Qwen, created by Alibaba Cloud. You are a helpful assistant.' }}\n    {%- endif %}\n    {{- \"\\n\\n# Tools\\n\\nYou may call one or more functions to assist with the user query.\\n\\nYou are provided with function signatures within <tools></tools> XML tags:\\n<tools>\" }}\n    {%- for tool in tools %}\n        {{- \"\\n\" }}\n        {{- tool | tojson }}\n    {%- endfor %}\n    {{- \"\\n</tools>\\n\\nFor each function call, return a json object with function name and arguments within <tool_call></tool_call> XML tags:\\n<tool_call>\\n{{\\\"name\\\": <function-name>, \\\"arguments\\\": <args-json-object>}}\\n</tool_call><|im_end|>\\n\" }}\n{%- else %}\n    {%- if messages[0]['role'] == 'system' %}\n        {{- '<|im_start|>system\\n' + messages[0]['content'] + '<|im_end|>\\n' }}\n    {%- else %}\n        {{- '<|im_start|>system\\nYou are Qwen, created by Alibaba Cloud. You are a helpful assistant.<|im_end|>\\n' }}\n    {%- endif %}\n{%- endif %}\n{%- for message in messages %}\n    {%- if (message.role == \"user\") or (message.role == \"system\" and not loop.first) or (message.role == \"assistant\" and not message.tool_calls) %}\n        {{- '<|im_start|>' + message.role + '\\n' + message.content + '<|im_end|>' + '\\n' }}\n    {%- elif message.role == \"assistant\" %}\n        {{- '<|im_start|>' + message.role }}\n        {%- if message.content %}\n            {{- '\\n' + message.content }}\n        {%- endif %}\n        {%- for tool_call in message.tool_calls %}\n            {%- if tool_call.function is defined %}\n                {%- set tool_call = tool_call.function %}\n            {%- endif %}\n            {{- '\\n<tool_call>\\n{\"name\": \"' }}\n            {{- tool_call.name }}\n            {{- '\", \"arguments\": ' }}\n            {{- tool_call.arguments | tojson }}\n            {{- '}\\n</tool_call>' }}\n        {%- endfor %}\n        {{- '<|im_end|>\\n' }}\n    {%- elif message.role == \"tool\" %}\n        {%- if (loop.index0 == 0) or (messages[loop.index0 - 1].role != \"tool\") %}\n            {{- '<|im_start|>user' }}\n        {%- endif %}\n        {{- '\\n<tool_response>\\n' }}\n        {{- message.content }}\n        {{- '\\n</tool_response>' }}\n        {%- if loop.last or (messages[loop.index0 + 1].role != \"tool\") %}\n            {{- '<|im_end|>\\n' }}\n        {%- endif %}\n    {%- endif %}\n{%- endfor %}\n{%- if add_generation_prompt %}\n    {{- '<|im_start|>assistant\\n' }}\n{%- endif %}",
+    "lora_adapters": [
+      {
+        "id": 0,
+        "path": "/tmp/claude-1000/-home-khoavd-WORKSPACE-thesis/455df74b-1819-4a4e-95fa-50b585678a24/scratchpad/gguf/random-1.5b.gguf",
+        "scale": 1.0,
+        "task_name": "",
+        "prompt_prefix": ""
+      }
+    ]
+  },
+  "generation": {
+    "temperature": 0.0,
+    "max_tokens": 512,
+    "seed": 0,
+    "max_attempts": 2,
+    "placeholder_check": true,
+    "fixed_prefix_tokens": 4195
+  },
+  "sql_timeout": 30.0,
+  "started": "2026-11-07T19:16:44",
+  "wall_seconds": 38.0,
+  "summary": {
+    "questions": 5,
+    "decisions": {
+      "sql": 5
+    },
+    "skipped": 0,
+    "asked": 5,
+    "repaired": 5,
+    "repair_ran": 0,
+    "first_attempt": {
+      "no_sql": 5
+    },
+    "final": {
+      "no_sql": 5
+    },
+    "seconds_per_question": 6.9714,
+    "seconds_first_attempt": 3.6326,
+    "max_completion_tokens": 281
+  }
+}

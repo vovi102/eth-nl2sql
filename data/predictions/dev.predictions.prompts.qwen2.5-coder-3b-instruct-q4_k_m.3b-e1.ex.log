@@ -1,0 +1,29 @@
+  overall                EX 0.977  (+extra columns 0.977)  173/177
+  answerable             EX 0.975  (+extra columns 0.975)  157/161
+  unanswerable           EX 1.000  (+extra columns 1.000)  16/16
+  kinds: {'correct': 173, 'wrong_result': 4}
+  by_lang:
+    en                     EX 1.000  (+extra columns 1.000)  86/86
+    vi                     EX 0.956  (+extra columns 0.956)  87/91
+  by_group:
+    address                EX 1.000  (+extra columns 1.000)  26/26
+    ambiguous              EX 1.000  (+extra columns 1.000)  15/15
+    class                  EX 1.000  (+extra columns 1.000)  28/28
+    entity                 EX 0.905  (+extra columns 0.905)  38/42
+    nil                    EX 1.000  (+extra columns 1.000)  8/8
+    plain                  EX 1.000  (+extra columns 1.000)  24/24
+    token                  EX 1.000  (+extra columns 1.000)  26/26
+    unsupported            EX 1.000  (+extra columns 1.000)  8/8
+  by_phenomenon:
+    alias                  EX 0.983  (+extra columns 0.983)  57/58
+    ambiguous_property     EX 1.000  (+extra columns 1.000)  15/15
+    class                  EX 1.000  (+extra columns 1.000)  28/28
+    multi_address          EX 0.913  (+extra columns 0.913)  42/46
+  discriminating:
+    direction              EX 0.965  (+extra columns 0.965)  110/114
+    status                 EX 1.000  (+extra columns 1.000)  31/31
+    time                   EX 0.981  (+extra columns 0.981)  103/105
+  by_train_exposure:
+    held_out               EX 1.000  (+extra columns 1.000)  19/19
+    no_named_target        EX 1.000  (+extra columns 1.000)  32/32
+    not_held_out           EX 0.968  (+extra columns 0.968)  122/126

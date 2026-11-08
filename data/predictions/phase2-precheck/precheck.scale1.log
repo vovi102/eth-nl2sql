@@ -1,0 +1,25 @@
+model qwen2.5-coder-1.5b-instruct-q4_k_m, LoRA random-1.5b.gguf at scale 1.0, n_ctx 8192, 5 prompts, fixed prefix 4195 tokens -> /tmp/claude-1000/-home-khoavd-WORKSPACE-thesis/455df74b-1819-4a4e-95fa-50b585678a24/scratchpad/precheck.scale1.jsonl
+  [1/5] q00001 sql no_sql -> no_sql (11.8 s)
+  [2/5] q00036 sql no_sql -> no_sql (5.0 s)
+  [3/5] q00071 sql no_sql -> no_sql (6.3 s)
+  [4/5] q00107 sql no_sql -> no_sql (7.6 s)
+  [5/5] q00142 sql no_sql -> no_sql (4.2 s)
+{
+  "questions": 5,
+  "decisions": {
+    "sql": 5
+  },
+  "skipped": 0,
+  "asked": 5,
+  "repaired": 5,
+  "repair_ran": 0,
+  "first_attempt": {
+    "no_sql": 5
+  },
+  "final": {
+    "no_sql": 5
+  },
+  "seconds_per_question": 6.9714,
+  "seconds_first_attempt": 3.6326,
+  "max_completion_tokens": 281
+}

@@ -16,12 +16,16 @@ The rules, the convention of BIRD:
   an answerable question is wrong when the system abstains.
 - A question without a prediction, or whose prompt was too long for the model (`skipped`), is
   wrong; `evaluate-sql --only-predicted` leaves them out and counts them instead.
+
+With the manifest of the phase-2 train data, `train_exposure` adds the split of R8
+(phase2-plan.md §3): is a target of the question one that no train prompt names?
 """
 
 from __future__ import annotations
 
 import math
 from collections import Counter, defaultdict
+from collections.abc import Callable
 from datetime import date, datetime
 from decimal import Decimal
 from itertools import permutations
@@ -169,6 +173,43 @@ def run_questions(
     return results
 
 
+NAMED_TYPES = ("entity", "address", "token", "class")
+
+
+def held_out_targets(train_manifest: dict) -> dict[str, set[str]]:
+    """What no train prompt names (decision 27): the held-out entities, and the named addresses
+    and tokens left out of the fillers because their names carry one of them."""
+    removed = train_manifest["holdout"]["removed"]
+    return {
+        "entity": set(train_manifest["holdout_entities"]),
+        "address": set(removed["addresses"]),
+        "token": set(removed["tokens"]),
+    }
+
+
+def train_exposure(
+    gold: dict,
+    held_out: dict[str, set[str]],
+    class_members: Callable[[str, int], list[tuple[str, list[str]]]],
+) -> str:
+    """held_out, not_held_out or no_named_target, from the gold mentions of the question.
+
+    A class counts through its members (`EntityLinker.class_members`): the held-out entities are
+    no top-5 member of a class, but a question may ask for more than 5.
+    """
+    named = [m for m in gold["mentions"] if m["type"] in NAMED_TYPES]
+    if not named:
+        return "no_named_target"
+    for m in named:
+        if m["type"] == "class":
+            members = {entity for entity, _ in class_members(m["target"], m["top_n"])}
+            if members & held_out["entity"]:
+                return "held_out"
+        elif m["target"] in held_out[m["type"]]:
+            return "held_out"
+    return "not_held_out"
+
+
 def _ex(results: list[dict]) -> dict:
     n = len(results)
     hits = sum(r["correct"] for r in results)
@@ -177,11 +218,17 @@ def _ex(results: list[dict]) -> dict:
             "correct": hits, "questions": n}  # fmt: skip
 
 
-def report(results: list[dict], gold_records: list[dict], manifest: dict | None) -> dict:
+def report(
+    results: list[dict],
+    gold_records: list[dict],
+    manifest: dict | None,
+    exposure: dict[str, str] | None = None,
+) -> dict:
     """EX overall, on answerable and unanswerable questions, by language, group, phenomenon.
 
     `discriminating` is EX on the questions where a mistake (manifest `discriminates`: status,
     direction, time) changes the answer, so that a correct answer shows the mistake was avoided.
+    `exposure` maps question_id to its `train_exposure`, for the slice `by_train_exposure`.
     """
     gold = {g["question_id"]: g for g in gold_records}
     templates = (manifest or {}).get("templates", {})
@@ -199,6 +246,8 @@ def report(results: list[dict], gold_records: list[dict], manifest: dict | None)
         for check, differs in checks.get(r["question_id"], {}).items():
             if differs:
                 slices["discriminating"][check].append(r)
+        if exposure is not None:
+            slices["by_train_exposure"][exposure[r["question_id"]]].append(r)
     answerable = [r for r in results if r["expected"] == "sql"]
     executed = [r for r in answerable if r.get("postgres_parses") is not None]
     return {
@@ -223,7 +272,9 @@ def format_report(rep: dict) -> str:
 
     lines = [line(k, rep[k]) for k in ("overall", "answerable", "unanswerable")]
     lines.append(f"  kinds: {rep['kinds']}")
-    for name in ("by_lang", "by_group", "by_phenomenon", "discriminating"):
+    for name in ("by_lang", "by_group", "by_phenomenon", "discriminating", "by_train_exposure"):
+        if name not in rep:
+            continue
         lines.append(f"  {name}:")
         lines += ["  " + line(k, s) for k, s in rep.get(name, {}).items()]
     return "\n".join(lines)

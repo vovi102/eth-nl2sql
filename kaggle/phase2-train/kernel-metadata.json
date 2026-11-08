@@ -1,0 +1,17 @@
+{
+  "id": "aohkvd/eth-nl2sql-phase2-train",
+  "title": "eth-nl2sql phase2 train",
+  "code_file": "train_lora.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": "true",
+  "enable_gpu": "true",
+  "enable_tpu": "false",
+  "enable_internet": "true",
+  "machine_shape": "NvidiaTeslaT4",
+  "docker_image_pinning_type": "original",
+  "dataset_sources": ["aohkvd/eth-nl2sql-phase2-sft"],
+  "competition_sources": [],
+  "kernel_sources": [],
+  "model_sources": []
+}

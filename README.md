@@ -196,6 +196,86 @@ và phân tích ở [docs/proposed-method.md](docs/proposed-method.md) §8.
 Mỗi template để riêng 5% số câu (`split: val`) để theo dõi loss. Vì `sft.jsonl` có sẵn trường
 `decision` và `messages`, `count-prompt-tokens` đếm được độ dài cả chuỗi train.
 
+### Huấn luyện trên Kaggle (S5–S6)
+
+Môi trường huấn luyện tách riêng ở `kaggle/phase2-train/` (Python 3.13, TRL 1.17.1, PEFT 0.21.2,
+transformers 5.22.1, torch 2.11.0). Local dùng torch bản CPU, Kaggle dùng torch CUDA có sẵn trong
+image. Lý do chọn phiên bản và nguồn tra cứu ở [docs/phase2-plan.md](docs/phase2-plan.md) §4.
+
+```bash
+# tokenizer + config của revision đã ghim (11 MB, không có weight), cho test
+R=2e1fd397ee46e1388853d2af2c993145b0f1098a; D=models/hf/qwen2.5-coder-1.5b-instruct; mkdir -p $D
+for f in config.json generation_config.json tokenizer.json tokenizer_config.json vocab.json merges.txt; do
+  curl -sL -o $D/$f https://huggingface.co/Qwen/Qwen2.5-Coder-1.5B-Instruct/resolve/$R/$f; done
+uv run --project kaggle/phase2-train pytest kaggle/phase2-train/tests   # 14 test, khoảng 12 phút, CPU
+```
+
+Test kiểm tra các điểm sau:
+
+- `sft.jsonl` và `config.json` khớp bản đóng băng S3.
+- Chat template của HF render cả 1.968 ví dụ giống hệt template trong GGUF của phase 1.
+- Trên mọi ví dụ, loss phủ đúng câu trả lời, `<|im_end|>` và ký tự xuống dòng sau nó, dùng chính
+  cách TRL tokenize.
+- Fused LM head của TRL cho cùng loss với logits đầy đủ.
+- Một lần huấn luyện ngắn trên CPU, với model Qwen2 tí hon và tokenizer thật, chạy hết đường ống,
+  tới cả GGUF (`convert_lora_to_gguf.py` của `~/opt/llama.cpp/src-b12032`).
+
+Đăng lên Kaggle và chạy (mỗi bước đăng/tải cần người dùng đồng ý trước):
+
+```bash
+P=kaggle/phase2-train
+uv run python $P/train_lora.py prepare-dataset --out $P/build/dataset   # chỉ sft.jsonl
+kaggle datasets create -p $P/build/dataset                              # dataset private
+uv run python $P/train_lora.py prepare --model 1.5b --max-steps 50 --out $P/build/1.5b-pilot
+kaggle kernels push -p $P/build/1.5b-pilot                              # chạy thử 50 bước
+uv run python $P/train_lora.py prepare --model 1.5b --out $P/build/1.5b  # chạy đủ 2 epoch
+kaggle kernels push -p $P/build/1.5b --timeout 35400                  # giây; giới hạn quota nếu treo
+kaggle kernels status aohkvd/eth-nl2sql-phase2-train
+kaggle kernels output aohkvd/eth-nl2sql-phase2-train -p models/lora/1.5b-run
+```
+
+`prepare` chép `train_lora.py` vào thư mục kernel và gắn sẵn tham số chạy, `config.json`,
+`requirements.lock` cùng SHA256 của bản đóng băng, vì script kernel của Kaggle chạy không có
+tham số. Trên Kaggle, script làm lần lượt:
+
+1. Kiểm tra bản đóng băng.
+2. Cài `requirements.lock` (có hash).
+3. Tải base model ở revision đã ghim.
+4. Kiểm tra tokenize và fused head. Trên GPU dưới sm80 (T4), chuyển attention sang nhánh lặp K/V
+   để sdpa dùng kernel memory-efficient, và so loss với nhánh GQA trước khi train (§4).
+5. Huấn luyện.
+6. Chuyển adapter sang GGUF bằng llama.cpp b12032.
+7. Ghi `run.json`.
+
+Đánh giá dev ở local. Script đọc thư mục mà `kaggle kernels output` tải về,
+`models/lora/<model>-run/` (gồm `run.json` và `gguf/<model>-e{1,2}.gguf`):
+
+```bash
+bash scripts/phase2_dev.sh 1.5b --check   # điều kiện: bản đóng băng, SHA256 adapter
+bash scripts/phase2_dev.sh 1.5b           # hệ số 0 (5.2), dev e1/e2, chấm, chọn checkpoint
+```
+
+- `generate-sql --adapter models/lora/1.5b-e2.gguf` đối chiếu adapter với `GET /lora-adapters`
+  của server. Nó ghi SHA256 và hệ số của adapter vào `.meta.json`, và thêm `.1.5b-e2` (hệ số 0
+  thì thêm `.1.5b-e2.scale0`) vào tên file dự đoán.
+- `--no-repair` chỉ cho mỗi câu một lần thử.
+- `evaluate-sql --train-manifest data/train/manifest.json` thêm phần chia `by_train_exposure`
+  (R8): câu có đích là thực thể giữ riêng, câu có đích không bị giữ riêng, và câu không có đích
+  có tên.
+
+S5 (1.5B) đã chạy xong ngày 2026-11-08:
+
+- kernel version 5 train 2 epoch trong 4,46 giờ;
+- kiểm tra hệ số 0 đạt (177/177 câu trả lời giống hệt phase 1);
+- EX dev 0,955 (e1) và 0,960 (e2), chọn `1.5b-e2`.
+
+S6 (3B) đã chạy xong cùng ngày: kernel version 7 train trong 7,79 giờ, kiểm tra hệ số 0 đạt, EX
+dev 0,977 cho cả e1 và e2, chọn `3b-e2` (hoà thì lấy epoch 2).
+
+Tóm tắt nằm ở `data/predictions/dev-phase2-{1.5b,3b}.summary.json`. Phân tích ở
+[docs/phase2-plan.md](docs/phase2-plan.md) §5.6, §5.7 và [docs/proposed-method.md](docs/proposed-method.md)
+§8.
+
 ## Dữ liệu cũ (đã lưu trữ)
 
 Tập mẫu CSV `data/raw/full/` (06/2026, giao dịch địa chỉ có nhãn + ~1% còn lại) và database
