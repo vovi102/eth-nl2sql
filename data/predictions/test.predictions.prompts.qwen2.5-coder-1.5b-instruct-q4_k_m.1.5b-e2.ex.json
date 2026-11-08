@@ -1,0 +1,160 @@
+{
+  "overall": {
+    "ex": 0.8079268292682927,
+    "ex_extra_columns_ok": 0.8079268292682927,
+    "correct": 265,
+    "questions": 328
+  },
+  "answerable": {
+    "ex": 0.7871621621621622,
+    "ex_extra_columns_ok": 0.7871621621621622,
+    "correct": 233,
+    "questions": 296
+  },
+  "unanswerable": {
+    "ex": 1.0,
+    "ex_extra_columns_ok": 1.0,
+    "correct": 32,
+    "questions": 32
+  },
+  "kinds": {
+    "correct": 265,
+    "wrong_result": 29,
+    "execution": 16,
+    "unknown_placeholder": 13,
+    "abstained": 5
+  },
+  "postgres_parses": 1.0,
+  "by_lang": {
+    "en": {
+      "ex": 0.8176100628930818,
+      "ex_extra_columns_ok": 0.8176100628930818,
+      "correct": 130,
+      "questions": 159
+    },
+    "vi": {
+      "ex": 0.7988165680473372,
+      "ex_extra_columns_ok": 0.7988165680473372,
+      "correct": 135,
+      "questions": 169
+    }
+  },
+  "by_group": {
+    "address": {
+      "ex": 0.6666666666666666,
+      "ex_extra_columns_ok": 0.6666666666666666,
+      "correct": 26,
+      "questions": 39
+    },
+    "ambiguous": {
+      "ex": 0.7777777777777778,
+      "ex_extra_columns_ok": 0.7777777777777778,
+      "correct": 35,
+      "questions": 45
+    },
+    "class": {
+      "ex": 0.6666666666666666,
+      "ex_extra_columns_ok": 0.6666666666666666,
+      "correct": 28,
+      "questions": 42
+    },
+    "entity": {
+      "ex": 1.0,
+      "ex_extra_columns_ok": 1.0,
+      "correct": 70,
+      "questions": 70
+    },
+    "nil": {
+      "ex": 1.0,
+      "ex_extra_columns_ok": 1.0,
+      "correct": 16,
+      "questions": 16
+    },
+    "plain": {
+      "ex": 1.0,
+      "ex_extra_columns_ok": 1.0,
+      "correct": 48,
+      "questions": 48
+    },
+    "token": {
+      "ex": 0.5,
+      "ex_extra_columns_ok": 0.5,
+      "correct": 26,
+      "questions": 52
+    },
+    "unsupported": {
+      "ex": 1.0,
+      "ex_extra_columns_ok": 1.0,
+      "correct": 16,
+      "questions": 16
+    }
+  },
+  "by_phenomenon": {
+    "alias": {
+      "ex": 0.7777777777777778,
+      "ex_extra_columns_ok": 0.7777777777777778,
+      "correct": 77,
+      "questions": 99
+    },
+    "ambiguous_property": {
+      "ex": 0.7777777777777778,
+      "ex_extra_columns_ok": 0.7777777777777778,
+      "correct": 35,
+      "questions": 45
+    },
+    "class": {
+      "ex": 0.6666666666666666,
+      "ex_extra_columns_ok": 0.6666666666666666,
+      "correct": 28,
+      "questions": 42
+    },
+    "multi_address": {
+      "ex": 0.9111111111111111,
+      "ex_extra_columns_ok": 0.9111111111111111,
+      "correct": 82,
+      "questions": 90
+    }
+  },
+  "discriminating": {
+    "direction": {
+      "ex": 0.8054054054054054,
+      "ex_extra_columns_ok": 0.8054054054054054,
+      "correct": 149,
+      "questions": 185
+    },
+    "status": {
+      "ex": 0.9861111111111112,
+      "ex_extra_columns_ok": 0.9861111111111112,
+      "correct": 71,
+      "questions": 72
+    },
+    "time": {
+      "ex": 0.8256410256410256,
+      "ex_extra_columns_ok": 0.8256410256410256,
+      "correct": 161,
+      "questions": 195
+    }
+  },
+  "by_train_exposure": {
+    "held_out": {
+      "ex": 0.8378378378378378,
+      "ex_extra_columns_ok": 0.8378378378378378,
+      "correct": 31,
+      "questions": 37
+    },
+    "no_named_target": {
+      "ex": 1.0,
+      "ex_extra_columns_ok": 1.0,
+      "correct": 64,
+      "questions": 64
+    },
+    "not_held_out": {
+      "ex": 0.748898678414097,
+      "ex_extra_columns_ok": 0.748898678414097,
+      "correct": 170,
+      "questions": 227
+    }
+  },
+  "train_manifest": "data/train/manifest.json",
+  "train_manifest_sha256": "ee46476cc7e31af56d5a61ecd5676b3ec03177cadbad9ba59a7810cdec2b6716"
+}

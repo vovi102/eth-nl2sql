@@ -1,0 +1,26 @@
+2026-11-08 22:12:45 phase 2 on test (S8): preconditions
+2026-11-08 22:12:45 chosen checkpoints: 3B 3b-e2, 1.5B 1.5b-e2
+2026-11-08 22:12:45 preconditions hold (--check: stopping here)
+2026-11-08 22:12:56 phase 2 on test (S8): preconditions
+2026-11-08 22:12:56 chosen checkpoints: 3B 3b-e2, 1.5B 1.5b-e2
+2026-11-08 22:13:02 llama-server ready: qwen2.5-coder-3b-instruct-q4_k_m --lora /home/khoavd/WORKSPACE/thesis/eth-nl2sql/models/lora/3b-run/gguf/3b-e2.gguf
+2026-11-08 22:13:02 dev check: 3B + 3b-e2 on dev (about 14 min)
+dev check passed: the 177 replies are identical to the S6 dev run
+2026-11-08 22:26:00 3b-e2: generating -> data/predictions/test.predictions.prompts.qwen2.5-coder-3b-instruct-q4_k_m.3b-e2.jsonl
+2026-11-08 22:49:03 3b-e2: done
+2026-11-08 22:49:03 3b-e2.no-check: generating -> data/predictions/test.predictions.prompts.qwen2.5-coder-3b-instruct-q4_k_m.3b-e2.no-check.jsonl
+2026-11-08 23:12:04 3b-e2.no-check: done
+2026-11-08 23:12:04 3b-e2.oracle: generating -> data/predictions/test.prompts.qwen2.5-coder-3b-instruct-q4_k_m.3b-e2.jsonl
+2026-11-08 23:35:42 3b-e2.oracle: done
+2026-11-08 23:35:58 llama-server ready: qwen2.5-coder-1.5b-instruct-q4_k_m --lora /home/khoavd/WORKSPACE/thesis/eth-nl2sql/models/lora/1.5b-run/gguf/1.5b-e2.gguf
+2026-11-08 23:35:58 1.5b-e2: generating -> data/predictions/test.predictions.prompts.qwen2.5-coder-1.5b-instruct-q4_k_m.1.5b-e2.jsonl
+2026-11-08 23:51:05 1.5b-e2: done
+2026-11-08 23:51:06 score: data/predictions/test.predictions.prompts.qwen2.5-coder-3b-instruct-q4_k_m.3b-e2.jsonl
+2026-11-08 23:54:36 score: data/predictions/test.predictions.prompts.qwen2.5-coder-3b-instruct-q4_k_m.3b-e2.no-check.jsonl
+2026-11-08 23:58:28 score: data/predictions/test.prompts.qwen2.5-coder-3b-instruct-q4_k_m.3b-e2.jsonl
+2026-11-09 00:02:51 score: data/predictions/test.predictions.prompts.qwen2.5-coder-1.5b-instruct-q4_k_m.1.5b-e2.jsonl
+3b                         EX 0.814  267/328  (phase 1 252; {'better': 27, 'worse': 12, 'p': 0.023703})
+3b_no_placeholder_check    EX 0.814  267/328  (phase 1 218; {'better': 57, 'worse': 8, 'p': 0.0})
+3b_oracle_linking          EX 0.823  270/328  (phase 1 259; {'better': 26, 'worse': 15, 'p': 0.117275})
+1.5b                       EX 0.808  265/328  (phase 1 201; {'better': 64, 'worse': 0, 'p': 0.0})
+2026-11-09 00:07:12 finished in 114 min; failed: none

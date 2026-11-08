@@ -1034,6 +1034,161 @@ hệt lần chạy 3B mặc định của phase 1, nên EX cũng là 159/177.
   - với e2, mỗi câu mất 4,23 s và cả lần chạy 794 s, gần bằng phase 1. Chi phí của LoRA được bù
     bằng việc không phải hỏi lại.
 
+### 5.8 Kết quả test (S8, 2026-11-08 – 2026-11-09, sau khi thấy test phase 1)
+
+`scripts/phase2_test.sh` chạy **một lần**, từ 22:13 đến 00:07 (114 phút), không bước nào lỗi.
+Trước khi đọc test, script kiểm tra bốn điều:
+
+- bản đóng băng S3 còn nguyên;
+- checkpoint lấy từ `dev-phase2-{3b,1.5b}.summary.json` (`3b-e2`, `1.5b-e2`), và SHA256 của GGUF
+  khớp `run.json`;
+- file prompt và file linking của test giống hệt từng byte lúc S4, nên hai phase trả lời cùng một
+  bộ prompt;
+- chạy lại dev với 3B + `3b-e2` cho 177/177 câu trả lời giống hệt S6.
+
+Nguồn (**đo**):
+
+- `data/predictions/test-phase2.summary.json` và `test-phase2.log`;
+- các file `test.*.{3b-e2,1.5b-e2}*.{ex.json,ex-details.jsonl,jsonl.meta.json}`.
+
+Kiểm định McNemar chính xác (hai phía) tính trên từng câu, so với cấu hình tương ứng của phase 1
+(S4). Các phần chia của phase 1 ở bảng thứ hai là **tự tính** từ `ex-details` của S4: gần/xa và
+nghĩa linking theo cùng cách như mục 5.5; thực thể giữ riêng bằng hàm `train_exposure` của
+`evaluate-sql`.
+
+| Cấu hình | EX phase 1 | EX phase 2 | Tốt lên / xấu đi | p |
+|---|---:|---:|---:|---:|
+| **3B, mặc định** | 0,768 (252) | **0,814 (267)** | 27 / 12 | 0,024 |
+| 3B, `--no-placeholder-check` | 0,665 (218) | 0,814 (267) | 57 / 8 | < 0,0001 |
+| 3B, linking oracle | 0,790 (259) | 0,823 (270) | 26 / 15 | 0,117 |
+| **1.5B, mặc định** | 0,613 (201) | **0,808 (265)** | 64 / 0 | < 0,0001 |
+
+Số câu đúng theo phần (phase 1 → phase 2):
+
+| Phần | Số câu | 3B | 3B oracle | 1.5B |
+|---|---:|---|---|---|
+| Câu trả lời được | 296 | 220 → 235 | 227 → 238 | 169 → 233 |
+| Template gần | 180 | 157 → 172 | 158 → 175 | 117 → 170 |
+| Template xa | 116 | 63 → 63 | 69 → 63 | 52 → 63 |
+| Nghĩa property của bộ linking khớp gold | 259 | 208 → 220 | 209 → 221 | 154 → 218 |
+| Nghĩa property lệch gold | 37 | 12 → 15 | 18 → 17 | 15 → 15 |
+| Thực thể giữ riêng | 37 | 29 → 32 | 29 → 33 | 19 → 31 |
+| Không giữ riêng | 227 | 167 → 171 | 174 → 173 | 129 → 170 |
+| Không có đích có tên | 64 | 56 → 64 | 56 → 64 | 53 → 64 |
+| VI | 169 | 127 → 137 | 129 → 139 | 90 → 135 |
+| EN | 159 | 125 → 130 | 130 → 131 | 111 → 130 |
+| Nhóm entity / address / token / class | 70 / 39 / 52 / 42 | 62 → 70, 23 → 26, 31 → 26, 29 → 28 | 64 → 70, 23 → 26, 32 → 26, 31 → 28 | 45 → 70, 26 → 26, 22 → 26, 12 → 28 |
+| Nhóm ambiguous / plain / nil + unsupported | 45 / 48 / 32 | 35 → 37, 40 → 48, 32 → 32 | 37 → 40, 40 → 48, 32 → 32 | 27 → 35, 37 → 48, 32 → 32 |
+| Phân biệt được: hướng / trạng thái / thời gian | 185 / 72 / 195 | 140 → 151, 61 → 71, 150 → 163 | 145 → 153, 65 → 72, 153 → 165 | 104 → 149, 65 → 71, 116 → 161 |
+
+Template xa, số câu đúng:
+
+| Template xa | Số câu | 3B phase 1 | 3B + e2 | 1.5B phase 1 | 1.5B + e2 |
+|---|---:|---:|---:|---:|---:|
+| `daily_avg_gas_price` | 12 | 4 | 12 | 2 | 12 |
+| `entity_failed_calls` | 14 | 11 | 14 | 13 | 14 |
+| `address_tx_sent_count` | 13 | 13 | 13 | 13 | 13 |
+| `blob_tx_count` | 12 | 12 | 12 | 12 | 12 |
+| `contract_creation_count` | 12 | 12 | 12 | 12 | 12 |
+| `token_top_receivers` | 13 | 5 | 0 | 0 | 0 |
+| `address_largest_eth_sent` | 13 | 3 | 0 | 0 | 0 |
+| `class_top_contracts` | 14 | 3 | 0 | 0 | 0 |
+| `token_largest_transfer` | 13 | 0 | 0 | 0 | 0 |
+
+- **Phase 2 cao hơn phase 1 ở cả bốn cấu hình, và mức tăng nằm hết ở template gần.**
+  - 3B tăng 15 câu (27 tốt lên, 12 xấu đi; p = 0,024). Template gần tăng từ 157 lên 172/180
+    (0,956), gần mức dev; template xa giữ nguyên 63/116.
+  - 1.5B tăng 64 câu và không câu nào xấu đi.
+- **3B và 1.5B sau fine-tune không phân biệt được trên test.** 3B đúng 267 câu, 1.5B đúng 265:
+  3B đúng thêm 2 câu, 1.5B không đúng câu nào mà 3B sai (p = 0,5). Trên dev cũng vậy. 1.5B + e2
+  so với 3B phase 1: 25 câu tốt lên, 12 câu xấu đi (p = 0,047).
+- **Ở template xa, adapter đổi kỹ năng chứ không thêm kỹ năng.** Với 3B, tổng template xa không
+  đổi, nhưng thành phần đổi:
+  - +11 câu ở hai template mà train có đủ kỹ năng thành phần. `daily_avg_gas_price` từ 4 lên
+    12/12, vì mọi câu trả lời đều chọn cột ngày và `ORDER BY day`. `entity_failed_calls` từ 11
+    lên 14/14, gồm cả 5 câu bộ linking thiếu nghĩa `tx_count`;
+  - −11 câu ở ba template cần khung SQL mà train không có (chi tiết ở dưới).
+
+  Với oracle, template xa giảm từ 69 xuống 63; với 1.5B, tăng từ 52 lên 63. Ở cả bốn lần chạy
+  phase 2, chín template xa chia làm hai nhóm: năm template có đủ kỹ năng thì đúng hết, bốn
+  template cần khung train không có thì đúng 0 câu. Đây là cùng hiện tượng đã thấy trên dev
+  (`entity_top_callers`, mục 5.7), nay ở ba template.
+- **Ba template xấu đi, và một template vẫn 0** (3B + e2, linking của bộ linking):
+  - `token_top_receivers` 0/13 (phase 1: 5/13). Evidence của template này có dòng
+    `-- "nhận": to_address IN {E}`, chưa gắn placeholder. 12/13 câu chép nguyên dòng đó vào
+    `WHERE` nên bị chấm `unknown_placeholder`; câu còn lại lỗi `execution`. Không câu nào trong
+    1.968 prompt train có `{E}` chưa gắn placeholder, nên adapter đã học "mỗi dòng evidence là một
+    điều kiện". Cùng cơ chế làm sai một câu `ambiguous_volume` (q00385): bộ linking đọc "Morpho"
+    thành token, và evidence có dòng `"chảy vào": to_address IN {E}`.
+  - `address_largest_eth_sent` 0/13 (phase 1: 3/13).
+    - 10 câu lỗi `execution` vì gọi cột mã giao dịch là `transaction_hash` (tên cột ở
+      `token_transfers`) thay cho `hash` của `transactions`. 8 trong 10 câu có đúng khung của
+      gold (`value / 1e18`, `ORDER BY … LIMIT 1`) và chỉ sai tên cột; 2 câu viết
+      `SUM(value) … GROUP BY transaction_hash`.
+    - Lần hỏi lại, có kèm thông báo lỗi của DuckDB, lặp đúng SQL cũ.
+    - 3 câu EN "What was the largest ETH amount …" viết `MAX(value) / 1e18`: đúng số lượng nhưng
+      không có `hash` mà gold đòi (lỗi gold, mục 5.5).
+    - Không câu trả lời train nào chọn cột `hash` hay `transaction_hash`, và không câu nào có
+      `LIMIT 1`.
+  - `class_top_contracts` 0/14 (phase 1: 3/14):
+    - 5 câu EN vẫn bị từ chối vì "Rank";
+    - 5 câu VI nhóm theo cột `address`, cột này không có trong `transactions` (lỗi `execution`);
+    - 4 câu sai kết quả, cả 4 nhóm theo `token_address` trên `token_transfers`.
+
+    Với linking oracle, 5 câu "Rank" được trả lời nhưng cả 7 câu EN đều nhóm theo `token_address`
+    trên `token_transfers`. Đó là khung top-k duy nhất của train (60 câu: "top token nhận"), và là
+    cùng kiểu lỗi của 1.5B + e2 ở `entity_top_callers` trên dev.
+  - `token_largest_transfer` 0/13, như phase 1. 7 câu tính `SUM` trên cả khoảng thời gian; 6 câu
+    `SUM … GROUP BY token_address … LIMIT 1`. Không câu nào chứa số lượng của lượt chuyển lớn nhất
+    (phase 1: 4/13 câu có).
+- **Template gần: còn 8 câu sai** với 3B + e2 (1.5B + e2: 10):
+  - `ambiguous_users` 9/15. 5 câu "người dùng của X" lọc `token_address IN {E1}` trên
+    `transactions` (lỗi `execution`). Phase 1 có kiểu lỗi khác: lọc `from_address`;
+  - `ambiguous_times` 14/15;
+  - `ambiguous_volume` 14/15 (q00385 ở trên).
+
+  `address_eth_received` lên 13/13 (phase 1: 7/13). Adapter không còn viết subquery vào
+  `contracts.name`.
+- **Kiểm tra placeholder và hỏi lại không còn tác dụng.** Không câu nào thiếu placeholder ở lần
+  thử đầu, nên mặc định và `--no-placeholder-check` cho SQL giống hệt nhau ở 328/328 câu. 34 câu
+  được hỏi lại (21 lỗi `execution`, 13 `unknown_placeholder`). Cả 34 câu trả lời lặp đúng SQL cũ,
+  nên không câu nào được sửa. Phase 1: 63 câu hỏi lại, 43 câu sửa được. Với 1.5B + e2: 29 câu
+  hỏi lại, 0 câu sửa được.
+- **Oracle − pipeline = 0,009** (3 câu tốt lên, 0 xấu đi; p = 0,25). Phase 1: 0,021. Trên 37 câu
+  bộ linking đọc lệch nghĩa, 3B tăng từ 12 lên 15. Cả 3 câu tăng đều ở `entity_failed_calls`;
+  các template khác có cùng kết quả ở cả hai phase. Vậy với 3B, adapter không làm model kém bền
+  hơn với nhiễu linking.
+- **Thực thể giữ riêng (R8).** Với 3B + e2:
+  - EX là 32/37 (0,865) ở câu có thực thể giữ riêng, 171/227 (0,753) ở câu không giữ riêng.
+    Khoảng cách này đến từ phân bố template: câu giữ riêng ít thuộc template xa hơn;
+  - chỉ tính template gần: 25/27 (0,926) so với 135/141 (0,957). Phase 1: 20/27 và 125/141.
+    Mức tăng ở câu giữ riêng (+5/27) không nhỏ hơn ở câu không giữ riêng (+10/141), nên không
+    thấy dấu hiệu adapter chỉ giúp thực thể đã thấy khi train. Địa chỉ nằm trong evidence của
+    prompt. Số câu giữ riêng nhỏ;
+  - 5 câu giữ riêng còn sai: 2 `token_top_receivers`, 1 `token_largest_transfer`, 2
+    `ambiguous_users`.
+- **Từ dev sang test.** 3B + e2 giảm từ 0,977 xuống 0,814 (phase 1: từ 0,898 xuống 0,768);
+  1.5B + e2 giảm từ 0,960 xuống 0,808. Template gần trên test (0,956) gần mức dev; khoảng cách
+  nằm ở template xa (0,543).
+- **Đo phụ ở hai template "lớn nhất" (mục 5.5).** Chạy lại đúng script của S4 cho cả hai phase.
+  Script tính lại số của phase 1 đúng như S4. Trong 10 câu chỉ hỏi số lượng, kết quả có số lượng
+  của gold ở:
+  - 3B + e2: 3 câu (phase 1: 5);
+  - oracle + e2: 3 câu (phase 1: 4);
+  - 1.5B + e2: 5 câu (phase 1: 5).
+
+  Nếu tính cả các câu này, EX 3B là 0,784 → 0,823; oracle 0,802 → 0,832; 1.5B 0,628 → 0,823.
+  Kết luận không đổi. Số chính thức vẫn là EX ở bảng đầu (**tự tính**, script
+  `s8_largest.py` trong scratchpad, cùng code với script của S4).
+- **Thời gian:**
+  - 3B + e2: 1.371 s cho 328 câu (4,57 s mỗi câu `sql`); phase 1: 1.385 s (4,67 s);
+  - 1.5B + e2: 894 s (2,81 s); phase 1: 1.066 s (3,36 s);
+  - câu trả lời dài nhất là 124 token; phase 1 có câu chạm giới hạn 512.
+- **Không huấn luyện lại.** Các lỗi ở trên là khung SQL mà train không có, không phải lỗi đường
+  ống hay dữ liệu đã chứng minh, nên mục 9 không cho phép lần huấn luyện thứ hai. Thêm template
+  train cho các khung này từ đây là thay đổi "sau khi thấy test phase 2", và không còn test sạch
+  để đo nó.
+
 ## 6. File và lệnh mới
 
 | File | Nội dung |
@@ -1049,6 +1204,7 @@ hệt lần chạy 3B mặc định của phase 1, nên EX cũng là 159/177.
 | `tests/test_template_signature.py`, `tests/test_train_templates.py` | **Đã có (S1).** Chuẩn hoá SQL, các kiểu vi phạm và gần, mọi câu mẫu train cho bản ghi hợp lệ, bộ linking đọc đúng (R9), không trùng với cách bộ linking đọc câu dev/test |
 | `tests/test_train_build.py` | **Đã có (S2).** Rút và lọc thực thể giữ riêng; số câu mỗi variant; `token_out`; mọi lý do loại của L1 (bộ linking giả lập); phân loại lỗi thực thể/token. Hai lần chạy trên DB mẫu có KB làm giàu: prompt train giống hệt prompt `generate-sql`, B8 đọc lại đúng gold, manifest khớp với file; thực thể giữ riêng không bị nêu tên ở đâu |
 | `scripts/phase2_dev.sh` | **Đã có (S5).** Chấm dev hai checkpoint của một model, không cần trông, chạy tiếp được sau khi đứt: kiểm tra bản đóng băng và SHA256 của adapter so với `run.json`; kiểm tra runtime ở hệ số 0 (5.2); dev với từng adapter; chấm điểm với `--train-manifest`; chọn checkpoint theo 5.3; ghi `data/predictions/dev-phase2-<model>.summary.json` |
+| `scripts/phase2_test.sh` | **Đã có (S8, sau khi thấy test phase 1).** Chạy test phase 2 một lần, không cần trông. Kiểm tra trước: bản đóng băng; checkpoint đã chọn trên dev và SHA256 của GGUF; file prompt và linking test giống hệt S4; chạy lại dev với 3B + `3b-e2` phải giống hệt S6. Sau đó sinh SQL cho bốn cấu hình của 5.5 (`--allow-test --adapter`), chấm với `--train-manifest`, so với phase 1 bằng McNemar và ghi `data/predictions/test-phase2.summary.json`. `--check` chỉ kiểm tra điều kiện |
 | README | Mục "Fine-tune LoRA (phase 2)": lệnh sinh, đăng dataset, huấn luyện, chuyển adapter, đánh giá |
 
 Mỗi dòng của `sft.jsonl` có dạng:
@@ -1087,8 +1243,8 @@ uv run eth-nl2sql evaluate-sql --gold data/benchmark/dev.jsonl --predictions dat
 | S5 | **Xong (2026-11-07 – 2026-11-08), sau khi thấy test phase 1.** Dataset private `aohkvd/eth-nl2sql-phase2-sft`. Kernel `aohkvd/eth-nl2sql-phase2-train`: version 1 lỗi `torchao`; version 2 chạy thử 50 bước (162 s/bước, chậm vì attention rơi về kernel math); version 3 lỗi ở `check_attention`; version 4 kiểm tốc độ 10 bước sau khi sửa (72,6 s/bước); version 5 chạy đủ 2 epoch trong 4,46 giờ (65,9 s/bước) (mục 4). Kiểm tra runtime: 177/177 câu trả lời ở hệ số 0 giống hệt phase 1. EX dev: e1 0,955, e2 0,960 → chọn **`1.5b-e2`** (mục 5.6). Dùng 7,53 giờ GPU | Người dùng cho phép đăng dataset, push kernel và tải 3,09 GB trên Kaggle (2026-11-07); chọn ngưỡng tốc độ cho lần chạy đủ (2026-11-08) |
 | S6 | **Xong (2026-11-08), sau khi thấy test phase 1.** Kernel version 6 kiểm 10 bước (114,6 s/bước, đạt ngưỡng ≤ 145 s); version 7 chạy đủ 2 epoch trong 7,79 giờ (116,0 s/bước) (mục 4). Kiểm tra runtime: 177/177 câu trả lời ở hệ số 0 giống hệt phase 1. EX dev: e1 và e2 cùng 0,977 → chọn **`3b-e2`** (mục 5.7). Quota sau S6: 15,88 giờ | Người dùng cho phép S6 với cùng quy tắc ngưỡng (2026-11-08) |
 | S7 | **Xong (2026-11-08), sau khi thấy test phase 1.** Dataset private `aohkvd/eth-nl2sql-phase2-dev-prompts` (161 prompt `sql` của dev). Kernel `aohkvd/eth-nl2sql-phase2-fp16` version 1 sinh fp16 trong 0,91 giờ; Q4_K_M chạy ở local. Dev, một lần thử, không kiểm tra placeholder: base Q4_K_M 136, fp16 94; + `3b-e2` Q4_K_M 173, fp16 168 (mục 5.4) | Người dùng cho phép ("làm S7", 2026-11-08) |
-| S8 | Chạy test phase 2 theo mục 5.5, cộng phần chia đã thấy / chưa thấy | Cho phép `--allow-test` |
-| S9 | Viết kết quả vào §8, cập nhật README | |
+| S8 | **Xong (2026-11-08 22:13 – 2026-11-09 00:07), sau khi thấy test phase 1.** `scripts/phase2_test.sh` chạy một lần, 114 phút, chạy lại dev giống hệt S6 (177/177). EX test: 3B + `3b-e2` 0,814 (phase 1: 0,768; p = 0,024), oracle 0,823, `--no-placeholder-check` 0,814, 1.5B + `1.5b-e2` 0,808 (phase 1: 0,613). Template gần 172/180, template xa 63/116 như phase 1 (mục 5.8) | Người dùng cho phép `--allow-test` ("chạy s8", 2026-11-08) |
+| S9 | **Xong (2026-11-09).** Kết quả ở mục 5.8, [proposed-method.md](proposed-method.md) §8 và README | |
 
 Sau S4, mọi thay đổi kế hoạch phase 2 phải ghi rõ là "sau khi thấy test phase 1".
 
@@ -1108,7 +1264,8 @@ Sau S4, mọi thay đổi kế hoạch phase 2 phải ghi rõ là "sau khi thấ
 Đánh giá chạy local, không tốn quota:
 - dev: 790 s cho một lần chạy 3B (**đo**: `wall_seconds` trong `.meta.json` của lần chạy 3B mặc
   định);
-- test: khoảng 25 phút (**ước lượng**, theo tỉ lệ 328/177);
+- test: 1.385 s cho 3B phase 1, 1.371 s cho 3B + `3b-e2`, 894 s cho 1.5B + `1.5b-e2` (**đo**:
+  `wall_seconds`, mục 5.8). Cả S8 mất 114 phút (**đo**: `test-phase2.log`);
 - dev với 1.5B + LoRA: 449–454 s cho một lần chạy, 2,6 s/câu (**đo**, mục 5.6). Nạp adapter ở
   hệ số 0 làm mỗi câu chậm hơn khoảng 20% (3,95 s so với 3,28 s). Adapter thật lại cho câu trả
   lời ngắn hơn và gần như không phải hỏi lại, nên lần chạy nhanh hơn phase 1 (647 s).

@@ -303,6 +303,31 @@ S7 đã chạy ngày 2026-11-08 (kernel fp16 mất 0,91 giờ GPU). Trên dev, v
 kiểm tra placeholder: 3B base đúng 136 câu ở Q4_K_M và 94 câu ở fp16; 3B + `3b-e2` đúng 173 câu
 ở Q4_K_M và 168 câu ở fp16.
 
+### Test phase 2 (S8)
+
+Chỉ chạy một lần, khi người dùng cho phép `--allow-test`. Script không cần trông, mất khoảng 2 giờ
+trên GTX 1650:
+
+```bash
+bash scripts/phase2_test.sh --check   # bản đóng băng, checkpoint đã chọn, input test giống S4
+bash scripts/phase2_test.sh           # chạy lại dev, 4 cấu hình trên test, chấm, so với phase 1
+```
+
+Trước khi đọc test, script chạy lại dev với 3B + `3b-e2` và dừng nếu câu trả lời khác S6. Tóm tắt
+nằm ở `data/predictions/test-phase2.summary.json`; log ở `data/predictions/test-phase2.log`.
+
+S8 đã chạy ngày 2026-11-08 – 2026-11-09 (114 phút). EX test so với phase 1:
+
+| Cấu hình | Phase 1 | Phase 2 |
+|---|---|---|
+| 3B, mặc định | 0,768 | 0,814 |
+| 3B, `--no-placeholder-check` | 0,665 | 0,814 |
+| 3B, linking oracle | 0,790 | 0,823 |
+| 1.5B, mặc định | 0,613 | 0,808 |
+
+Phân tích ở [docs/phase2-plan.md](docs/phase2-plan.md) §5.8 và
+[docs/proposed-method.md](docs/proposed-method.md) §8.
+
 ## Dữ liệu cũ (đã lưu trữ)
 
 Tập mẫu CSV `data/raw/full/` (06/2026, giao dịch địa chỉ có nhãn + ~1% còn lại) và database

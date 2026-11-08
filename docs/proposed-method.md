@@ -305,7 +305,7 @@ Mỗi cấu hình chạy cho cả phase 1 và phase 2. Ngoại lệ (quyết đ�
 | Sinh SQL + B8 (`generate-sql`, `src/eth_nl2sql/sql_generation.py`) | Xong; client tách riêng để phase 2 dùng lại. Kết quả dev ở bảng dưới |
 | Định dạng nhãn linking (gold và đầu ra bộ linking) | Xong: [linking-labels.md](linking-labels.md) |
 | Benchmark (template, nhãn gold) | Xong: 505 câu, 40 template đã duyệt, dev 177 / test 328 chia theo template (`data/benchmark/`, [benchmark.md](benchmark.md)); tập 169 thực thể sau đợt duyệt 3–4; sinh lại 2026-11-03 để bỏ câu hoà ở `LIMIT` (thay 4 câu dev, 2 câu test) |
-| Phase 2 (LoRA) | Đã lập kế hoạch và chốt quyết định 14–23 (2026-11-04, [phase2-plan.md](phase2-plan.md)). S0 xong: phase 1 được chốt trong `data/predictions/phase1-freeze.json` (SHA256 của KB, model, code, prompt/linking và 7 lần chạy dev). `property_senses.csv` đã đổi lúc 2026-11-04 19:53, sau benchmark và prompt dev, nhưng chỉ ở các cột không nạp vào `link`: link lại dev và dựng lại 5 file prompt dev cho file giống hệt từng byte. S1 xong, người dùng duyệt 2026-11-05 (quyết định 24–27): 30 template train-only (`train_templates.py`) và bộ kiểm tra rò rỉ (`template_signature.py`), 0 vi phạm ([phase2-plan.md](phase2-plan.md) §2.1, §2.5). S2 xong (2026-11-05): `data/train/`, 1.968 ví dụ (98 val), 4.277–4.624 token mỗi ví dụ, 20 thực thể giữ riêng không bị nêu tên ([phase2-plan.md](phase2-plan.md) §2.6). S3 xong (2026-11-05 22:42): đóng băng dữ liệu train và cấu hình huấn luyện (`data/train/freeze.json`). S4 xong (2026-11-06): test phase 1, kết quả ở bảng dưới. S5 xong (2026-11-08, sau khi thấy test phase 1): LoRA cho 1.5B trên Kaggle (2 epoch, 4,46 giờ trên một T4), chọn checkpoint `1.5b-e2`, EX dev 0,960 (kết quả ở dưới; [phase2-plan.md](phase2-plan.md) §4, §5.6). S6 xong (2026-11-08): LoRA cho 3B (7,79 giờ trên một T4), chọn `3b-e2`, EX dev 0,977 ([phase2-plan.md](phase2-plan.md) §5.7). S7 xong (2026-11-08): ablation lượng tử hoá trên dev ([phase2-plan.md](phase2-plan.md) §5.4). Chưa chạy S8 (test phase 2) |
+| Phase 2 (LoRA) | Đã lập kế hoạch và chốt quyết định 14–23 (2026-11-04, [phase2-plan.md](phase2-plan.md)). S0 xong: phase 1 được chốt trong `data/predictions/phase1-freeze.json` (SHA256 của KB, model, code, prompt/linking và 7 lần chạy dev). `property_senses.csv` đã đổi lúc 2026-11-04 19:53, sau benchmark và prompt dev, nhưng chỉ ở các cột không nạp vào `link`: link lại dev và dựng lại 5 file prompt dev cho file giống hệt từng byte. S1 xong, người dùng duyệt 2026-11-05 (quyết định 24–27): 30 template train-only (`train_templates.py`) và bộ kiểm tra rò rỉ (`template_signature.py`), 0 vi phạm ([phase2-plan.md](phase2-plan.md) §2.1, §2.5). S2 xong (2026-11-05): `data/train/`, 1.968 ví dụ (98 val), 4.277–4.624 token mỗi ví dụ, 20 thực thể giữ riêng không bị nêu tên ([phase2-plan.md](phase2-plan.md) §2.6). S3 xong (2026-11-05 22:42): đóng băng dữ liệu train và cấu hình huấn luyện (`data/train/freeze.json`). S4 xong (2026-11-06): test phase 1, kết quả ở bảng dưới. S5 xong (2026-11-08, sau khi thấy test phase 1): LoRA cho 1.5B trên Kaggle (2 epoch, 4,46 giờ trên một T4), chọn checkpoint `1.5b-e2`, EX dev 0,960 (kết quả ở dưới; [phase2-plan.md](phase2-plan.md) §4, §5.6). S6 xong (2026-11-08): LoRA cho 3B (7,79 giờ trên một T4), chọn `3b-e2`, EX dev 0,977 ([phase2-plan.md](phase2-plan.md) §5.7). S7 xong (2026-11-08): ablation lượng tử hoá trên dev ([phase2-plan.md](phase2-plan.md) §5.4). S8 xong (2026-11-09): test phase 2 chạy một lần, EX 3B + LoRA 0,814, 1.5B + LoRA 0,808 (kết quả ở dưới; [phase2-plan.md](phase2-plan.md) §5.8). S9 xong: kết quả đã ghi vào đây, phase2-plan và README |
 
 **Kết quả phase 1 trên dev (2026-11-04).** Benchmark sau khi bỏ câu hoà ở `LIMIT`
 ([benchmark.md](benchmark.md) §6, bước 6). Zero-shot, giải mã tham lam, kiểm tra placeholder và
@@ -546,6 +546,61 @@ một lần thử, không kiểm tra placeholder. Nguồn: `data/predictions/dev
   xa `entity_top_callers`, nơi fp16 + LoRA nhóm theo `to_address` cả ở câu tiếng Anh.
 - Vậy chạy adapter học trên fp16 bằng runtime Q4_K_M không làm mất EX trên dev. Lỗi mà adapter
   đưa vào template xa có thật ở fp16 (5/14 câu đúng) và Q4_K_M chỉ che bớt (10/14).
+
+**Kết quả phase 2 trên test (S8, 2026-11-08 – 2026-11-09, sau khi thấy test phase 1).** Chạy một
+lần bằng `scripts/phase2_test.sh` (114 phút, không bước nào lỗi), với checkpoint đã chọn trên dev
+(`3b-e2`, `1.5b-e2`). Script kiểm tra trước ba điều: file prompt và linking test giống hệt S4;
+chạy lại dev với 3B + `3b-e2` cho 177/177 câu trả lời giống hệt S6; mọi tham số khác như phase 1.
+Nguồn: `data/predictions/test-phase2.summary.json` và các file `test.*.{3b-e2,1.5b-e2}*` (**đo**);
+các phần chia của phase 1 là **tự tính** từ `ex-details` của S4. Kiểm định McNemar chính xác
+(hai phía) so với cấu hình tương ứng của phase 1. Chi tiết ở [phase2-plan.md](phase2-plan.md)
+§5.8.
+
+| Cấu hình | EX test phase 1 | EX test phase 2 | Tốt lên / xấu đi (p) | Template gần (180) | Template xa (116) | EX dev phase 2 |
+|---|---|---|---|---|---|---|
+| **3B, mặc định** | 0,768 | **0,814** | 27 / 12 (0,024) | 157 → 172 | 63 → 63 | 0,977 |
+| 3B, `--no-placeholder-check` | 0,665 | 0,814 | 57 / 8 (< 0,0001) | 132 → 172 | 54 → 63 | |
+| 3B, linking oracle | 0,790 | 0,823 | 26 / 15 (0,117) | 158 → 175 | 69 → 63 | |
+| **1.5B, mặc định** | 0,613 | **0,808** | 64 / 0 (< 0,0001) | 117 → 170 | 52 → 63 | 0,960 |
+
+- **Fine-tune giúp rõ ở template gần, không giúp ở template xa.** 3B tăng 15 câu (vượt ngưỡng ±9
+  câu), toàn bộ ở 13 template có template train gần. 1.5B tăng 64 câu và không câu nào xấu đi.
+  Sau fine-tune, hai model gần như bằng nhau: 267 và 265 câu (3B đúng thêm 2 câu, p = 0,5). Vậy
+  1.5B + LoRA đạt mức của 3B + LoRA và vượt 3B phase 1 (25 câu tốt lên, 12 xấu đi; p = 0,047).
+- **Template xa của 3B giữ nguyên 63/116, nhưng đổi thành phần.**
+  - Tăng 11 câu ở hai template mà train có đủ kỹ năng thành phần: `daily_avg_gas_price` (4 lên
+    12/12) và `entity_failed_calls` (11 lên 14/14).
+  - Giảm 11 câu ở ba template cần khung SQL train không có: `token_top_receivers` (5 xuống 0/13),
+    `address_largest_eth_sent` (3 xuống 0/13), `class_top_contracts` (3 xuống 0/14).
+  - `token_largest_transfer` vẫn 0/13.
+
+  Ở các template này, adapter dùng khung hoặc tên cột của train thay cho thứ còn thiếu:
+  - `token_largest_transfer`: "lớn nhất" thành `SUM`;
+  - `address_largest_eth_sent`: 8/13 câu có đúng khung `ORDER BY … LIMIT 1` nhưng gọi cột mã
+    giao dịch là `transaction_hash` (tên ở `token_transfers`), cột này không có trong
+    `transactions`. Lần hỏi lại lặp đúng câu cũ;
+  - top-k thành `GROUP BY token_address` trên `token_transfers`, khung top-k duy nhất của train.
+
+  Adapter còn chép nguyên vào SQL dòng evidence `to_address IN {E}` chưa gắn placeholder, dòng
+  này chỉ có ở `token_top_receivers`: 12/13 câu bị chấm `unknown_placeholder`. Trên dev cũng thấy
+  hiện tượng này ở `entity_top_callers`. Kết quả cho thấy LoRA trên template train-only dạy khung
+  SQL của train chứ không dạy kỹ năng SQL tổng quát; model gốc làm được một phần các câu xa này
+  nhờ khả năng chung.
+- **Các thành phần của phase 1 không còn tác dụng.**
+  - Không câu nào thiếu placeholder ở lần thử đầu, nên mặc định và `--no-placeholder-check` cho
+    SQL giống hệt nhau ở 328/328 câu.
+  - 34 câu được hỏi lại, và cả 34 lần model lặp đúng SQL cũ (phase 1: 43/63 câu sửa được).
+  - Khoảng cách oracle − pipeline giảm từ 0,021 xuống 0,009 (3 / 0, p = 0,25).
+- **Thực thể giữ riêng khỏi train** (37 câu test). Chỉ tính template gần, 3B + LoRA đúng 25/27 câu
+  có thực thể giữ riêng và 135/141 câu không giữ riêng (phase 1: 20/27 và 125/141). Không thấy
+  dấu hiệu adapter chỉ giúp thực thể đã thấy khi train, vì địa chỉ đến từ evidence. Số câu nhỏ.
+- **Từ dev sang test**, 3B + LoRA giảm 0,163 (phase 1: 0,130) và 1.5B + LoRA giảm 0,152. Template
+  gần trên test (0,956) gần mức dev; khoảng cách nằm hết ở template xa (0,543).
+- **Đo phụ ở hai template "lớn nhất"** (cùng script với S4). Trong 10 câu chỉ hỏi số lượng, 3B +
+  LoRA có số lượng của gold ở 3 câu (phase 1: 5). Nếu tính cả các câu này, EX 3B là 0,784 → 0,823
+  và 1.5B là 0,628 → 0,823. Số chính thức vẫn là EX.
+- **Không huấn luyện lại.** Các lỗi trên là khung SQL train không có, không phải lỗi đường ống hay
+  dữ liệu đã chứng minh, nên tiêu chí dừng (quyết định 23) không cho lần huấn luyện thứ hai.
 
 ## 9. Các quyết định (chốt ngày 2026-11-01, bổ sung 2026-11-03 và 2026-11-04)
 

@@ -1,0 +1,138 @@
+{
+ "3b": {
+  "ex": 0.8140243902439024,
+  "correct": 267,
+  "questions": 328,
+  "phase1": {
+   "ex": 0.7682926829268293,
+   "correct": 252
+  },
+  "vs_phase1": {
+   "better": 27,
+   "worse": 12,
+   "p": 0.023703
+  },
+  "by_train_exposure": {
+   "held_out": {
+    "ex": 0.8648648648648649,
+    "ex_extra_columns_ok": 0.8648648648648649,
+    "correct": 32,
+    "questions": 37
+   },
+   "no_named_target": {
+    "ex": 1.0,
+    "ex_extra_columns_ok": 1.0,
+    "correct": 64,
+    "questions": 64
+   },
+   "not_held_out": {
+    "ex": 0.7533039647577092,
+    "ex_extra_columns_ok": 0.7533039647577092,
+    "correct": 171,
+    "questions": 227
+   }
+  }
+ },
+ "3b_no_placeholder_check": {
+  "ex": 0.8140243902439024,
+  "correct": 267,
+  "questions": 328,
+  "phase1": {
+   "ex": 0.6646341463414634,
+   "correct": 218
+  },
+  "vs_phase1": {
+   "better": 57,
+   "worse": 8,
+   "p": 0.0
+  },
+  "by_train_exposure": {
+   "held_out": {
+    "ex": 0.8648648648648649,
+    "ex_extra_columns_ok": 0.8648648648648649,
+    "correct": 32,
+    "questions": 37
+   },
+   "no_named_target": {
+    "ex": 1.0,
+    "ex_extra_columns_ok": 1.0,
+    "correct": 64,
+    "questions": 64
+   },
+   "not_held_out": {
+    "ex": 0.7533039647577092,
+    "ex_extra_columns_ok": 0.7533039647577092,
+    "correct": 171,
+    "questions": 227
+   }
+  }
+ },
+ "3b_oracle_linking": {
+  "ex": 0.823170731707317,
+  "correct": 270,
+  "questions": 328,
+  "phase1": {
+   "ex": 0.7896341463414634,
+   "correct": 259
+  },
+  "vs_phase1": {
+   "better": 26,
+   "worse": 15,
+   "p": 0.117275
+  },
+  "by_train_exposure": {
+   "held_out": {
+    "ex": 0.8918918918918919,
+    "ex_extra_columns_ok": 0.8918918918918919,
+    "correct": 33,
+    "questions": 37
+   },
+   "no_named_target": {
+    "ex": 1.0,
+    "ex_extra_columns_ok": 1.0,
+    "correct": 64,
+    "questions": 64
+   },
+   "not_held_out": {
+    "ex": 0.762114537444934,
+    "ex_extra_columns_ok": 0.762114537444934,
+    "correct": 173,
+    "questions": 227
+   }
+  }
+ },
+ "1.5b": {
+  "ex": 0.8079268292682927,
+  "correct": 265,
+  "questions": 328,
+  "phase1": {
+   "ex": 0.6128048780487805,
+   "correct": 201
+  },
+  "vs_phase1": {
+   "better": 64,
+   "worse": 0,
+   "p": 0.0
+  },
+  "by_train_exposure": {
+   "held_out": {
+    "ex": 0.8378378378378378,
+    "ex_extra_columns_ok": 0.8378378378378378,
+    "correct": 31,
+    "questions": 37
+   },
+   "no_named_target": {
+    "ex": 1.0,
+    "ex_extra_columns_ok": 1.0,
+    "correct": 64,
+    "questions": 64
+   },
+   "not_held_out": {
+    "ex": 0.748898678414097,
+    "ex_extra_columns_ok": 0.748898678414097,
+    "correct": 170,
+    "questions": 227
+   }
+  }
+ }
+}
