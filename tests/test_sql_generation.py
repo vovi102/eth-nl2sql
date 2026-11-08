@@ -22,6 +22,7 @@ from eth_nl2sql.sql_generation import (
     adapter_tag,
     generate,
     generate_one,
+    messages_key,
     missing_placeholders,
     served_adapter,
     shared_prefix,
@@ -362,3 +363,68 @@ def test_generate_sql_refuses_an_adapter_it_is_not_told_about(
     assert main(base) == 1  # the server applies an adapter the run is not named after
     assert main([*base, "--adapter", str(tmp_path / "1.5b-e2.gguf")]) == 1
     assert not (tmp_path / "run.jsonl").exists()
+
+
+def _replies_file(tmp_path: Path, prompt: dict, reply: str) -> Path:
+    """What `train_lora.py generate` writes on Kaggle (S7, phase2-plan.md §5.4)."""
+    replies = tmp_path / "replies.qwen2.5-coder-3b-instruct-fp16.3b-e2.jsonl"
+    row = {"question_id": prompt["question_id"],
+           "messages_sha256": messages_key(prompt["messages"]), "reply": reply,
+           "prompt_tokens": 4321, "completion_tokens": 30, "finish": "stop",
+           "seconds": 5.5}  # fmt: skip
+    replies.write_text(json.dumps(row, ensure_ascii=False) + "\n")
+    meta = {"model": "qwen2.5-coder-3b-instruct-fp16.3b-e2",
+            "generation": {"temperature": 0.0, "do_sample": False, "max_new_tokens": 512,
+                           "backend": "transformers 5.22.1, float16"}}  # fmt: skip
+    (tmp_path / (replies.name + ".meta.json")).write_text(json.dumps(meta))
+    return replies
+
+
+def test_generate_sql_plays_back_replies_through_b8(
+    case, db: Path, knowledge_base_dir: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    prompt, _, _ = case
+    prompts = _prompt_file(tmp_path, case)
+    replies = _replies_file(tmp_path, prompt, WRONG)
+    monkeypatch.chdir(tmp_path)  # the default output goes to data/predictions/
+    argv = ["generate-sql", "--prompts", str(prompts), "--db", str(db),
+            "--knowledge-base-dir", str(knowledge_base_dir), "--replies", str(replies)]  # fmt: skip
+    assert main(argv) == 1  # a replay cannot repair
+    assert main([*argv, "--no-repair"]) == 0
+    out = tmp_path / "data/predictions/dev.prompts.qwen2.5-coder-3b-instruct-fp16.3b-e2.jsonl"
+    [line] = [json.loads(line) for line in out.read_text().splitlines()]
+    assert len(line["attempts"]) == 1 and line["attempts"][0]["reply"] == WRONG
+    assert line["attempts"][0]["error_kind"] == "execution"  # B8 ran the query
+    assert line["attempts"][0]["prompt_tokens"] == 4321
+    meta = json.loads(out.with_name(out.name + ".meta.json").read_text())
+    assert meta["model"] == "qwen2.5-coder-3b-instruct-fp16.3b-e2" and meta["adapter"] is None
+    assert meta["server"]["replies"]["sha256"] == hashlib.sha256(replies.read_bytes()).hexdigest()
+    assert meta["generation"]["backend"].startswith("transformers")
+    assert meta["generation"]["max_attempts"] == 1
+
+
+def test_a_replay_must_answer_exactly_the_sql_prompts(
+    case, db: Path, knowledge_base_dir: Path, tmp_path: Path
+) -> None:
+    prompt, _, _ = case
+    prompts = _prompt_file(tmp_path, case)
+    other = {**prompt, "messages": [*prompt["messages"][:-1], {"role": "user", "content": "?"}]}
+    replies = _replies_file(tmp_path, other, RIGHT)
+    argv = ["generate-sql", "--prompts", str(prompts), "--output", str(tmp_path / "run.jsonl"),
+            "--db", str(db), "--knowledge-base-dir", str(knowledge_base_dir),
+            "--replies", str(replies), "--no-repair"]  # fmt: skip
+    assert main(argv) == 1
+    assert not (tmp_path / "run.jsonl").exists()
+
+
+def test_the_kaggle_script_keys_prompts_the_same_way() -> None:
+    """train_lora.py (Kaggle) and ReplayClient must agree on the key of a prompt."""
+    import importlib.util
+
+    path = Path(__file__).resolve().parents[1] / "kaggle/phase2-train/train_lora.py"
+    spec = importlib.util.spec_from_file_location("train_lora", path)
+    train_lora = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(train_lora)
+    messages = [{"role": "system", "content": "Bạn là trợ lý SQL."},
+                {"role": "user", "content": "Ví {E1} nhận bao nhiêu ETH? ✓"}]  # fmt: skip
+    assert train_lora.messages_key(messages) == messages_key(messages)

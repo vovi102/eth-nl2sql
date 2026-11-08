@@ -1,0 +1,23 @@
+2026-11-08 20:13:23 quantization ablation on dev (3B): preconditions
+2026-11-08 20:13:23 preconditions hold (--check: stopping here)
+2026-11-08 20:13:31 quantization ablation on dev (3B): preconditions
+2026-11-08 20:13:35 llama-server ready: qwen2.5-coder-3b-instruct-q4_k_m 
+2026-11-08 20:13:35 Q4_K_M base -> data/predictions/dev.predictions.prompts.qwen2.5-coder-3b-instruct-q4_k_m.no-check.no-repair.jsonl
+2026-11-08 20:26:02 llama-server ready: qwen2.5-coder-3b-instruct-q4_k_m --lora /home/khoavd/WORKSPACE/thesis/eth-nl2sql/models/lora/3b-run/gguf/3b-e2.gguf
+2026-11-08 20:26:02 Q4_K_M + 3b-e2 -> data/predictions/dev.predictions.prompts.qwen2.5-coder-3b-instruct-q4_k_m.3b-e2.no-check.no-repair.jsonl
+2026-11-08 20:39:49 Q4_K_M runs done; run again after: kaggle kernels output aohkvd/eth-nl2sql-phase2-fp16 -p models/lora/3b-fp16
+2026-11-08 20:40:03 score: data/predictions/dev.predictions.prompts.qwen2.5-coder-3b-instruct-q4_k_m.no-check.no-repair.jsonl
+2026-11-08 20:42:20 score: data/predictions/dev.predictions.prompts.qwen2.5-coder-3b-instruct-q4_k_m.3b-e2.no-check.no-repair.jsonl
+2026-11-08 21:17:41 quantization ablation on dev (3B): preconditions
+2026-11-08 21:17:41 fp16 qwen2.5-coder-3b-instruct-fp16 -> data/predictions/dev.predictions.prompts.qwen2.5-coder-3b-instruct-fp16.no-check.no-repair.jsonl
+2026-11-08 21:18:36 fp16 qwen2.5-coder-3b-instruct-fp16.3b-e2 -> data/predictions/dev.predictions.prompts.qwen2.5-coder-3b-instruct-fp16.3b-e2.no-check.no-repair.jsonl
+2026-11-08 21:19:45 score: data/predictions/dev.predictions.prompts.qwen2.5-coder-3b-instruct-q4_k_m.no-check.no-repair.ex.json exists
+2026-11-08 21:19:45 score: data/predictions/dev.predictions.prompts.qwen2.5-coder-3b-instruct-q4_k_m.3b-e2.no-check.no-repair.ex.json exists
+2026-11-08 21:19:45 score: data/predictions/dev.predictions.prompts.qwen2.5-coder-3b-instruct-fp16.no-check.no-repair.jsonl
+2026-11-08 21:21:25 score: data/predictions/dev.predictions.prompts.qwen2.5-coder-3b-instruct-fp16.3b-e2.no-check.no-repair.jsonl
+q4_base 136/177 q4_lora 173/177 fp16_base 94/177 fp16_lora 168/177
+  quantization, base: fp16 vs Q4: {'better': 2, 'worse': 44, 'p': 0.0, 'same_sql': '62/161'}
+  quantization, + LoRA: fp16 vs Q4: {'better': 0, 'worse': 5, 'p': 0.0625, 'same_sql': '155/161'}
+  LoRA at Q4: {'better': 40, 'worse': 3, 'p': 0.0, 'same_sql': '0/161'}
+  LoRA at fp16: {'better': 79, 'worse': 5, 'p': 0.0, 'same_sql': '0/161'}
+2026-11-08 21:23:12 finished in 5 min

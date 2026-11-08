@@ -25,11 +25,13 @@ the server is not sent (decision 7 of proposed-method.md §9): its line has `ski
 The client is apart from the loop, so that phase 2 (LoRA) runs through the same code with
 another server: anything that speaks the OpenAI chat API. A LoRA adapter is loaded by
 llama-server itself (`--lora`, `--lora-scaled`); `served_adapter` checks that the server applies
-the adapter the run is named after, and no other one.
+the adapter the run is named after, and no other one. `ReplayClient` plays back replies made
+elsewhere (transformers fp16 on Kaggle, phase2-plan.md §5.4) through the same loop.
 """
 
 from __future__ import annotations
 
+import hashlib
 import json
 import time
 import urllib.error
@@ -212,6 +214,77 @@ def served_adapter(adapters: list[dict] | None, adapter: Path | None) -> dict | 
 def adapter_tag(adapter: Path, scale: float) -> str:
     """The adapter's part of a prediction file name: its stem, and the scale unless it is 1."""
     return adapter.stem if scale == 1 else f"{adapter.stem}.scale{scale:g}"
+
+
+def messages_key(messages: list[dict]) -> str:
+    """The key of a prompt in a replies file. kaggle/phase2-train/train_lora.py computes the
+    same key on Kaggle (a test checks that the two agree)."""
+    text = json.dumps(messages, ensure_ascii=False, sort_keys=True)
+    return hashlib.sha256(text.encode()).hexdigest()
+
+
+class ReplayClient:
+    """Replies made elsewhere, played back through the same B8 loop (`generate-sql --replies`).
+
+    The quantization ablation (phase2-plan.md §5.4) generates with transformers in fp16 on
+    Kaggle, where the database is not; `train_lora.py generate` writes one line per sql prompt,
+    {question_id, messages_sha256, reply, prompt_tokens, completion_tokens, finish, seconds},
+    and a meta file beside it. Here the replies go through the same SQL extraction, run and
+    output format as a llama-server run. There is a reply only for the original messages, so a
+    replay has no repair: `chat` refuses messages it has no reply for.
+    """
+
+    def __init__(self, path: Path) -> None:
+        self.path = Path(path)
+        meta_path = self.path.with_name(self.path.name + ".meta.json")
+        if not meta_path.is_file():
+            raise ClientError(f"{meta_path} is missing")
+        self.meta = json.loads(meta_path.read_text())
+        self.replies: dict[str, dict] = {}
+        for line in self.path.read_text(encoding="utf-8").splitlines():
+            if line.strip():
+                row = json.loads(line)
+                self.replies[row["messages_sha256"]] = row
+        self.max_tokens = self.meta["generation"]["max_new_tokens"]
+        self.used: set[str] = set()
+
+    def chat(self, messages: list[dict]) -> dict:
+        key = messages_key(messages)
+        row = self.replies.get(key)
+        if row is None:
+            raise ClientError(f"{self.path} has no reply for these messages (a repair?)")
+        self.used.add(key)
+        return {"reply": row["reply"], "prompt_tokens": row["prompt_tokens"],
+                "cached_tokens": None, "completion_tokens": row["completion_tokens"]}  # fmt: skip
+
+    def prompt_token_ids(self, messages: list[dict]) -> list[int] | None:
+        return None
+
+    def prime(self, tokens: list[int]) -> None:
+        pass
+
+    def context_size(self) -> int | None:
+        return None
+
+    def generation_parameters(self) -> dict:
+        return dict(self.meta["generation"])
+
+    def server_info(self) -> dict:
+        return {
+            "models": [self.meta["model"]],
+            "model_path": None,
+            "n_ctx": None,
+            "lora_adapters": None,
+            "replies": {
+                "path": str(self.path),
+                "sha256": _file_sha256(self.path),
+                "meta": self.meta,
+            },  # fmt: skip
+        }
+
+
+def _file_sha256(path: Path) -> str:
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
 def _fits(client: ChatClient, messages: list[dict], n_ctx: int | None) -> tuple[bool, int | None]:

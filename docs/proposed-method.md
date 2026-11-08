@@ -305,7 +305,7 @@ Mỗi cấu hình chạy cho cả phase 1 và phase 2. Ngoại lệ (quyết đ�
 | Sinh SQL + B8 (`generate-sql`, `src/eth_nl2sql/sql_generation.py`) | Xong; client tách riêng để phase 2 dùng lại. Kết quả dev ở bảng dưới |
 | Định dạng nhãn linking (gold và đầu ra bộ linking) | Xong: [linking-labels.md](linking-labels.md) |
 | Benchmark (template, nhãn gold) | Xong: 505 câu, 40 template đã duyệt, dev 177 / test 328 chia theo template (`data/benchmark/`, [benchmark.md](benchmark.md)); tập 169 thực thể sau đợt duyệt 3–4; sinh lại 2026-11-03 để bỏ câu hoà ở `LIMIT` (thay 4 câu dev, 2 câu test) |
-| Phase 2 (LoRA) | Đã lập kế hoạch và chốt quyết định 14–23 (2026-11-04, [phase2-plan.md](phase2-plan.md)). S0 xong: phase 1 được chốt trong `data/predictions/phase1-freeze.json` (SHA256 của KB, model, code, prompt/linking và 7 lần chạy dev). `property_senses.csv` đã đổi lúc 2026-11-04 19:53, sau benchmark và prompt dev, nhưng chỉ ở các cột không nạp vào `link`: link lại dev và dựng lại 5 file prompt dev cho file giống hệt từng byte. S1 xong, người dùng duyệt 2026-11-05 (quyết định 24–27): 30 template train-only (`train_templates.py`) và bộ kiểm tra rò rỉ (`template_signature.py`), 0 vi phạm ([phase2-plan.md](phase2-plan.md) §2.1, §2.5). S2 xong (2026-11-05): `data/train/`, 1.968 ví dụ (98 val), 4.277–4.624 token mỗi ví dụ, 20 thực thể giữ riêng không bị nêu tên ([phase2-plan.md](phase2-plan.md) §2.6). S3 xong (2026-11-05 22:42): đóng băng dữ liệu train và cấu hình huấn luyện (`data/train/freeze.json`). S4 xong (2026-11-06): test phase 1, kết quả ở bảng dưới. S5 xong (2026-11-08, sau khi thấy test phase 1): LoRA cho 1.5B trên Kaggle (2 epoch, 4,46 giờ trên một T4), chọn checkpoint `1.5b-e2`, EX dev 0,960 (kết quả ở dưới; [phase2-plan.md](phase2-plan.md) §4, §5.6). S6 xong (2026-11-08): LoRA cho 3B (7,79 giờ trên một T4), chọn `3b-e2`, EX dev 0,977 ([phase2-plan.md](phase2-plan.md) §5.7). Chưa chạy S7 (ablation lượng tử hoá) và S8 (test phase 2) |
+| Phase 2 (LoRA) | Đã lập kế hoạch và chốt quyết định 14–23 (2026-11-04, [phase2-plan.md](phase2-plan.md)). S0 xong: phase 1 được chốt trong `data/predictions/phase1-freeze.json` (SHA256 của KB, model, code, prompt/linking và 7 lần chạy dev). `property_senses.csv` đã đổi lúc 2026-11-04 19:53, sau benchmark và prompt dev, nhưng chỉ ở các cột không nạp vào `link`: link lại dev và dựng lại 5 file prompt dev cho file giống hệt từng byte. S1 xong, người dùng duyệt 2026-11-05 (quyết định 24–27): 30 template train-only (`train_templates.py`) và bộ kiểm tra rò rỉ (`template_signature.py`), 0 vi phạm ([phase2-plan.md](phase2-plan.md) §2.1, §2.5). S2 xong (2026-11-05): `data/train/`, 1.968 ví dụ (98 val), 4.277–4.624 token mỗi ví dụ, 20 thực thể giữ riêng không bị nêu tên ([phase2-plan.md](phase2-plan.md) §2.6). S3 xong (2026-11-05 22:42): đóng băng dữ liệu train và cấu hình huấn luyện (`data/train/freeze.json`). S4 xong (2026-11-06): test phase 1, kết quả ở bảng dưới. S5 xong (2026-11-08, sau khi thấy test phase 1): LoRA cho 1.5B trên Kaggle (2 epoch, 4,46 giờ trên một T4), chọn checkpoint `1.5b-e2`, EX dev 0,960 (kết quả ở dưới; [phase2-plan.md](phase2-plan.md) §4, §5.6). S6 xong (2026-11-08): LoRA cho 3B (7,79 giờ trên một T4), chọn `3b-e2`, EX dev 0,977 ([phase2-plan.md](phase2-plan.md) §5.7). S7 xong (2026-11-08): ablation lượng tử hoá trên dev ([phase2-plan.md](phase2-plan.md) §5.4). Chưa chạy S8 (test phase 2) |
 
 **Kết quả phase 1 trên dev (2026-11-04).** Benchmark sau khi bỏ câu hoà ở `LIMIT`
 ([benchmark.md](benchmark.md) §6, bước 6). Zero-shot, giải mã tham lam, kiểm tra placeholder và
@@ -528,6 +528,24 @@ Nguồn: `data/predictions/dev-phase2-{1.5b,3b}.summary.json` và các file
   (phase 1: 1.5B 7/19, 3B 17/19).
 - Không còn câu nào thiếu placeholder ở lần thử đầu (phase 1: 1.5B 40 câu, 3B 26 câu), nên hỏi
   lại gần như không còn tác dụng.
+
+**Ablation lượng tử hoá (S7, 2026-11-08, sau khi thấy test phase 1).** 3B fp16 (transformers trên
+một T4 của Kaggle) so với Q4_K_M (llama-server ở local). Cả hai dùng cùng prompt và cùng B8; dev,
+một lần thử, không kiểm tra placeholder. Nguồn: `data/predictions/dev-phase2-quant.summary.json`
+(**đo**); chi tiết ở [phase2-plan.md](phase2-plan.md) §5.4.
+
+| | Q4_K_M | fp16 |
+|---|---|---|
+| 3B base | 136 (0,768) | 94 (0,531) |
+| 3B + `3b-e2` | 173 (0,977) | 168 (0,949) |
+
+- Với base, Q4_K_M đúng nhiều hơn fp16 42 câu (p < 0,0001). fp16 base viết địa chỉ cụ thể thay
+  cho placeholder ở 72/161 câu, Q4_K_M ở 36 câu; 36 trong 44 câu fp16 sai thêm thuộc kiểu này.
+  Giả thuyết, chưa kiểm: prompt phase 1 được chỉnh trên dev bằng chính 3B Q4_K_M.
+- Với adapter, hai runtime cho cùng SQL ở 155/161 câu. 5 câu chênh (p = 0,063) đều thuộc template
+  xa `entity_top_callers`, nơi fp16 + LoRA nhóm theo `to_address` cả ở câu tiếng Anh.
+- Vậy chạy adapter học trên fp16 bằng runtime Q4_K_M không làm mất EX trên dev. Lỗi mà adapter
+  đưa vào template xa có thật ở fp16 (5/14 câu đúng) và Q4_K_M chỉ che bớt (10/14).
 
 ## 9. Các quyết định (chốt ngày 2026-11-01, bổ sung 2026-11-03 và 2026-11-04)
 

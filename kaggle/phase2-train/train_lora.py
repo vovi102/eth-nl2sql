@@ -18,6 +18,18 @@ Subcommands:
   5. keeps the PEFT adapter of each epoch (or of the last step with --max-steps), converts it
      to a GGUF f16 adapter with convert_lora_to_gguf.py of llama.cpp b12032, the runtime of
      the evaluation, and writes run.json: versions, hashes, timings, memory, losses.
+
+The quantization ablation (S7, phase2-plan.md §5.4) runs here too, in the same locked
+environment:
+
+- `prepare-dev-prompts` (locally): the folder of a second private dataset, the sql prompts of
+  dev only (R6 allows dev prompts for this ablation; test is never uploaded).
+- `prepare-generate` (locally): a kernel that runs `generate`, with the SHA256 of the prompts
+  and of the adapter baked in. The adapter comes from the output of the training kernel.
+- `generate` (on Kaggle; locally on CPU with a tiny model): the base model in fp16 with the
+  PEFT adapter, greedy, at most 512 new tokens, one reply per prompt, first with the adapter
+  disabled (base) and then enabled. It writes replies.<model>.jsonl and a meta file per
+  configuration; `eth-nl2sql generate-sql --replies` plays them back through B8 locally.
 """
 
 from __future__ import annotations
@@ -167,9 +179,15 @@ def check_freeze(data: Path, config_text: str, frozen: dict[str, str]) -> None:
 
 
 def find_kaggle_data() -> Path:
-    found = sorted(KAGGLE_INPUT.rglob("sft.jsonl"))
+    return find_kaggle_file("sft.jsonl")
+
+
+def find_kaggle_file(name: str, parent: str | None = None) -> Path:
+    """The one file `name` under /kaggle/input (datasets and kernel outputs), in a folder named
+    `parent` if given."""
+    found = sorted(p for p in KAGGLE_INPUT.rglob(name) if parent is None or p.parent.name == parent)
     if len(found) != 1:
-        raise SystemExit(f"expected one sft.jsonl under {KAGGLE_INPUT}, found {found}")
+        raise SystemExit(f"expected one {parent or '*'}/{name} under {KAGGLE_INPUT}, found {found}")
     return found[0]
 
 
@@ -673,6 +691,265 @@ def train(args: argparse.Namespace, kernel: dict | None) -> int:
     return 0
 
 
+# ---- fp16 generation (S7, phase2-plan.md §5.4) -----------------------------------------------
+
+DEV_PROMPTS = "dev-prompts.jsonl"
+
+
+def messages_key(messages: list[dict]) -> str:
+    """The key of a prompt in a replies file; eth_nl2sql.sql_generation.messages_key is the
+    same function (a test of the main package checks that they agree)."""
+    return sha256_text(json.dumps(messages, ensure_ascii=False, sort_keys=True))
+
+
+def greedy(model, tokenizer, max_new_tokens: int) -> dict:
+    """Make greedy decoding the model's own generation config, and say what it is.
+
+    Qwen2.5's generation_config.json samples (temperature 0.7, top_p 0.8, top_k 20,
+    repetition_penalty 1.1), and generate() fills the fields of a config passed to it that are
+    left at their defaults from the model's config, so passing do_sample=False alone would not
+    undo them: the model's config itself is replaced. llama-server at temperature 0 is greedy,
+    with no repetition penalty, and stops at the end-of-generation tokens.
+    """
+    from transformers import GenerationConfig
+
+    eos = tokenizer.convert_tokens_to_ids([END_OF_TURN, "<|endoftext|>"])
+    model.generation_config = GenerationConfig(
+        do_sample=False, max_new_tokens=max_new_tokens, eos_token_id=eos,
+        pad_token_id=tokenizer.pad_token_id, repetition_penalty=1.0,
+        temperature=None, top_p=None, top_k=None,
+    )  # fmt: skip
+    return {"temperature": 0.0, "do_sample": False, "max_new_tokens": max_new_tokens,
+            "repetition_penalty": 1.0, "eos_token_id": eos}  # fmt: skip
+
+
+def encode_prompt(tokenizer, messages: list[dict], device):
+    enc = tokenizer.apply_chat_template(messages, add_generation_prompt=True, return_tensors="pt",
+                                        return_dict=True)  # fmt: skip
+    return enc["input_ids"].to(device), enc["attention_mask"].to(device)
+
+
+def check_attention_logits(model, tokenizer, prompt: dict, device, backend=None) -> dict:
+    """The first prompt through both attention paths (as `check_attention` does for training):
+    the next token must agree. Leaves the repeated key/value heads on."""
+    from contextlib import nullcontext
+
+    import torch
+    from torch.nn.attention import sdpa_kernel
+
+    ids, mask = encode_prompt(tokenizer, prompt["messages"], device)
+    logits = {}
+    for repeat in (False, True):
+        repeat_kv_in_sdpa(repeat)
+        kernels = sdpa_kernel([backend]) if repeat and backend is not None else nullcontext()
+        autocast = torch.autocast(device.type, dtype=torch.float16, enabled=device.type == "cuda")
+        with torch.no_grad(), autocast, kernels:
+            out = model(input_ids=ids, attention_mask=mask, logits_to_keep=1)
+        logits[repeat] = out.logits[0, -1].float()
+    result = {
+        "same_next_token": int(logits[True].argmax()) == int(logits[False].argmax()),
+        "max_abs_logit_diff": round(float((logits[True] - logits[False]).abs().max()), 4),
+        "backend": str(backend),
+    }
+    if not result["same_next_token"]:
+        raise SystemExit(f"repeated key/value heads change the next token: {result}")
+    return result
+
+
+def generate_replies(model, tokenizer, prompts: list[dict], out_file: Path, *, device,
+                     autocast: bool) -> dict:  # fmt: skip
+    """One greedy reply per prompt, each line written as it comes; the counts of the run."""
+    from collections import Counter
+    from contextlib import nullcontext
+
+    import torch
+
+    eos = set(model.generation_config.eos_token_id)
+    rows = []
+    with out_file.open("w", encoding="utf-8") as f:
+        for i, prompt in enumerate(prompts, 1):
+            ids, mask = encode_prompt(tokenizer, prompt["messages"], device)
+            cast = torch.autocast(device.type, dtype=torch.float16) if autocast else nullcontext()
+            if device.type == "cuda":
+                torch.cuda.synchronize()
+            started = time.monotonic()
+            with torch.no_grad(), cast:
+                out = model.generate(input_ids=ids, attention_mask=mask)
+            if device.type == "cuda":
+                torch.cuda.synchronize()
+            new = out[0, ids.shape[1] :].tolist()
+            finish = "stop" if new and new[-1] in eos else "length"
+            reply_ids = new[:-1] if finish == "stop" else new
+            row = {
+                "question_id": prompt["question_id"],
+                "messages_sha256": messages_key(prompt["messages"]),
+                "reply": tokenizer.decode(reply_ids),
+                "prompt_tokens": ids.shape[1],
+                "completion_tokens": len(reply_ids),
+                "finish": finish,
+                "seconds": round(time.monotonic() - started, 3),
+            }
+            f.write(json.dumps(row, ensure_ascii=False) + "\n")
+            f.flush()
+            rows.append(row)
+            if i % 20 == 0 or i == len(prompts):
+                log(f"  {out_file.name}: {i}/{len(prompts)}")
+    completion = [r["completion_tokens"] for r in rows]
+    seconds = [r["seconds"] for r in rows]
+    return {
+        "prompts": len(rows),
+        "finish": dict(Counter(r["finish"] for r in rows)),
+        "completion_tokens": {"mean": round(statistics.mean(completion), 1),
+                              "max": max(completion)},
+        "seconds": {"total": round(sum(seconds), 1), "mean": round(statistics.mean(seconds), 3)},
+    }  # fmt: skip
+
+
+def generate(args: argparse.Namespace, kernel: dict | None) -> int:
+    from contextlib import nullcontext
+
+    started = time.time()
+    on_kaggle = kernel is not None
+    if args.out:
+        out = Path(args.out).resolve()
+    elif on_kaggle:
+        out = KAGGLE_WORKING
+    else:
+        raise SystemExit("give --out")
+    out.mkdir(parents=True, exist_ok=True)
+    work = Path(args.work or ("/tmp/phase2" if on_kaggle else out / "work")).resolve()
+    work.mkdir(parents=True, exist_ok=True)
+
+    # 1. Inputs: the dev prompts and the adapter, with the SHA256 baked in at `prepare-generate`.
+    prompts_path = Path(args.prompts) if args.prompts else find_kaggle_file(DEV_PROMPTS)
+    adapter_dir = (
+        Path(args.adapter)
+        if args.adapter
+        else find_kaggle_file("adapter_model.safetensors", args.adapter_name).parent
+    )
+    inputs = {"prompts_sha256": sha256(prompts_path),
+              "adapter_sha256": sha256(adapter_dir / "adapter_model.safetensors")}  # fmt: skip
+    if kernel and inputs != kernel["inputs"]:
+        raise SystemExit(f"inputs {inputs} are not the prepared ones {kernel['inputs']}")
+    prompts = [json.loads(line) for line in prompts_path.read_text(encoding="utf-8").splitlines()
+               if line.strip()]  # fmt: skip
+    if args.limit:
+        prompts = prompts[: args.limit]
+    if kernel:
+        config_text, lock_text = kernel["config"], kernel["requirements_lock"]
+    else:
+        config_text = Path(args.config).read_text()
+        lock_text = (HERE / "requirements.lock").read_text()
+    model_config = json.loads(config_text)["models"][args.model]
+    log(f"{len(prompts)} prompts ({prompts_path}), adapter {adapter_dir}: {inputs}")
+
+    # 2. Environment, as for training.
+    if on_kaggle:
+        os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+    os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
+    removed = []
+    if args.install:
+        log("pip install requirements.lock")
+        install(lock_text)
+        removed = remove_incompatible_backends()
+        log(f"removed incompatible optional backends: {removed}")
+    versions = check_versions(lock_text)
+
+    import torch
+    from peft import PeftModel
+    from transformers import AutoModelForCausalLM, AutoTokenizer
+
+    gpu = torch.cuda.is_available() and not args.cpu
+    if gpu and torch.cuda.device_count() != 1:
+        raise SystemExit(f"{torch.cuda.device_count()} GPUs visible, one expected")
+    device = torch.device("cuda" if gpu else "cpu")
+    record = {
+        "script_sha256": kernel["source_sha256"] if kernel else sha256(HERE / "train_lora.py"),
+        "kernel": None if kernel is None else {k: v for k, v in kernel.items()
+                                               if k not in ("config", "requirements_lock")},
+        "args": vars(args),
+        "started": time.strftime("%Y-%m-%dT%H:%M:%S%z", time.localtime(started)),
+        "versions": versions,
+        "removed_packages": removed,
+        "environment": environment(),
+        "inputs": {"prompts": str(prompts_path), "prompt_count": len(prompts),
+                   "adapter": str(adapter_dir), **inputs},
+        "runs": {},
+    }  # fmt: skip
+    write_json(out / "generate.json", record)
+
+    # 3. The base model in fp16 (fp32 on CPU), the adapter on it, greedy decoding.
+    revision = args.revision or REVISIONS[args.model]
+    if args.base:
+        base = Path(args.base)
+        files = {p.name: sha256(p) for p in sorted(base.iterdir()) if p.is_file()}
+    else:
+        base = work / f"base-{args.model}"
+        log(f"downloading {model_config['hf_repo']}@{revision}")
+        files = download_base(model_config["hf_repo"], revision, base)
+    record["model"] = {"key": args.model, "hf_repo": model_config["hf_repo"],
+                       "revision": None if args.base else revision, "files": files}  # fmt: skip
+    tokenizer = AutoTokenizer.from_pretrained(base)
+    template_sha = sha256_text(tokenizer.chat_template)
+    if template_sha != CHAT_TEMPLATE_SHA256:
+        raise SystemExit(f"chat template {template_sha} is not the pinned one")
+    dtype = torch.float16 if gpu else torch.float32
+    model = AutoModelForCausalLM.from_pretrained(base, dtype=dtype, attn_implementation="sdpa")
+    model.to(device)
+    generation = greedy(model, tokenizer, args.max_new_tokens)
+    model = PeftModel.from_pretrained(model, adapter_dir)
+    model.eval()
+    if gpu and torch.cuda.get_device_capability() < (8, 0):
+        from torch.nn.attention import SDPBackend
+
+        record["attention"] = check_attention_logits(model, tokenizer, prompts[0], device,
+                                                     SDPBackend.EFFICIENT_ATTENTION)  # fmt: skip
+        log(f"attention with repeated key/value heads: {record['attention']}")
+    else:
+        record["attention"] = None
+    write_json(out / "generate.json", record)
+
+    # 4. Replies: the adapter disabled (base), then enabled.
+    tag = model_config["hf_repo"].split("/")[-1].lower() + ("-fp16" if gpu else "-fp32")
+    configurations = [
+        (tag, None, model.disable_adapter),
+        (f"{tag}.{args.adapter_name}", args.adapter_name, nullcontext),
+    ]
+    for name, adapter, context in configurations:
+        log(f"generating: {name}")
+        replies = out / f"replies.{name}.jsonl"
+        with context():
+            counts = generate_replies(model, tokenizer, prompts, replies, device=device,
+                                      autocast=gpu)  # fmt: skip
+        meta = {
+            "model": name,
+            "hf_repo": model_config["hf_repo"],
+            "revision": record["model"]["revision"],
+            "adapter": None if adapter is None
+            else {"name": adapter, "sha256": inputs["adapter_sha256"]},
+            "prompts_sha256": inputs["prompts_sha256"],
+            "generation": generation | {
+                "backend": f"transformers {versions['transformers']}, {str(dtype).split('.')[-1]}",
+                "autocast_fp16": gpu,
+            },
+            "replies_sha256": sha256(replies),
+            "summary": counts,
+        }  # fmt: skip
+        write_json(replies.with_name(replies.name + ".meta.json"), meta)
+        record["runs"][name] = counts
+        write_json(out / "generate.json", record)
+        log(f"{name}: {counts}")
+
+    freeze = subprocess.run([sys.executable, "-m", "pip", "freeze"], capture_output=True,
+                            text=True).stdout  # fmt: skip
+    (out / "pip-freeze.txt").write_text(freeze)
+    record["finished"] = time.strftime("%Y-%m-%dT%H:%M:%S%z")
+    record["wall_seconds"] = round(time.time() - started, 1)
+    write_json(out / "generate.json", record)
+    log(f"done in {record['wall_seconds'] / 60:.1f} min")
+    return 0
+
+
 # ---- local preparation -----------------------------------------------------------------------
 
 
@@ -700,12 +977,20 @@ def prepare(args: argparse.Namespace) -> int:
     argv = ["train", "--model", args.model, "--install"]
     if args.max_steps:
         argv += ["--max-steps", str(args.max_steps)]
+    return bake(argv, {"frozen": frozen}, config_text, lock_text, Path(args.out),
+                HERE / "kernel-metadata.json")  # fmt: skip
+
+
+def bake(argv: list[str], extra: dict, config_text: str, lock_text: str, out: Path,
+         metadata: Path) -> int:  # fmt: skip
+    """Write this file with KERNEL set (the run's arguments and inputs) and kernel-metadata.json
+    into `out`."""
     source = (HERE / "train_lora.py").read_text()
     kernel = {
         "argv": argv,
         "source_sha256": sha256_text(source),
         "prepared": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
-        "frozen": frozen,
+        **extra,
         "config": config_text,
         "requirements_lock": lock_text,
         "requirements_lock_sha256": sha256_text(lock_text),
@@ -714,13 +999,65 @@ def prepare(args: argparse.Namespace) -> int:
     if source.count(marker) != 1:
         raise SystemExit("the KERNEL line is not found once")
     baked = source.replace(marker, f"KERNEL = json.loads({json.dumps(kernel)!r})\n")
-    out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
     (out / "train_lora.py").write_text(baked)
-    meta = json.loads((HERE / "kernel-metadata.json").read_text())
+    meta = json.loads(metadata.read_text())
     (out / "kernel-metadata.json").write_text(json.dumps(meta, indent=2) + "\n")
     print(f"wrote {out}: train_lora.py ({' '.join(argv)}), kernel-metadata.json ({meta['id']})")
     return 0
+
+
+def prepare_dev_prompts(args: argparse.Namespace) -> int:
+    """The sql prompts of dev, {question_id, messages}, and dataset-metadata.json: the second
+    dataset, for the quantization ablation only (R6). Test prompts are refused."""
+    path = Path(args.prompts)
+    if not path.name.startswith("dev.") or "test" in path.name:
+        raise SystemExit(f"{path} is not a dev prompt file: only dev goes to Kaggle (R6)")
+    dev = {
+        json.loads(line)["question_id"]
+        for line in Path(args.gold).read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    }
+    rows = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines()
+            if line.strip()]  # fmt: skip
+    if not {r["question_id"] for r in rows} <= dev:
+        raise SystemExit(f"{path} has questions that are not in {args.gold}")
+    sql = [{"question_id": r["question_id"], "messages": r["messages"]} for r in rows
+           if r["decision"] == "sql"]  # fmt: skip
+    out = Path(args.out)
+    out.mkdir(parents=True, exist_ok=True)
+    (out / DEV_PROMPTS).write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in sql),
+                                   encoding="utf-8")  # fmt: skip
+    meta = {"title": args.title, "id": args.dataset, "licenses": [{"name": "unknown"}]}
+    (out / "dataset-metadata.json").write_text(json.dumps(meta, indent=2) + "\n")
+    print(f"wrote {out}: {DEV_PROMPTS} ({len(sql)} sql prompts of {len(rows)}, "
+          f"{sha256(out / DEV_PROMPTS)[:12]}…), dataset-metadata.json")  # fmt: skip
+    return 0
+
+
+def prepare_generate(args: argparse.Namespace) -> int:
+    """The kernel folder of `generate`: the adapter must be a checkpoint of the training run
+    (`run.json` of `kaggle kernels output`), whose output the kernel reads it from."""
+    config_text = (HERE / "config.json").read_text()
+    lock_text = (HERE / "requirements.lock").read_text()
+    frozen = frozen_hashes(json.loads(Path(args.freeze).read_text()))
+    if sha256_text(config_text) != frozen["config.json"]:
+        raise SystemExit("config.json does not match the S3 freeze")
+    adapter = Path(args.adapter)
+    run = json.loads(Path(args.run).read_text())
+    trained = {c["name"]: c for c in run["checkpoints"]}
+    adapter_sha = sha256(adapter / "adapter_model.safetensors")
+    if run["model"]["key"] != args.model or \
+            trained.get(adapter.name, {}).get("adapter_sha256") != adapter_sha:  # fmt: skip
+        raise SystemExit(f"{adapter} is not a checkpoint of the {args.model} run {args.run}")
+    inputs = {"prompts_sha256": sha256(Path(args.prompts)), "adapter_sha256": adapter_sha}
+    argv = ["generate", "--model", args.model, "--adapter-name", adapter.name, "--install"]
+    extra = {
+        "inputs": inputs,
+        "trained_by": {"script_sha256": run["script_sha256"], "finished": run["finished"]},
+    }
+    return bake(argv, extra, config_text, lock_text, Path(args.out),
+                HERE / "kernel-metadata.fp16.json")  # fmt: skip
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -757,11 +1094,54 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--dataset", default="aohkvd/eth-nl2sql-phase2-sft")
     p.add_argument("--title", default="eth-nl2sql phase2 sft")
 
+    p = sub.add_parser("generate", help="fp16 replies of base and base + adapter (S7, §5.4)")
+    p.add_argument("--model", choices=sorted(REVISIONS), required=True)
+    p.add_argument("--adapter-name", required=True, help="the checkpoint, e.g. 3b-e2")
+    p.add_argument("--adapter", type=Path, help="PEFT adapter (default: under /kaggle/input)")
+    p.add_argument("--prompts", type=Path, help=f"{DEV_PROMPTS} (default: under /kaggle/input)")
+    p.add_argument("--config", type=Path, default=HERE / "config.json")
+    p.add_argument("--base", type=Path, help="local base model (default: the pinned revision)")
+    p.add_argument("--revision", help="override the pinned revision (never for the real runs)")
+    p.add_argument("--out", type=Path, help="default: /kaggle/working on Kaggle")
+    p.add_argument("--work", type=Path, help="scratch: the base model")
+    p.add_argument("--limit", type=int, help="first N prompts (local checks)")
+    p.add_argument("--max-new-tokens", type=int, default=512, help="as generate-sql --max-tokens")
+    p.add_argument("--install", action="store_true", help="pip install requirements.lock first")
+    p.add_argument("--cpu", action="store_true", help="generate on CPU even with a GPU")
+
+    p = sub.add_parser("prepare-dev-prompts", help="the dev prompts dataset folder (S7)")
+    p.add_argument(
+        "--prompts", type=Path, default=REPO / "data/prompts/dev.predictions.prompts.jsonl"
+    )
+    p.add_argument("--gold", type=Path, default=REPO / "data/benchmark/dev.jsonl")
+    p.add_argument("--out", type=Path, required=True)
+    p.add_argument("--dataset", default="aohkvd/eth-nl2sql-phase2-dev-prompts")
+    p.add_argument("--title", default="eth-nl2sql phase2 dev prompts")
+
+    p = sub.add_parser("prepare-generate", help="the kernel folder of `generate` (S7)")
+    p.add_argument("--model", choices=sorted(REVISIONS), required=True)
+    p.add_argument(
+        "--adapter",
+        type=Path,
+        required=True,
+        help="the downloaded PEFT checkpoint, e.g. models/lora/3b-run/adapters/3b-e2",
+    )
+    p.add_argument("--run", type=Path, required=True, help="run.json of the training kernel")
+    p.add_argument("--prompts", type=Path, required=True, help=f"the {DEV_PROMPTS} uploaded")
+    p.add_argument("--freeze", type=Path, default=REPO / "data/train/freeze.json")
+    p.add_argument("--out", type=Path, required=True)
+
     args = parser.parse_args(argv)
     if args.command == "prepare":
         return prepare(args)
     if args.command == "prepare-dataset":
         return prepare_dataset(args)
+    if args.command == "prepare-dev-prompts":
+        return prepare_dev_prompts(args)
+    if args.command == "prepare-generate":
+        return prepare_generate(args)
+    if args.command == "generate":
+        return generate(args, KERNEL)
     return train(args, KERNEL)
 
 

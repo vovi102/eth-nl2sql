@@ -770,6 +770,99 @@ chứng ở `data/predictions/phase2-precheck/`; adapter ở `models/lora/preche
 - Kết quả đo hai chỗ lệch cùng lúc: lượng tử hoá của base, và việc adapter học trên fp16 nhưng
   chạy trên Q4_K_M.
 
+**Cài đặt** (S7, 2026-11-08, sau khi thấy test phase 1). Thay cho `kaggle/phase2-fp16-generate/`
+của mục 6, phần sinh fp16 nằm trong `train_lora.py`. Lý do: dùng lại đúng môi trường đã ghim,
+cách cài lock, bản sửa attention cho T4 và cách gắn tham số vào kernel.
+
+- `prepare-dev-prompts` dựng dataset private thứ hai, `aohkvd/eth-nl2sql-phase2-dev-prompts`:
+  - chỉ có 161 prompt `sql` của dev, dạng `{question_id, messages}`;
+  - không có gold SQL;
+  - lệnh từ chối file có tên không bắt đầu bằng `dev.` hoặc có chữ `test`, và câu hỏi không có
+    trong `data/benchmark/dev.jsonl` (R6).
+- `prepare-generate` dựng kernel `aohkvd/eth-nl2sql-phase2-fp16` và gắn sẵn SHA256 của prompt và
+  của adapter. Adapter phải là một checkpoint trong `run.json` của lần train. Kernel đọc adapter từ
+  output của kernel train (`kernel_sources`), và dừng nếu SHA256 khác.
+- `generate`:
+  - nạp base fp16 ở revision đã ghim và gắn adapter PEFT lên (không merge), chạy dưới autocast fp16
+    như lúc train;
+  - trên T4 bật nhánh lặp K/V, và kiểm tra token kế tiếp của prompt đầu giống nhánh GQA;
+  - giải mã tham lam, tối đa 512 token mới, dừng ở `<|im_end|>` hoặc `<|endoftext|>`;
+  - chạy base (tắt adapter bằng `disable_adapter`), rồi base + adapter;
+  - ghi `replies.<model>.jsonl` và file meta cho mỗi cấu hình.
+
+  `generation_config.json` của Qwen2.5 lấy mẫu (temperature 0,7, top_p 0,8, top_k 20,
+  repetition_penalty 1,1), và `generate()` điền các trường để mặc định từ cấu hình đó. Vì vậy
+  script thay hẳn cấu hình của model bằng cấu hình tham lam, không có phạt lặp, giống
+  `llama-server` ở temperature 0.
+- `generate-sql --replies FILE` (cần `--no-repair`) phát lại các câu trả lời đó qua đúng vòng B8
+  của `generate-sql`: tách SQL, chạy với địa chỉ của bản linking, ghi cùng định dạng dự đoán. Lệnh
+  dừng nếu file không trả lời đúng tập prompt `sql` của file prompt.
+- `scripts/phase2_quant.sh` chạy hai lần Q4_K_M ở local (base và + `3b-e2`, cùng cờ server như
+  phase 1), phát lại hai lần fp16, chấm cả bốn với `--train-manifest`, và ghi
+  `data/predictions/dev-phase2-quant.summary.json`.
+- Kiểm tra trước khi đăng (**đo**):
+  - tokenizer HF cho đúng số token prompt mà `llama-server` đếm ở phase 1, trên 161/161 prompt dev;
+  - `decode(encode(reply))` cho lại đúng câu trả lời trên mọi câu trả lời của 3B + e2;
+  - test CPU với model tí hon và adapter ngẫu nhiên: câu trả lời trùng với giải mã argmax làm tay,
+    có và không có adapter;
+  - bỏ phần thay cấu hình sinh thì test fail.
+
+**Kết quả** (S7, 2026-11-08, sau khi thấy test phase 1). Nguồn (**đo**):
+
+- `data/predictions/dev-phase2-quant.summary.json` và `dev-phase2-quant.log`;
+- các file `dev.predictions.prompts.qwen2.5-coder-3b-instruct-{q4_k_m,fp16}[.3b-e2].no-check.no-repair.*`;
+- `models/lora/3b-fp16/generate.json` (không đưa vào git).
+
+Kernel fp16 (version 1) chạy 3.283 s (0,91 giờ GPU) trên một T4:
+
+- prompt và adapter khớp SHA256 đã gắn; adapter đọc từ output version 7 của kernel train;
+- kiểm tra attention đạt: token kế tiếp giống nhau ở hai nhánh, logit lệch tối đa 0,055;
+- mỗi câu mất 9,7 s, so với 4,1–4,4 s của Q4_K_M trên GTX 1650.
+
+Điều kiện chung của bốn lần chạy: dev, một lần thử, không kiểm tra placeholder.
+
+| | Q4_K_M | fp16 | fp16 so với Q4_K_M |
+|---|---:|---:|---|
+| 3B base | **136** (0,768) | 94 (0,531) | đúng thêm 2, sai thêm 44 (p < 0,0001); SQL giống nhau 62/161 |
+| 3B + `3b-e2` | **173** (0,977) | 168 (0,949) | đúng thêm 0, sai thêm 5 (p = 0,063); SQL giống nhau 155/161 |
+| Tác dụng của LoRA | đúng thêm 40, sai thêm 3 | đúng thêm 79, sai thêm 5 | |
+
+| Phần | Q4 base | fp16 base | Q4 + e2 | fp16 + e2 |
+|---|---:|---:|---:|---:|
+| Template gần (123) | 89 | 48 | 123 | 123 |
+| Template xa (38) | 31 | 30 | 34 | 29 |
+| VI (91) / EN (86) | 70 / 66 | 51 / 43 | 87 / 86 | 86 / 82 |
+| Câu không dùng placeholder mà viết địa chỉ | 36 | 72 | 0 | 0 |
+| Câu chạm 512 token | 1 | 5 | 0 | 0 |
+
+- **Hai lần Q4_K_M tái lập đúng các lần chạy trước.**
+  - Q4 + e2 giống hệt lần chạy e2 của S6 ở 177/177 câu (S6 không có câu nào phải hỏi lại).
+  - Lần thử đầu của Q4 base giống hệt lần chạy `--no-placeholder-check` của phase 1 ở 177/177
+    câu.
+- **Không thấy lỗi đường ống fp16.**
+  - Số token prompt giống Q4_K_M ở 161/161 câu.
+  - Với adapter, SQL của hai runtime giống nhau ở 155/161 câu.
+  - Kiểm tra attention đạt.
+  - Test CPU so giải mã với argmax làm tay.
+- **Base: Q4_K_M đúng nhiều hơn fp16 42 câu.** Lỗi chính của fp16 là không dùng placeholder.
+  - Ở 72/161 câu, fp16 base viết địa chỉ cụ thể vào `IN (…)`: lấy từ giá trị ví dụ của schema,
+    hoặc chuỗi `0x000…0`. Q4_K_M base mắc lỗi này ở 36 câu.
+  - 36 trong 44 câu fp16 làm sai thêm thuộc kiểu này. Các câu còn lại chủ yếu nhầm chiều
+    `from_address` / `to_address`.
+  - Với cấu hình mặc định (kiểm tra placeholder và một lần hỏi lại), phần lớn các câu này sẽ được
+    hỏi lại; phép đo này không đo điều đó.
+  - Giả thuyết, **chưa kiểm**: prompt, evidence và `evidence_hint` của phase 1 được chỉnh trên dev
+    bằng chính 3B Q4_K_M, nên phần lợi đó gắn với đúng runtime này. Base fp16 không được dùng khi
+    chỉnh, và ở các lựa chọn sát nhau (placeholder hay địa chỉ, `from` hay `to`), số học khác đi
+    là đủ đổi câu trả lời tham lam.
+- **Có adapter: Q4_K_M không kém fp16** (173 so với 168; p = 0,063, nằm trong ngưỡng ±9 câu).
+  - Cả 5 câu fp16 + e2 sai thêm đều thuộc `entity_top_callers` (1 VI, 4 EN). Model nhóm theo
+    `to_address`, cùng kiểu lỗi mà Q4 + e2 mắc ở 4 câu VI (mục 5.7).
+  - Ở fp16, template này còn 5/14 câu đúng, so với 10/14 ở Q4_K_M. Vậy lỗi mà adapter đưa vào
+    template xa này có thật, và lượng tử hoá chỉ che bớt một phần.
+- **Kết luận cho rủi ro "adapter học trên fp16, chạy trên Q4_K_M" (mục 10):** không thấy mất EX
+  khi chạy adapter trên Q4_K_M. Q4_K_M + e2 bằng hoặc hơn fp16 + e2 trên dev.
+
 ### 5.5 Các cấu hình chạy cho phase 2 (R1)
 
 | Cấu hình | dev | test |
@@ -950,7 +1043,7 @@ hệt lần chạy 3B mặc định của phase 1, nên EX cũng là 159/177.
 | `src/eth_nl2sql/benchmark_validate.py` | **Đã sửa (S1).** `TIE_BREAKERS` thêm `hour`, `number` và `token_address` cho gold của train. Không gold nào của benchmark kết thúc `ORDER BY` bằng ba cột này, nên benchmark không đổi |
 | `src/eth_nl2sql/train_build.py` | **Đã có (S2).** `uv run python -m eth_nl2sql.train_build [--count-scale 0.1] [--out-dir …] [--holdout 20]`, cùng cách chạy với benchmark (quyết định 5 của [benchmark.md](benchmark.md)). Các bước: kiểm tra rò rỉ; giá trị điền trừ thực thể giữ riêng và mọi giá trị điền mang tên chúng, cộng `token_out`; sinh câu bằng `benchmark_build.generate` theo từng variant; bỏ câu trùng dev; linking thật và lọc L1; loại câu còn nêu tên thực thể giữ riêng; dựng prompt. Ghi `data/train/{train.jsonl, dropped.jsonl, sft.jsonl, manifest.json}`. Mỗi dòng của `dropped.jsonl` có kèm cách bộ linking đọc câu (`linked`) và nguyên nhân lỗi đã biết (`cause`: thực thể đọc thành token hoặc ngược lại) |
 | `kaggle/phase2-train/` | **Đã có (S5).** `config.json` (đóng băng ở S3); `train_lora.py` với ba lệnh `prepare-dataset`, `prepare` (dựng thư mục kernel) và `train` (`--model`, `--max-steps`); `kernel-metadata.json` (private, GPU T4, có internet); `pyproject.toml` và `uv.lock` (môi trường local, torch CPU); `requirements.lock` (cho Kaggle); `tests/` (14 test, khoảng 12 phút trên CPU, chạy bằng `uv run --project kaggle/phase2-train pytest kaggle/phase2-train/tests`). Chi tiết ở mục 4 |
-| `kaggle/phase2-fp16-generate/` | `generate_fp16.py` cho mục 5.4: đầu ra cùng định dạng dự đoán `{question_id, decision, sql, attempts}` |
+| `kaggle/phase2-train/` (S7) | **Đã có (S7, sau khi thấy test phase 1).** Thay cho `kaggle/phase2-fp16-generate/`: lệnh `prepare-dev-prompts`, `prepare-generate` và `generate` của `train_lora.py`, cùng `kernel-metadata.fp16.json`; `tests/test_generate_fp16.py` (4 test). `generate-sql --replies` đưa câu trả lời fp16 về cùng định dạng dự đoán `{question_id, decision, sql, attempts}`. `scripts/phase2_quant.sh` chạy phần local. Chi tiết ở mục 5.4 |
 | `sql_generation.py` / `cli.py` | **Đã có (S5).** `generate-sql --adapter PATH`: kiểm tra `GET /lora-adapters` của server có đúng một adapter là file này (kể cả ở scale 0), rồi ghi SHA256 của adapter, hệ số và danh sách `/lora-adapters` vào `.meta.json`. Tên file dự đoán thêm `.<adapter>` (kèm `.scale<k>` khi hệ số khác 1). Server có nạp adapter mà lệnh không có `--adapter` thì lệnh dừng, để không lần chạy nào bị ghi nhầm là base. Thêm `--no-repair` (một lần thử) |
 | `execution_evaluation.py` / `cli.py` | **Đã có (S5).** `evaluate-sql --train-manifest data/train/manifest.json` thêm phần chia `by_train_exposure`, tính theo mention gold. `held_out`: có ít nhất một đích là thực thể giữ riêng, ví/contract hay token mang tên chúng (`holdout.removed`), hoặc lớp mà `top_n` thành viên có thực thể giữ riêng. `not_held_out`: có đích có tên nhưng không đích nào bị giữ riêng; cả 79 thực thể còn lại đều có trong train. `no_named_target`: câu không có đích có tên (câu thường, địa chỉ gõ sẵn, NIL). Trên dev: 19 / 126 / 32 câu |
 | `tests/test_template_signature.py`, `tests/test_train_templates.py` | **Đã có (S1).** Chuẩn hoá SQL, các kiểu vi phạm và gần, mọi câu mẫu train cho bản ghi hợp lệ, bộ linking đọc đúng (R9), không trùng với cách bộ linking đọc câu dev/test |
@@ -993,7 +1086,7 @@ uv run eth-nl2sql evaluate-sql --gold data/benchmark/dev.jsonl --predictions dat
 | S4 | **Xong (2026-11-06, 00:24–04:18).** Chạy test phase 1 **một lần** cho 7 cấu hình: 3B mặc định, `--no-placeholder-check`, oracle, `--schema linked`, `--no-evidence`, `--literal`, và 1.5B. Script `scripts/phase1_test.sh` chạy không cần trông, mất 233 phút trên GTX 1650. Script kiểm tra bản đóng băng, chạy lại dev (177/177 câu trả lời giống hệt bản đã chốt), link test, dựng prompt, sinh SQL, chấm điểm và ghi tóm tắt vào `data/predictions/test-phase1.summary.json`. EX test: 3B 0,768, oracle 0,790, 1.5B 0,613. Chi tiết ở [proposed-method.md](proposed-method.md) §8 | Người dùng cho phép `--allow-test` (2026-11-05) |
 | S5 | **Xong (2026-11-07 – 2026-11-08), sau khi thấy test phase 1.** Dataset private `aohkvd/eth-nl2sql-phase2-sft`. Kernel `aohkvd/eth-nl2sql-phase2-train`: version 1 lỗi `torchao`; version 2 chạy thử 50 bước (162 s/bước, chậm vì attention rơi về kernel math); version 3 lỗi ở `check_attention`; version 4 kiểm tốc độ 10 bước sau khi sửa (72,6 s/bước); version 5 chạy đủ 2 epoch trong 4,46 giờ (65,9 s/bước) (mục 4). Kiểm tra runtime: 177/177 câu trả lời ở hệ số 0 giống hệt phase 1. EX dev: e1 0,955, e2 0,960 → chọn **`1.5b-e2`** (mục 5.6). Dùng 7,53 giờ GPU | Người dùng cho phép đăng dataset, push kernel và tải 3,09 GB trên Kaggle (2026-11-07); chọn ngưỡng tốc độ cho lần chạy đủ (2026-11-08) |
 | S6 | **Xong (2026-11-08), sau khi thấy test phase 1.** Kernel version 6 kiểm 10 bước (114,6 s/bước, đạt ngưỡng ≤ 145 s); version 7 chạy đủ 2 epoch trong 7,79 giờ (116,0 s/bước) (mục 4). Kiểm tra runtime: 177/177 câu trả lời ở hệ số 0 giống hệt phase 1. EX dev: e1 và e2 cùng 0,977 → chọn **`3b-e2`** (mục 5.7). Quota sau S6: 15,88 giờ | Người dùng cho phép S6 với cùng quy tắc ngưỡng (2026-11-08) |
-| S7 | Ablation lượng tử hoá (5.4) | **Đăng prompt dev** lên Kaggle |
+| S7 | **Xong (2026-11-08), sau khi thấy test phase 1.** Dataset private `aohkvd/eth-nl2sql-phase2-dev-prompts` (161 prompt `sql` của dev). Kernel `aohkvd/eth-nl2sql-phase2-fp16` version 1 sinh fp16 trong 0,91 giờ; Q4_K_M chạy ở local. Dev, một lần thử, không kiểm tra placeholder: base Q4_K_M 136, fp16 94; + `3b-e2` Q4_K_M 173, fp16 168 (mục 5.4) | Người dùng cho phép ("làm S7", 2026-11-08) |
 | S8 | Chạy test phase 2 theo mục 5.5, cộng phần chia đã thấy / chưa thấy | Cho phép `--allow-test` |
 | S9 | Viết kết quả vào §8, cập nhật README | |
 
@@ -1008,9 +1101,9 @@ Sau S4, mọi thay đổi kế hoạch phase 2 phải ghi rõ là "sau khi thấ
 | Huấn luyện 1.5B: 1.870 câu × 2 epoch = 234 bước, cộng 3 lần đo loss val (version 5) | 4,47 | **đo**: `kaggle quota` 2026-11-08 sau lần chạy là 7,53 giờ; `wall_seconds` 16.057 |
 | Kiểm tốc độ 3B, 10 bước (version 6) | 0,55 | **đo**: `kaggle quota` 8,08 giờ sau lần chạy; `wall_seconds` 1.990 |
 | Huấn luyện 3B (version 7) | 7,80 | **đo**: `kaggle quota` 15,88 giờ sau lần chạy; `wall_seconds` 28.047. Bản 2026-11-04 ước lượng 4,5–6,5 |
-| Ablation lượng tử hoá | khoảng 1 | ước lượng |
+| Ablation lượng tử hoá (S7, kernel fp16 version 1) | 0,91 | **đo**: `kaggle quota` 16,79 giờ sau lần chạy; `wall_seconds` 3.283 |
 | Dự phòng: huấn luyện lại 3B một lần (quyết định 23) | khoảng 7,8 | ước lượng theo version 7 |
-| **Tổng** | **khoảng 24,7** (15,88 đã dùng, **đo**; phần còn lại ước lượng). Bản 2026-11-04 ghi 15–18 | quota 30 giờ/tuần, làm mới 2026-11-14 (**đo**); còn 14,12 giờ trong tuần này |
+| **Tổng** | **khoảng 24,6** (16,79 đã dùng, **đo**; còn lại là dự phòng huấn luyện lại 3B, ước lượng). Bản 2026-11-04 ghi 15–18 | quota 30 giờ/tuần, làm mới 2026-11-14 (**đo**); còn 13,21 giờ trong tuần này |
 
 Đánh giá chạy local, không tốn quota:
 - dev: 790 s cho một lần chạy 3B (**đo**: `wall_seconds` trong `.meta.json` của lần chạy 3B mặc
@@ -1038,7 +1131,7 @@ Sau S4, mọi thay đổi kế hoạch phase 2 phải ghi rõ là "sau khi thấ
 | Template train khác phân phối test | EX tăng ít, hoặc giảm ở các dạng câu có trong test mà train không có (top-k, `LIMIT 1`, cặp `{E1}`/`{E2}`) | Đây chính là thứ cần đo. Báo EX theo template và nhóm; so phase 1 với phase 2 trên cùng câu |
 | fp16 trên T4 (Qwen2.5 vốn huấn luyện bf16) | Loss NaN do tràn số | Giữ trọng số LoRA ở fp32, giảm lr một nửa, hoặc chuyển QLoRA; ghi lại |
 | OOM ở 6.144 token | Không chạy được | Chỉ tính logits trên phần trả lời; giảm độ dài chuỗi xuống 5.120 (prompt dài nhất 4.448); chuyển QLoRA |
-| Adapter học trên fp16, chạy trên Q4_K_M | EX phase 2 thấp hơn mức model học được | Ablation lượng tử hoá (5.4) đo phần này |
+| Adapter học trên fp16, chạy trên Q4_K_M | EX phase 2 thấp hơn mức model học được | Ablation lượng tử hoá (5.4) đo phần này. **Đã đo (S7):** trên dev, Q4_K_M + `3b-e2` 173 so với fp16 + `3b-e2` 168, nên không thấy mất EX |
 | `--lora` làm đổi runtime hoặc mất prefix cố định | So sánh với phase 1 không còn sạch | Kiểm tra hệ số 0 (5.2) |
 | Bộ linking loại nhiều câu train | Thiếu dữ liệu ở một số template | Ngưỡng 20% ở mục 2.3; xem lại câu chữ, không sửa từ điển |
 | Dev bị nhìn khi chọn checkpoint | Số dev phase 2 lạc quan | Chỉ 2 lựa chọn, quy tắc chốt trước; số khách quan là test |

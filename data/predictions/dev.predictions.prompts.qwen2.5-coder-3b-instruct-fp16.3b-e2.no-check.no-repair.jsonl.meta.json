@@ -1,0 +1,103 @@
+{
+  "prompts": "data/prompts/dev.predictions.prompts.jsonl",
+  "prompts_sha256": "a61f00182f0ffa2f8883daa0a9ad371deffb6995805e27dd75b3206c6af0d7d3",
+  "prompt_options": {
+    "evidence": true,
+    "placeholders": true,
+    "schema": "full"
+  },
+  "linking": "data/linking/dev.predictions.jsonl",
+  "linking_sha256": "54c57fb0744223e45bd08a6a98732deb75cf3b6dd3422268d65aebe22c3d9d3a",
+  "limit": null,
+  "model": "qwen2.5-coder-3b-instruct-fp16.3b-e2",
+  "model_sha256": null,
+  "adapter": null,
+  "server": {
+    "models": [
+      "qwen2.5-coder-3b-instruct-fp16.3b-e2"
+    ],
+    "model_path": null,
+    "n_ctx": null,
+    "lora_adapters": null,
+    "replies": {
+      "path": "models/lora/3b-fp16/replies.qwen2.5-coder-3b-instruct-fp16.3b-e2.jsonl",
+      "sha256": "658bf83cc6f7c1415ad282e88668bab3f43f9f55a8b5d846f847b76d856bd21e",
+      "meta": {
+        "model": "qwen2.5-coder-3b-instruct-fp16.3b-e2",
+        "hf_repo": "Qwen/Qwen2.5-Coder-3B-Instruct",
+        "revision": "488639f1ff808d1d3d0ba301aef8c11461451ec5",
+        "adapter": {
+          "name": "3b-e2",
+          "sha256": "618d95eac23b698739774b842828ece32768c1ab438057d574022cee7d4351f6"
+        },
+        "prompts_sha256": "362c484e170b5f2cd1ad7cba402bc8fbbbd6731ab6d6b0bdf748ac826876b42a",
+        "generation": {
+          "temperature": 0.0,
+          "do_sample": false,
+          "max_new_tokens": 512,
+          "repetition_penalty": 1.0,
+          "eos_token_id": [
+            151645,
+            151643
+          ],
+          "backend": "transformers 5.22.1, float16",
+          "autocast_fp16": true
+        },
+        "replies_sha256": "658bf83cc6f7c1415ad282e88668bab3f43f9f55a8b5d846f847b76d856bd21e",
+        "summary": {
+          "prompts": 161,
+          "finish": {
+            "stop": 161
+          },
+          "completion_tokens": {
+            "mean": 81.4,
+            "max": 111
+          },
+          "seconds": {
+            "total": 1552.3,
+            "mean": 9.642
+          }
+        }
+      }
+    }
+  },
+  "generation": {
+    "temperature": 0.0,
+    "do_sample": false,
+    "max_new_tokens": 512,
+    "repetition_penalty": 1.0,
+    "eos_token_id": [
+      151645,
+      151643
+    ],
+    "backend": "transformers 5.22.1, float16",
+    "autocast_fp16": true,
+    "max_attempts": 1,
+    "placeholder_check": false,
+    "fixed_prefix_tokens": 0
+  },
+  "sql_timeout": 30.0,
+  "started": "2026-11-08T21:18:40",
+  "wall_seconds": 61.1,
+  "summary": {
+    "questions": 177,
+    "decisions": {
+      "sql": 161,
+      "nil": 8,
+      "unsupported": 8
+    },
+    "skipped": 0,
+    "asked": 161,
+    "repaired": 0,
+    "repair_ran": 0,
+    "first_attempt": {
+      "ran": 161
+    },
+    "final": {
+      "ran": 161
+    },
+    "seconds_per_question": 0.00019875776397515528,
+    "seconds_first_attempt": 0.00019875776397515528,
+    "max_completion_tokens": 111
+  }
+}

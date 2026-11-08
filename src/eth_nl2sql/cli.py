@@ -46,8 +46,10 @@ from eth_nl2sql.sql_generation import (
     MAX_ATTEMPTS,
     ClientError,
     OpenAICompatibleClient,
+    ReplayClient,
     adapter_tag,
     generate,
+    messages_key,
     served_adapter,
     shared_prefix,
     summary,
@@ -260,9 +262,22 @@ def _generate_sql(args: argparse.Namespace) -> int:
     linking_path = args.linking or Path(prompt_meta["input"])
     linking = {r["question_id"]: r for r in read_records(linking_path, allow_test=args.allow_test)}
 
-    client = OpenAICompatibleClient(
-        args.server, model=args.model, max_tokens=args.max_tokens, seed=args.seed
-    )
+    if args.replies:
+        if not args.no_repair or args.adapter or args.limit:
+            raise ClientError("--replies plays back one reply per prompt: give --no-repair, "
+                              "and neither --adapter nor --limit")  # fmt: skip
+        client = ReplayClient(args.replies)
+        asked = {messages_key(p["messages"]) for p in prompts if p["decision"] == "sql"}
+        if asked != set(client.replies):
+            missing, extra = len(asked - set(client.replies)), len(set(client.replies) - asked)
+            raise ClientError(
+                f"{args.replies} does not answer exactly the sql prompts of "
+                f"{args.prompts}: {missing} without reply, {extra} too many"
+            )
+    else:
+        client = OpenAICompatibleClient(
+            args.server, model=args.model, max_tokens=args.max_tokens, seed=args.seed
+        )
     # Of the whole file, so that a trial run primes the same tokens as the full run.
     prefix = [] if args.no_fixed_prefix else shared_prefix(client, prompts)
     if args.limit:
@@ -541,6 +556,11 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument(
         "--no-repair", action="store_true", help="one attempt per question, no repair (ablation)"
     )
+    p.add_argument(
+        "--replies", type=Path,
+        help="play back the replies of `train_lora.py generate` (transformers fp16 on Kaggle, "
+        "phase2-plan.md §5.4) instead of asking a server; needs --no-repair",
+    )  # fmt: skip
     p.add_argument("--timeout", type=float, default=30.0, help="seconds per query")
 
     p = sub.add_parser(

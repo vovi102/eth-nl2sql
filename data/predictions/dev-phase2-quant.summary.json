@@ -1,0 +1,153 @@
+{
+ "runs": {
+  "q4_base": {
+   "file": "data/predictions/dev.predictions.prompts.qwen2.5-coder-3b-instruct-q4_k_m.no-check.no-repair.jsonl",
+   "ex": 0.768361581920904,
+   "correct": 136,
+   "kinds": {
+    "correct": 136,
+    "wrong_result": 31,
+    "execution": 6,
+    "parse": 2,
+    "not_a_query": 2
+   },
+   "by_train_exposure": {
+    "held_out": {
+     "ex": 0.8421052631578947,
+     "ex_extra_columns_ok": 0.8421052631578947,
+     "correct": 16,
+     "questions": 19
+    },
+    "no_named_target": {
+     "ex": 1.0,
+     "ex_extra_columns_ok": 1.0,
+     "correct": 32,
+     "questions": 32
+    },
+    "not_held_out": {
+     "ex": 0.6984126984126984,
+     "ex_extra_columns_ok": 0.6984126984126984,
+     "correct": 88,
+     "questions": 126
+    }
+   }
+  },
+  "q4_lora": {
+   "file": "data/predictions/dev.predictions.prompts.qwen2.5-coder-3b-instruct-q4_k_m.3b-e2.no-check.no-repair.jsonl",
+   "ex": 0.9774011299435028,
+   "correct": 173,
+   "kinds": {
+    "correct": 173,
+    "wrong_result": 4
+   },
+   "by_train_exposure": {
+    "held_out": {
+     "ex": 1.0,
+     "ex_extra_columns_ok": 1.0,
+     "correct": 19,
+     "questions": 19
+    },
+    "no_named_target": {
+     "ex": 1.0,
+     "ex_extra_columns_ok": 1.0,
+     "correct": 32,
+     "questions": 32
+    },
+    "not_held_out": {
+     "ex": 0.9682539682539683,
+     "ex_extra_columns_ok": 0.9682539682539683,
+     "correct": 122,
+     "questions": 126
+    }
+   }
+  },
+  "fp16_base": {
+   "file": "data/predictions/dev.predictions.prompts.qwen2.5-coder-3b-instruct-fp16.no-check.no-repair.jsonl",
+   "ex": 0.5310734463276836,
+   "correct": 94,
+   "kinds": {
+    "correct": 94,
+    "wrong_result": 66,
+    "execution": 9,
+    "parse": 6,
+    "not_a_query": 2
+   },
+   "by_train_exposure": {
+    "held_out": {
+     "ex": 0.5263157894736842,
+     "ex_extra_columns_ok": 0.5263157894736842,
+     "correct": 10,
+     "questions": 19
+    },
+    "no_named_target": {
+     "ex": 1.0,
+     "ex_extra_columns_ok": 1.0,
+     "correct": 32,
+     "questions": 32
+    },
+    "not_held_out": {
+     "ex": 0.4126984126984127,
+     "ex_extra_columns_ok": 0.4126984126984127,
+     "correct": 52,
+     "questions": 126
+    }
+   }
+  },
+  "fp16_lora": {
+   "file": "data/predictions/dev.predictions.prompts.qwen2.5-coder-3b-instruct-fp16.3b-e2.no-check.no-repair.jsonl",
+   "ex": 0.9491525423728814,
+   "correct": 168,
+   "kinds": {
+    "correct": 168,
+    "wrong_result": 9
+   },
+   "by_train_exposure": {
+    "held_out": {
+     "ex": 0.9473684210526315,
+     "ex_extra_columns_ok": 0.9473684210526315,
+     "correct": 18,
+     "questions": 19
+    },
+    "no_named_target": {
+     "ex": 1.0,
+     "ex_extra_columns_ok": 1.0,
+     "correct": 32,
+     "questions": 32
+    },
+    "not_held_out": {
+     "ex": 0.9365079365079365,
+     "ex_extra_columns_ok": 0.9365079365079365,
+     "correct": 118,
+     "questions": 126
+    }
+   }
+  }
+ },
+ "pairs": {
+  "quantization, base: fp16 vs Q4": {
+   "better": 2,
+   "worse": 44,
+   "p": 0.0,
+   "same_sql": "62/161"
+  },
+  "quantization, + LoRA: fp16 vs Q4": {
+   "better": 0,
+   "worse": 5,
+   "p": 0.0625,
+   "same_sql": "155/161"
+  },
+  "LoRA at Q4": {
+   "better": 40,
+   "worse": 3,
+   "p": 0.0,
+   "same_sql": "0/161"
+  },
+  "LoRA at fp16": {
+   "better": 79,
+   "worse": 5,
+   "p": 0.0,
+   "same_sql": "0/161"
+  }
+ },
+ "conditions": "dev, one attempt, no placeholder check (\u00a75.4)"
+}

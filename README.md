@@ -276,6 +276,33 @@ Tóm tắt nằm ở `data/predictions/dev-phase2-{1.5b,3b}.summary.json`. Phân
 [docs/phase2-plan.md](docs/phase2-plan.md) §5.6, §5.7 và [docs/proposed-method.md](docs/proposed-method.md)
 §8.
 
+### Ablation lượng tử hoá (S7)
+
+So 3B fp16 (transformers trên Kaggle) với Q4_K_M (llama-server ở local), có và không có adapter
+`3b-e2`. Mỗi câu chỉ có một lần thử, không kiểm tra placeholder
+([docs/phase2-plan.md](docs/phase2-plan.md) §5.4). Mỗi bước đăng lên Kaggle cần người dùng đồng ý
+trước.
+
+```bash
+P=kaggle/phase2-train
+uv run python $P/train_lora.py prepare-dev-prompts --out $P/build/dev-prompts  # 161 prompt sql của dev
+kaggle datasets create -p $P/build/dev-prompts                                  # dataset private
+uv run python $P/train_lora.py prepare-generate --model 3b \
+  --adapter models/lora/3b-run/adapters/3b-e2 --run models/lora/3b-run/run.json \
+  --prompts $P/build/dev-prompts/dev-prompts.jsonl --out $P/build/3b-fp16
+kaggle kernels push -p $P/build/3b-fp16 --timeout 10800
+bash scripts/phase2_quant.sh       # chưa có output fp16: chỉ chạy hai lần Q4_K_M rồi dừng
+kaggle kernels output aohkvd/eth-nl2sql-phase2-fp16 -p models/lora/3b-fp16
+bash scripts/phase2_quant.sh       # phát lại fp16 (generate-sql --replies), chấm cả bốn lần chạy
+```
+
+`generate-sql --replies FILE --no-repair` đưa câu trả lời fp16 qua đúng vòng B8 của
+`generate-sql`. Tóm tắt nằm ở `data/predictions/dev-phase2-quant.summary.json`.
+
+S7 đã chạy ngày 2026-11-08 (kernel fp16 mất 0,91 giờ GPU). Trên dev, với một lần thử và không
+kiểm tra placeholder: 3B base đúng 136 câu ở Q4_K_M và 94 câu ở fp16; 3B + `3b-e2` đúng 173 câu
+ở Q4_K_M và 168 câu ở fp16.
+
 ## Dữ liệu cũ (đã lưu trữ)
 
 Tập mẫu CSV `data/raw/full/` (06/2026, giao dịch địa chỉ có nhãn + ~1% còn lại) và database
