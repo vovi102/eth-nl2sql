@@ -6,8 +6,8 @@ import duckdb
 import pytest
 from conftest import PHRASES, SENSES, write_property_senses
 
-from eth_nl2sql import property_senses
-from eth_nl2sql.build_duckdb import DatabaseError, load_knowledge_base
+from eth_nl2sql.ingest.duckdb_build import DatabaseError, load_knowledge_base
+from eth_nl2sql.knowledge import property_senses
 
 
 def test_check_accepts_the_fixture(property_senses_dir: Path) -> None:

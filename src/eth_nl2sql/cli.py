@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import importlib
 import json
 import logging
 import statistics
@@ -10,18 +11,19 @@ import time
 from collections import Counter
 from pathlib import Path
 
-from eth_nl2sql import entity_knowledge_base as knowledge_base
-from eth_nl2sql import property_senses
-from eth_nl2sql.bigquery_schema import fetch_schema
-from eth_nl2sql.build_duckdb import (
+from eth_nl2sql import paths
+from eth_nl2sql.ingest.bigquery import ExtractError, Extractor, Window, verify_extract
+from eth_nl2sql.ingest.bigquery_schema import fetch_schema
+from eth_nl2sql.ingest.duckdb_build import (
     DatabaseError,
     build_database,
     load_knowledge_base,
     report_path,
     verify_database,
 )
-from eth_nl2sql.entity_linking import EntityLinker
-from eth_nl2sql.entity_linking_evaluation import (
+from eth_nl2sql.knowledge import entities as knowledge_base
+from eth_nl2sql.knowledge import property_senses
+from eth_nl2sql.linking.evaluation import (
     EvaluationError,
     evaluate,
     format_report,
@@ -29,8 +31,9 @@ from eth_nl2sql.entity_linking_evaluation import (
     read_records,
     write_records,
 )
-from eth_nl2sql.entity_linking_resources import load_resources
-from eth_nl2sql.execution_evaluation import (
+from eth_nl2sql.linking.linker import EntityLinker
+from eth_nl2sql.linking.resources import load_resources
+from eth_nl2sql.sql.evaluation import (
     GoldError,
     gold_as_predictions,
     held_out_targets,
@@ -38,11 +41,9 @@ from eth_nl2sql.execution_evaluation import (
     run_questions,
     train_exposure,
 )
-from eth_nl2sql.execution_evaluation import format_report as format_ex_report
-from eth_nl2sql.extract_bigquery import ExtractError, Extractor, Window, verify_extract
-from eth_nl2sql.prompt_builder import SCHEMA_MODES, PromptBuilder, PromptOptions, load_schema
-from eth_nl2sql.sql_execution import SqlRunner
-from eth_nl2sql.sql_generation import (
+from eth_nl2sql.sql.evaluation import format_report as format_ex_report
+from eth_nl2sql.sql.execution import SqlRunner
+from eth_nl2sql.sql.generation import (
     MAX_ATTEMPTS,
     ClientError,
     OpenAICompatibleClient,
@@ -54,18 +55,19 @@ from eth_nl2sql.sql_generation import (
     shared_prefix,
     summary,
 )
+from eth_nl2sql.sql.prompt import SCHEMA_MODES, PromptBuilder, PromptOptions, load_schema
 
-DEFAULT_DB = Path("data/db/ethereum.duckdb")
-DEFAULT_MONTH_DIR = Path("data/raw/2026-09")
-DEFAULT_SCHEMA_FILE = Path("data/schema/bigquery_crypto_ethereum.json")
-DEFAULT_PROPERTY_SENSES_DIR = Path("data/schema")
-DEFAULT_LABELS_DIR = Path("data/raw/labels/eth-labels")
-DEFAULT_KNOWLEDGE_BASE_DIR = Path("data/entity_knowledge_base")
-DEFAULT_LINKING_DIR = Path("data/linking")
-DEFAULT_PROMPTS_DIR = Path("data/prompts")
-DEFAULT_PREDICTIONS_DIR = Path("data/predictions")
+DEFAULT_DB = paths.DB
+DEFAULT_MONTH_DIR = paths.RAW_MONTH_DIR
+DEFAULT_SCHEMA_FILE = paths.SCHEMA_FILE
+DEFAULT_PROPERTY_SENSES_DIR = paths.SCHEMA_DIR
+DEFAULT_LABELS_DIR = paths.LABELS_DIR
+DEFAULT_KNOWLEDGE_BASE_DIR = paths.KNOWLEDGE_BASE_DIR
+DEFAULT_LINKING_DIR = paths.LINKING_DIR
+DEFAULT_PROMPTS_DIR = paths.PROMPTS_DIR
+DEFAULT_PREDICTIONS_DIR = paths.PREDICTIONS_DIR
 DEFAULT_SERVER = "http://127.0.0.1:8080"
-DEFAULT_MANIFEST = Path("data/benchmark/manifest.json")
+DEFAULT_MANIFEST = paths.BENCHMARK_MANIFEST
 
 
 def _knowledge_base(args: argparse.Namespace) -> int:
@@ -393,7 +395,7 @@ def _extract(args: argparse.Namespace) -> int:
         totals = verify_extract(args.out, memory_limit=args.memory_limit)
         print(f"verified {args.out}")
     else:
-        out = args.out or Path("data/raw") / args.month
+        out = args.out or paths.RAW_DIR / args.month
         ex = Extractor(out, Window.month(args.month), project=args.project)
         if args.dry_run:
             for name, n in ex.plan():
@@ -408,7 +410,22 @@ def _extract(args: argparse.Namespace) -> int:
     return 0
 
 
+# Builders with options of their own: the rest of the command line goes to the module's main().
+BUILDERS = {
+    "build-benchmark": ("eth_nl2sql.benchmark.build", "build data/benchmark: dev, test, manifest"),
+    "build-train": ("eth_nl2sql.training.build", "build data/train: phase-2 training data (S2)"),
+    "check-train-signatures": (
+        "eth_nl2sql.training.signature",
+        "leakage checks R1-R3 and R5 of the train templates against the benchmark",
+    ),
+}
+
+
 def main(argv: list[str] | None = None) -> int:
+    argv = sys.argv[1:] if argv is None else argv
+    if argv and argv[0] in BUILDERS:
+        return importlib.import_module(BUILDERS[argv[0]][0]).main(argv[1:])
+
     parser = argparse.ArgumentParser(prog="eth-nl2sql")
     sub = parser.add_subparsers(dest="command", required=True)
 
@@ -582,6 +599,9 @@ def main(argv: list[str] | None = None) -> int:
         p.add_argument(
             "--allow-test", action="store_true", help="final evaluation only: allow test.jsonl"
         )
+
+    for name, (_, help_text) in BUILDERS.items():
+        sub.add_parser(name, help=help_text, add_help=False)  # listed only; dispatched above
 
     args = parser.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s", datefmt="%H:%M:%S")

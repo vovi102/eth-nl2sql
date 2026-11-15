@@ -5,7 +5,7 @@ from __future__ import annotations
 import duckdb
 import pytest
 
-from eth_nl2sql.benchmark_validate import (
+from eth_nl2sql.benchmark.validate import (
     GoldQueryError,
     check_record,
     check_sql,

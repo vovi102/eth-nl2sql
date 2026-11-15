@@ -17,11 +17,11 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 import pytest
 
-from eth_nl2sql import entity_knowledge_base as knowledge_base
-from eth_nl2sql import property_senses
-from eth_nl2sql.bigquery_schema import SOURCE_TABLES
-from eth_nl2sql.build_duckdb import build_database
-from eth_nl2sql.extract_bigquery import SPECS, Window, _files, duckdb_parity
+from eth_nl2sql.ingest.bigquery import SPECS, Window, _files, duckdb_parity
+from eth_nl2sql.ingest.bigquery_schema import SOURCE_TABLES
+from eth_nl2sql.ingest.duckdb_build import build_database
+from eth_nl2sql.knowledge import entities as knowledge_base
+from eth_nl2sql.knowledge import property_senses
 
 WINDOW = Window(date(2026, 9, 1), date(2026, 9, 3))
 UINT256_MAX = str(2**256 - 1)  # 78 digits: token amounts stay text

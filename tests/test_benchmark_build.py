@@ -11,8 +11,7 @@ import duckdb
 import pytest
 from conftest import ROUTER, TOKEN
 
-from eth_nl2sql import property_senses
-from eth_nl2sql.benchmark_build import (
+from eth_nl2sql.benchmark.build import (
     LinkTables,
     build,
     build_record,
@@ -24,9 +23,10 @@ from eth_nl2sql.benchmark_build import (
     split_templates,
     ties_at_limit,
 )
-from eth_nl2sql.benchmark_templates import GROUPS, TEMPLATES, Fill, time_fill
-from eth_nl2sql.benchmark_validate import check_record, check_sql, substitute_placeholders
-from eth_nl2sql.build_duckdb import load_knowledge_base
+from eth_nl2sql.benchmark.templates import GROUPS, TEMPLATES, Fill, time_fill
+from eth_nl2sql.benchmark.validate import check_record, check_sql, substitute_placeholders
+from eth_nl2sql.ingest.duckdb_build import load_knowledge_base
+from eth_nl2sql.knowledge import property_senses
 
 REPO = Path(__file__).parent.parent
 

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from eth_nl2sql.benchmark_templates import (
+from eth_nl2sql.benchmark.templates import (
     Fill,
     assign_placeholders,
     implicit_senses,

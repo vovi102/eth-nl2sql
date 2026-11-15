@@ -9,7 +9,7 @@ from pathlib import Path
 import pytest
 from conftest import ALICE, BOB, TOKEN
 
-from eth_nl2sql.execution_evaluation import (
+from eth_nl2sql.sql.evaluation import (
     expected_decision,
     held_out_targets,
     report,
@@ -17,7 +17,7 @@ from eth_nl2sql.execution_evaluation import (
     score,
     train_exposure,
 )
-from eth_nl2sql.sql_execution import Execution, SqlRunner, extract_sql, repair_messages
+from eth_nl2sql.sql.execution import Execution, SqlRunner, extract_sql, repair_messages
 
 
 @pytest.mark.parametrize(

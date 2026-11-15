@@ -11,12 +11,11 @@ from pathlib import Path
 import pytest
 
 from eth_nl2sql.cli import main
-from eth_nl2sql.entity_linking import EntityLinker
-from eth_nl2sql.entity_linking_resources import load_resources
-from eth_nl2sql.execution_evaluation import score
-from eth_nl2sql.prompt_builder import PromptBuilder, load_schema
-from eth_nl2sql.sql_execution import SqlRunner
-from eth_nl2sql.sql_generation import (
+from eth_nl2sql.linking.linker import EntityLinker
+from eth_nl2sql.linking.resources import load_resources
+from eth_nl2sql.sql.evaluation import score
+from eth_nl2sql.sql.execution import SqlRunner
+from eth_nl2sql.sql.generation import (
     ClientError,
     OpenAICompatibleClient,
     adapter_tag,
@@ -28,6 +27,7 @@ from eth_nl2sql.sql_generation import (
     shared_prefix,
     summary,
 )
+from eth_nl2sql.sql.prompt import PromptBuilder, load_schema
 
 RIGHT = "```sql\nSELECT SUM(value) / 1e18 FROM transactions WHERE to_address IN {E1}\n```"
 OWN_ADDRESS = (
