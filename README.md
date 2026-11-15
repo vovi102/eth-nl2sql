@@ -2,6 +2,62 @@
 
 NL-to-SQL trên dữ liệu Ethereum.
 
+## Cấu trúc repo
+
+```
+src/eth_nl2sql/
+  cli.py                lệnh `eth-nl2sql` (uv run eth-nl2sql --help)
+  paths.py              đường dẫn mặc định trong data/
+  ingest/               BigQuery -> Parquet -> DuckDB
+  knowledge/            KB thực thể, từ điển nghĩa property
+  linking/              B1–B5: linking không dùng LLM, chấm linking
+  sql/                  B6–B8: prompt, gọi model, chạy SQL, chấm EX
+  benchmark/            template, kiểm tra và bộ sinh dev/test
+  training/             template train, kiểm tra rò rỉ, bộ sinh dữ liệu phase 2
+tests/                  pytest, một file mỗi module
+scripts/phase1/         test.sh (S4)
+scripts/phase2/         dev.sh (S5–S6), quant.sh (S7), test.sh (S8), precheck.sh
+kaggle/phase2-train/    huấn luyện LoRA trên Kaggle (project uv riêng)
+docs/                   phương pháp, nhãn linking, benchmark, kế hoạch phase 2
+data/
+  raw/                  2026-09/: tháng 9/2026 (Parquet không đưa vào git); labels/: eth-labels
+  db/                   ethereum.duckdb (không đưa vào git)
+  entity_knowledge_base/, schema/   KB và từ điển đã duyệt
+  benchmark/, train/    bộ đánh giá dev/test, dữ liệu train phase 2
+  linking/, prompts/    đầu ra linking và prompt, mỗi file đầu vào một file
+  predictions/          kết quả sinh SQL, mỗi thí nghiệm một thư mục (xem README.md trong đó)
+models/                 GGUF, tokenizer, adapter LoRA (không đưa vào git)
+```
+
+Package chỉ import theo một chiều: `ingest` → `knowledge` → `linking` → `sql` → `benchmark` →
+`training`. Bảng dưới ghi module tương ứng ở bố cục cũ (tag `thesis-v1`):
+
+| Package | Module (← tên cũ) |
+|---|---|
+| `ingest/` | `bigquery` ← `extract_bigquery`; `bigquery_schema`; `duckdb_build` ← `build_duckdb` |
+| `knowledge/` | `entities` ← `entity_knowledge_base`; `property_senses` |
+| `linking/` | `linker` ← `entity_linking`; `resources` ← `entity_linking_resources`; `time_expr` ← `entity_linking_time`; `evaluation` ← `entity_linking_evaluation` |
+| `sql/` | `prompt` ← `prompt_builder`; `generation` ← `sql_generation`; `execution` ← `sql_execution`; `evaluation` ← `execution_evaluation` |
+| `benchmark/` | `templates`, `validate`, `build` ← `benchmark_{templates,validate,build}` |
+| `training/` | `templates` ← `train_templates`; `signature` ← `template_signature`; `build` ← `train_build` |
+
+Scripts cũ `scripts/phase1_test.sh`, `scripts/phase2_{dev,quant,test}.sh` nay là
+`scripts/phase1/test.sh`, `scripts/phase2/{dev,quant,test}.sh`. Ba bộ sinh trước chạy bằng
+`python -m` nay là lệnh `build-benchmark`, `build-train`, `check-train-signatures`.
+
+### Tái lập kết quả luận văn
+
+Luận văn mô tả code ở commit `11c7769`, gắn tag `thesis-v1`, với bố cục phẳng cũ. Lần sắp lại
+repo chỉ đổi chỗ file và import, không đổi logic. Mọi file kết quả trong `data/` giữ nguyên từng
+byte; chỉ `data/predictions/` được chia thành thư mục con. Để chạy đúng code và đường dẫn mà luận văn nêu (kể cả các script
+`thesis-report/phan-tich/`), chuyển tạm repo về tag đó. `data/db/` và `models/` không nằm trong
+git nên vẫn giữ nguyên:
+
+```bash
+git switch --detach thesis-v1   # bố cục và code như luận văn
+git switch -                    # quay lại nhánh đang làm
+```
+
 ## Dữ liệu tháng 2026-09 (đầy đủ)
 
 `data/raw/2026-09/` là **toàn bộ** tháng 9/2026 (UTC) của `bigquery-public-data.crypto_ethereum`,
@@ -120,11 +176,11 @@ uv run eth-nl2sql evaluate-sql --gold data/benchmark/dev.jsonl \
   `n_ctx`, chat template, tham số sinh và thống kê lỗi/thời gian.
 - `--only-predicted` của `evaluate-sql` chỉ chấm các câu có dự đoán và không bị `skipped`,
   dùng cho lần chạy thử và ablation literal. Không có cờ này thì câu thiếu dự đoán bị tính sai.
-- Client (`OpenAICompatibleClient` trong `src/eth_nl2sql/sql_generation.py`) chỉ cần API chat
+- Client (`OpenAICompatibleClient` trong `src/eth_nl2sql/sql/generation.py`) chỉ cần API chat
   của OpenAI, nên phase 2 dùng lại được với server khác (vLLM). Riêng `count-prompt-tokens`
   và prefix cố định cần `/apply-template`, `/tokenize` và `/completion` của llama-server.
-- `data/predictions/prompt-v1/` là các lần chạy đầu tiên (2026-11-02), trước khi có prefix cố
-  định; `data/predictions/rejected-direction-rule/` là hai bản system prompt có thêm quy tắc
+- `data/predictions/phase1/dev-history/prompt-v1/` là các lần chạy đầu tiên (2026-11-02), trước khi có prefix cố
+  định; `data/predictions/phase1/dev-history/rejected-direction-rule/` là hai bản system prompt có thêm quy tắc
   from/to đã bị bỏ (`RULES.txt`, [docs/proposed-method.md](docs/proposed-method.md) §8).
   `before-hints/` và `hint-v1/` là lần chạy trước khi có `evidence_hint` và với hint lần 1 của
   `contract_called` (cột `evidence_hint` trong `data/schema/property_senses.csv`).
@@ -132,15 +188,15 @@ uv run eth-nl2sql evaluate-sql --gold data/benchmark/dev.jsonl \
 ## Fine-tune LoRA (phase 2, đang làm)
 
 Kế hoạch và các quyết định: [docs/phase2-plan.md](docs/phase2-plan.md). Phase 1 được chốt
-trong `data/predictions/phase1-freeze.json`: SHA256 của KB, model, code và 7 lần chạy dev, kèm
+trong `data/predictions/phase1/dev/phase1-freeze.json`: SHA256 của KB, model, code và 7 lần chạy dev, kèm
 EX của từng lần.
 
-Template chỉ dùng cho train nằm trong `src/eth_nl2sql/train_templates.py` (30 template, 2.000
+Template chỉ dùng cho train nằm trong `src/eth_nl2sql/training/templates.py` (30 template, 2.000
 câu). Kiểm tra rò rỉ so với template dev/test chỉ đọc code template và `manifest.json`, không
 đọc file câu hỏi:
 
 ```bash
-uv run python -m eth_nl2sql.template_signature [--report data/train/signature.json]
+uv run eth-nl2sql check-train-signatures [--report data/train/signature.json]
 ```
 
 Với mỗi template train, lệnh in ra câu dev/test giống nhất về câu chữ, và các template dev/test
@@ -166,8 +222,8 @@ với mã 1 khi có vi phạm:
 Sinh dữ liệu train (S2) bằng lệnh sau:
 
 ```bash
-uv run python -m eth_nl2sql.train_build --count-scale 0.1 --out-dir /tmp/train-dry  # chạy thử
-uv run python -m eth_nl2sql.train_build      # data/train/{train,dropped,sft}.jsonl, manifest.json
+uv run eth-nl2sql build-train --count-scale 0.1 --out-dir /tmp/train-dry  # chạy thử
+uv run eth-nl2sql build-train      # data/train/{train,dropped,sft}.jsonl, manifest.json
 uv run eth-nl2sql count-prompt-tokens data/train/sft.jsonl   # cần llama-server đang chạy
 ```
 
@@ -186,11 +242,11 @@ Các bước của lệnh:
 phase 1 một lần (S4), không cần trông, khoảng 4 giờ:
 
 ```bash
-bash scripts/phase1_test.sh --check   # chỉ kiểm tra điều kiện (không GPU, không đọc test)
-bash scripts/phase1_test.sh           # log: data/predictions/test-phase1.log
+bash scripts/phase1/test.sh --check   # chỉ kiểm tra điều kiện (không GPU, không đọc test)
+bash scripts/phase1/test.sh           # log: data/predictions/phase1/test/test-phase1.log
 ```
 
-S4 đã chạy ngày 2026-11-06. Tóm tắt nằm ở `data/predictions/test-phase1.summary.json`; kết quả
+S4 đã chạy ngày 2026-11-06. Tóm tắt nằm ở `data/predictions/phase1/test/test-phase1.summary.json`; kết quả
 và phân tích ở [docs/proposed-method.md](docs/proposed-method.md) §8.
 
 Mỗi template để riêng 5% số câu (`split: val`) để theo dõi loss. Vì `sft.jsonl` có sẵn trường
@@ -251,8 +307,8 @@ tham số. Trên Kaggle, script làm lần lượt:
 `models/lora/<model>-run/` (gồm `run.json` và `gguf/<model>-e{1,2}.gguf`):
 
 ```bash
-bash scripts/phase2_dev.sh 1.5b --check   # điều kiện: bản đóng băng, SHA256 adapter
-bash scripts/phase2_dev.sh 1.5b           # hệ số 0 (5.2), dev e1/e2, chấm, chọn checkpoint
+bash scripts/phase2/dev.sh 1.5b --check   # điều kiện: bản đóng băng, SHA256 adapter
+bash scripts/phase2/dev.sh 1.5b           # hệ số 0 (5.2), dev e1/e2, chấm, chọn checkpoint
 ```
 
 - `generate-sql --adapter models/lora/1.5b-e2.gguf` đối chiếu adapter với `GET /lora-adapters`
@@ -272,7 +328,7 @@ S5 (1.5B) đã chạy xong ngày 2026-11-08:
 S6 (3B) đã chạy xong cùng ngày: kernel version 7 train trong 7,79 giờ, kiểm tra hệ số 0 đạt, EX
 dev 0,977 cho cả e1 và e2, chọn `3b-e2` (hoà thì lấy epoch 2).
 
-Tóm tắt nằm ở `data/predictions/dev-phase2-{1.5b,3b}.summary.json`. Phân tích ở
+Tóm tắt nằm ở `data/predictions/phase2/dev/dev-phase2-{1.5b,3b}.summary.json`. Phân tích ở
 [docs/phase2-plan.md](docs/phase2-plan.md) §5.6, §5.7 và [docs/proposed-method.md](docs/proposed-method.md)
 §8.
 
@@ -291,13 +347,13 @@ uv run python $P/train_lora.py prepare-generate --model 3b \
   --adapter models/lora/3b-run/adapters/3b-e2 --run models/lora/3b-run/run.json \
   --prompts $P/build/dev-prompts/dev-prompts.jsonl --out $P/build/3b-fp16
 kaggle kernels push -p $P/build/3b-fp16 --timeout 10800
-bash scripts/phase2_quant.sh       # chưa có output fp16: chỉ chạy hai lần Q4_K_M rồi dừng
+bash scripts/phase2/quant.sh       # chưa có output fp16: chỉ chạy hai lần Q4_K_M rồi dừng
 kaggle kernels output aohkvd/eth-nl2sql-phase2-fp16 -p models/lora/3b-fp16
-bash scripts/phase2_quant.sh       # phát lại fp16 (generate-sql --replies), chấm cả bốn lần chạy
+bash scripts/phase2/quant.sh       # phát lại fp16 (generate-sql --replies), chấm cả bốn lần chạy
 ```
 
 `generate-sql --replies FILE --no-repair` đưa câu trả lời fp16 qua đúng vòng B8 của
-`generate-sql`. Tóm tắt nằm ở `data/predictions/dev-phase2-quant.summary.json`.
+`generate-sql`. Tóm tắt nằm ở `data/predictions/phase2/quant/dev-phase2-quant.summary.json`.
 
 S7 đã chạy ngày 2026-11-08 (kernel fp16 mất 0,91 giờ GPU). Trên dev, với một lần thử và không
 kiểm tra placeholder: 3B base đúng 136 câu ở Q4_K_M và 94 câu ở fp16; 3B + `3b-e2` đúng 173 câu
@@ -309,12 +365,12 @@ Chỉ chạy một lần, khi người dùng cho phép `--allow-test`. Script kh
 trên GTX 1650:
 
 ```bash
-bash scripts/phase2_test.sh --check   # bản đóng băng, checkpoint đã chọn, input test giống S4
-bash scripts/phase2_test.sh           # chạy lại dev, 4 cấu hình trên test, chấm, so với phase 1
+bash scripts/phase2/test.sh --check   # bản đóng băng, checkpoint đã chọn, input test giống S4
+bash scripts/phase2/test.sh           # chạy lại dev, 4 cấu hình trên test, chấm, so với phase 1
 ```
 
 Trước khi đọc test, script chạy lại dev với 3B + `3b-e2` và dừng nếu câu trả lời khác S6. Tóm tắt
-nằm ở `data/predictions/test-phase2.summary.json`; log ở `data/predictions/test-phase2.log`.
+nằm ở `data/predictions/phase2/test/test-phase2.summary.json`; log ở `data/predictions/phase2/test/test-phase2.log`.
 
 S8 đã chạy ngày 2026-11-08 – 2026-11-09 (114 phút). EX test so với phase 1:
 

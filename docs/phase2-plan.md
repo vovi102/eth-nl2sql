@@ -30,12 +30,12 @@ Ba tập dữ liệu có vai trò tách bạch:
 
 ### 2.1 Template train-only (quyết định 14)
 
-Danh mục đã cài trong `src/eth_nl2sql/train_templates.py` (người dùng duyệt 2026-11-05): 30
-template, 2.000 câu. Khuôn giống `benchmark_templates.py`: `[cụm](sense)` cho property,
+Danh mục đã cài trong `src/eth_nl2sql/training/templates.py` (người dùng duyệt 2026-11-05): 30
+template, 2.000 câu. Khuôn giống `benchmark/templates.py`: `[cụm](sense)` cho property,
 `{slot}` cho mention. Template thường có 2 cách diễn đạt mỗi ngôn ngữ; template nhập nhằng có 1
 cách cho mỗi variant.
 
-**Chữ ký** của một câu mẫu gồm ba phần. Nó được tính từ code (`benchmark_templates.TEMPLATES`
+**Chữ ký** của một câu mẫu gồm ba phần. Nó được tính từ code (`benchmark.templates.TEMPLATES`
 cùng `split` trong `manifest.json`), không đọc file câu hỏi:
 
 1. Tập sense, kể cả nghĩa ngầm. Mỗi sense được định danh bằng biểu thức SQL của nó trên bảng mà
@@ -51,10 +51,10 @@ cùng `split` trong `manifest.json`), không đọc file câu hỏi:
    - số thứ tự cột và tên alias trong `ORDER BY`/`GROUP BY` thay bằng biểu thức, theo đúng cách
      DuckDB gán tên.
 
-Quy tắc kiểm tra cài trong `src/eth_nl2sql/template_signature.py`, chạy bằng
-`uv run python -m eth_nl2sql.template_signature`:
+Quy tắc kiểm tra cài trong `src/eth_nl2sql/training/signature.py`, chạy bằng
+`uv run eth-nl2sql check-train-signatures`:
 
-- **Vi phạm** (lệnh thoát với mã 1; `train_build` sẽ dừng):
+- **Vi phạm** (lệnh thoát với mã 1; `build-train` sẽ dừng):
   - trùng id template (R1);
   - trùng chữ ký (R2);
   - cùng mention và cùng tập sense nhưng khung SQL khác: cùng evidence, câu truy vấn khác;
@@ -74,7 +74,7 @@ Bộ quy tắc này chặt hơn bản kế hoạch ngày 2026-11-04. Khi đó, "
 vấn" và câu chữ giống câu test mới chỉ bị liệt kê là gần. Quy tắc được siết lại sau vòng rà soát
 độc lập (mục 2.5); người dùng duyệt ngày 2026-11-05 (quyết định 25).
 
-Có thêm hai test chạy trên bảng cụm từ thật (`tests/test_train_templates.py`):
+Có thêm hai test chạy trên bảng cụm từ thật (`tests/test_training_templates.py`):
 
 - Bộ linking đọc mọi câu train đúng như markup: không thừa hay thiếu sense, không có tên lạ
   (NIL), mention đúng gold, và evidence không còn `{E}` chưa gắn placeholder.
@@ -182,7 +182,7 @@ Có thêm hai test chạy trên bảng cụm từ thật (`tests/test_train_temp
   | plain | 17% | 340 |
 
   Số câu chia đều cho các template trong nhóm, tức 56–76 câu mỗi template, luôn là số chẵn.
-- VI/EN 1:1 trong từng template, theo cách luân phiên của `benchmark_build.generate`.
+- VI/EN 1:1 trong từng template, theo cách luân phiên của `benchmark.build.generate`.
 - **Không có câu NIL hay unsupported.** Với các câu này `decision` khác `sql`, nên model không
   bao giờ được gọi (quyết định 16).
 - Seed riêng là 20261104, khác seed benchmark 20261101. Áp dụng như benchmark:
@@ -228,7 +228,7 @@ khi đó phải chạy lại phase 1.
 **Việc S2 phải làm thêm** (phát hiện ở S1):
 
 - Bộ lọc `token_out`: token mà đích đã chuyển đi (`token_transfers.from_address`), thu hẹp pool
-  token cho cả đích là lớp, như `token_in` đang làm. `benchmark_build._fill_slots` hiện chưa có
+  token cho cả đích là lớp, như `token_in` đang làm. `benchmark.build._fill_slots` hiện chưa có
   bộ lọc này.
 - Loại mọi bản ghi mà evidence còn `{E}` chưa gắn placeholder.
 - Báo tỉ lệ câu train mà tập sense của bộ linking khác gold. Trên câu mẫu tỉ lệ này gần 0, xem
@@ -241,14 +241,14 @@ khi đó phải chạy lại phase 1.
 - Đích (assistant) là `` ```sql\n<gold_sql còn placeholder>\n``` ``. Không có ví dụ sửa lỗi:
   vòng hỏi lại lúc suy luận giữ nguyên như phase 1.
 - Độ dài: prompt dev dài 4.253–4.448 token, phần trả lời trung bình 110 token (**đo**:
-  `data/predictions/dev.prompt-tokens.json` và các lần thử của 3B trên dev). Độ dài train được đo
+  `data/predictions/phase1/dev/dev.prompt-tokens.json` và các lần thử của 3B trên dev). Độ dài train được đo
   lại bằng `count-prompt-tokens`; câu nào dài hơn 6.144 token thì bị loại và ghi lại.
 
 ### 2.5 Chạy thử và rà soát độc lập ở S1 (2026-11-05)
 
 **Chạy thử trên DB thật.**
 
-- Sinh 6 câu cho mỗi variant bằng chính `benchmark_build.generate`, seed 20261104. Bộ lọc
+- Sinh 6 câu cho mỗi variant bằng chính `benchmark.build.generate`, seed 20261104. Bộ lọc
   `token_out` được giả lập bằng tập token mà đích đã chuyển đi.
 - Mỗi câu được link bằng bộ linking thật và lọc theo L1.
 - Kết quả theo template ở bảng danh mục, mục 2.1.
@@ -266,7 +266,7 @@ Kết quả:
 - Lần chạy thử đầu, trước khi sửa, đã bắt được hai lỗi câu chữ: "lời gọi" bị đọc thành `tx_failed`
   và câu bắt đầu bằng "Name" bị link thành tên lạ.
 
-Script chạy thử nằm ngoài repo; ở S2 nó được thay bằng `train_build --count-scale`.
+Script chạy thử nằm ngoài repo; ở S2 nó được thay bằng `build-train --count-scale`.
 
 **Rà soát độc lập.** Một workflow gồm 8 agent rà soát theo 4 góc nhìn:
 
@@ -310,7 +310,7 @@ Tập train so với test: 0 vi phạm.
 
 ### 2.6 Kết quả S2 (2026-11-05)
 
-Lệnh `uv run python -m eth_nl2sql.train_build` chạy hết 20 phút và ghi vào `data/train/`
+Lệnh `uv run eth-nl2sql build-train` chạy hết 20 phút và ghi vào `data/train/`
 (`train.jsonl`, `dropped.jsonl`, `sft.jsonl`, `manifest.json`, `sft.tokens.json`).
 
 - **Số câu.** Sinh 2.000, lọc L1 giữ **1.968 (98,4%)**, trong đó 98 câu là `val`. VI/EN là
@@ -351,9 +351,9 @@ kiểm chứng theo hướng phản bác. Có 19 phát hiện; 8 được xác n
 
 ## 3. Kiểm tra chống rò rỉ
 
-Chạy tự động trong `train_build` và có test riêng. Gặp lỗi thì dừng, không ghi file. R1–R3, R5
-và R9 đã cài ở S1 (`template_signature.py`, `tests/test_template_signature.py`,
-`tests/test_train_templates.py`); R4 và R6–R8 cài ở S2 và S8.
+Chạy tự động trong `build-train` và có test riêng. Gặp lỗi thì dừng, không ghi file. R1–R3, R5
+và R9 đã cài ở S1 (`training/signature.py`, `tests/test_signature.py`,
+`tests/test_training_templates.py`); R4 và R6–R8 cài ở S2 và S8.
 
 | # | Kiểm tra | Cách làm |
 |---|---|---|
@@ -361,10 +361,10 @@ và R9 đã cài ở S1 (`template_signature.py`, `tests/test_template_signature
 | R2 | Không trùng template, dù viết khác | Không trùng chữ ký; không cùng evidence; không cùng câu truy vấn (mục 2.1). Tính từ code, không đọc `test.jsonl`. Có test so thêm với cách bộ linking đọc từng câu mẫu dev/test |
 | R3 | Câu chữ không trùng | Câu mẫu train, sau khi bỏ markup và slot và chuẩn hoá bằng `normalize_alias`, phải khác mọi câu mẫu dev/test. Giống một câu test từ 0,8 trở lên (tỉ lệ từ chung theo `difflib`) là vi phạm; giống một câu dev thì chỉ liệt kê |
 | R4 | Câu hỏi không trùng dev | So chuỗi câu hỏi đã chuẩn hoá với `dev.jsonl`. Với test, R2 và R3 đã bảo đảm câu không thể trùng |
-| R5 | Liệt kê template gần | `template_signature --report`: với mỗi template train, các template dev/test gần nó và kiểu gần; với mỗi template dev/test, các template train gần nó. Báo cáo cuối chia EX test theo nhóm gần/xa (mục 5.5) |
+| R5 | Liệt kê template gần | `check-train-signatures --report`: với mỗi template train, các template dev/test gần nó và kiểu gần; với mỗi template dev/test, các template train gần nó. Báo cáo cuối chia EX test theo nhóm gần/xa (mục 5.5) |
 | R6 | Không gửi dev/test lên Kaggle | Dataset huấn luyện chỉ có `sft.jsonl` của train. Riêng ablation lượng tử hoá (mục 5.4) cần prompt dev: đăng thành một dataset riêng, phải hỏi trước. Không bao giờ đăng test |
 | R7 | Đóng băng | Manifest train ghi SHA256 của `train.jsonl`, `sft.jsonl`, cấu hình huấn luyện, `knowledge_base_version` và seed, **trước** khi chạy test phase 1 (mục 7, S3) |
-| R8 | Thực thể đã thấy / chưa thấy | Train giữ riêng 20 thực thể mà không prompt train nào nêu tên (quyết định 27): không ô thực thể, không ví/contract hay token mang tên chúng, không nằm trong danh sách thành viên lớp; `train_build` kiểm tra lần cuối evidence và câu hỏi của từng ví dụ. Danh sách ở `data/train/manifest.json` (`holdout_entities`, `holdout`). Lúc đánh giá cuối, với `--allow-test`: `evaluate-sql --train-manifest` chia EX test theo việc thực thể đích của câu có thuộc nhóm giữ riêng không; chỉ in số đếm. Nhóm giữ riêng là các thực thể ít nổi bật hơn (không phải thành viên lớn của lớp), nên so **mức tăng** phase 2 − phase 1 giữa hai nhóm, không so EX tuyệt đối |
+| R8 | Thực thể đã thấy / chưa thấy | Train giữ riêng 20 thực thể mà không prompt train nào nêu tên (quyết định 27): không ô thực thể, không ví/contract hay token mang tên chúng, không nằm trong danh sách thành viên lớp; `build-train` kiểm tra lần cuối evidence và câu hỏi của từng ví dụ. Danh sách ở `data/train/manifest.json` (`holdout_entities`, `holdout`). Lúc đánh giá cuối, với `--allow-test`: `evaluate-sql --train-manifest` chia EX test theo việc thực thể đích của câu có thuộc nhóm giữ riêng không; chỉ in số đếm. Nhóm giữ riêng là các thực thể ít nổi bật hơn (không phải thành viên lớn của lớp), nên so **mức tăng** phase 2 − phase 1 giữa hai nhóm, không so EX tuyệt đối |
 | R9 | Bộ linking đọc câu train đúng như markup | Test với bảng cụm từ thật: đúng tập sense, không có tên lạ, mention đúng gold, evidence không còn `{E}` chưa gắn placeholder |
 
 ## 4. Huấn luyện trên Kaggle (quyết định 18)
@@ -738,16 +738,16 @@ lại hỏi.
 ### 5.2 Kiểm tra runtime trước khi đánh giá
 
 Chạy dev với `--lora-scaled <adapter>:0`, tức adapter đã nạp nhưng hệ số bằng 0. Câu trả lời
-phải **giống hệt** lần chạy phase 1 (`data/predictions/dev.predictions.prompts.qwen2.5-coder-3b-instruct-q4_k_m.jsonl`).
+phải **giống hệt** lần chạy phase 1 (`data/predictions/phase1/dev/dev.predictions.prompts.qwen2.5-coder-3b-instruct-q4_k_m.jsonl`).
 Nếu khác, việc nạp adapter đã làm đổi runtime, và phải sửa trước khi đánh giá tiếp.
 
 **Kiểm tra trước, khi chưa có adapter thật** (S5, 2026-11-07, sau khi thấy test phase 1). Bằng
-chứng ở `data/predictions/phase2-precheck/`; adapter ở `models/lora/precheck/` (không đưa vào git).
+chứng ở `data/predictions/phase2/precheck/`, script ở `scripts/phase2/`; adapter ở `models/lora/precheck/` (không đưa vào git).
 
 - `random_adapter.py` dựng một adapter PEFT ngẫu nhiên, đúng tên và hình dạng của 1.5B: model
   dựng trên thiết bị `meta`, chỉ rút ngẫu nhiên các tensor LoRA. Adapter này được chuyển sang
   GGUF bằng b12032.
-- `runtime_precheck.sh` chạy dev 1.5B với `--lora-scaled …:0`. Kết quả: **177/177 câu trả lời
+- `precheck.sh` chạy dev 1.5B với `--lora-scaled …:0`. Kết quả: **177/177 câu trả lời
   giống hệt** lần chạy phase 1 (**đo**).
 - Đặt hệ số 1 qua `POST /lora-adapters` thì 5/5 câu trả lời đổi. Vậy adapter được áp thật, và
   `generate-sql --adapter` ghi đúng hệ số vào `.meta.json`.
@@ -797,9 +797,9 @@ cách cài lock, bản sửa attention cho T4 và cách gắn tham số vào ker
 - `generate-sql --replies FILE` (cần `--no-repair`) phát lại các câu trả lời đó qua đúng vòng B8
   của `generate-sql`: tách SQL, chạy với địa chỉ của bản linking, ghi cùng định dạng dự đoán. Lệnh
   dừng nếu file không trả lời đúng tập prompt `sql` của file prompt.
-- `scripts/phase2_quant.sh` chạy hai lần Q4_K_M ở local (base và + `3b-e2`, cùng cờ server như
+- `scripts/phase2/quant.sh` chạy hai lần Q4_K_M ở local (base và + `3b-e2`, cùng cờ server như
   phase 1), phát lại hai lần fp16, chấm cả bốn với `--train-manifest`, và ghi
-  `data/predictions/dev-phase2-quant.summary.json`.
+  `data/predictions/phase2/quant/dev-phase2-quant.summary.json`.
 - Kiểm tra trước khi đăng (**đo**):
   - tokenizer HF cho đúng số token prompt mà `llama-server` đếm ở phase 1, trên 161/161 prompt dev;
   - `decode(encode(reply))` cho lại đúng câu trả lời trên mọi câu trả lời của 3B + e2;
@@ -809,7 +809,7 @@ cách cài lock, bản sửa attention cho T4 và cách gắn tham số vào ker
 
 **Kết quả** (S7, 2026-11-08, sau khi thấy test phase 1). Nguồn (**đo**):
 
-- `data/predictions/dev-phase2-quant.summary.json` và `dev-phase2-quant.log`;
+- `data/predictions/phase2/quant/dev-phase2-quant.summary.json` và `dev-phase2-quant.log`;
 - các file `dev.predictions.prompts.qwen2.5-coder-3b-instruct-{q4_k_m,fp16}[.3b-e2].no-check.no-repair.*`;
 - `models/lora/3b-fp16/generate.json` (không đưa vào git).
 
@@ -925,9 +925,9 @@ lệ này gần với 12/86 câu mẫu (14%) của vòng rà soát. Lỗi tập 
 
 ### 5.6 Kết quả dev của 1.5B (S5, 2026-11-08, sau khi thấy test phase 1)
 
-`scripts/phase2_dev.sh 1.5b` chạy hết trong 31 phút, không bước nào lỗi. Nguồn (**đo**):
+`scripts/phase2/dev.sh 1.5b` chạy hết trong 31 phút, không bước nào lỗi. Nguồn (**đo**):
 
-- `data/predictions/dev-phase2-1.5b.summary.json` và `dev-phase2-1.5b.log`;
+- `data/predictions/phase2/dev/dev-phase2-1.5b.summary.json` và `dev-phase2-1.5b.log`;
 - các file `dev.predictions.prompts.qwen2.5-coder-1.5b-instruct-q4_k_m.1.5b-{e2.scale0,e1,e2}.*`.
 
 Phần chia gần / xa dùng quan hệ `leakage.near` trong `data/train/manifest.json`. 9/12 template
@@ -986,10 +986,10 @@ hệt lần chạy phase 1, nên EX cũng là 106/177.
 
 ### 5.7 Kết quả dev của 3B (S6, 2026-11-08, sau khi thấy test phase 1)
 
-`scripts/phase2_dev.sh 3b` chạy hết trong 50 phút, không bước nào lỗi. Cách chia gần / xa giống
+`scripts/phase2/dev.sh 3b` chạy hết trong 50 phút, không bước nào lỗi. Cách chia gần / xa giống
 mục 5.6. Nguồn (**đo**):
 
-- `data/predictions/dev-phase2-3b.summary.json` và `dev-phase2-3b.log`;
+- `data/predictions/phase2/dev/dev-phase2-3b.summary.json` và `dev-phase2-3b.log`;
 - các file `dev.predictions.prompts.qwen2.5-coder-3b-instruct-q4_k_m.3b-{e2.scale0,e1,e2}.*`.
 
 **Kiểm tra runtime (5.2) đạt.** Với adapter `3b-e2` nạp ở hệ số 0, cả 177/177 câu trả lời giống
@@ -1036,7 +1036,7 @@ hệt lần chạy 3B mặc định của phase 1, nên EX cũng là 159/177.
 
 ### 5.8 Kết quả test (S8, 2026-11-08 – 2026-11-09, sau khi thấy test phase 1)
 
-`scripts/phase2_test.sh` chạy **một lần**, từ 22:13 đến 00:07 (114 phút), không bước nào lỗi.
+`scripts/phase2/test.sh` chạy **một lần**, từ 22:13 đến 00:07 (114 phút), không bước nào lỗi.
 Trước khi đọc test, script kiểm tra bốn điều:
 
 - bản đóng băng S3 còn nguyên;
@@ -1048,7 +1048,7 @@ Trước khi đọc test, script kiểm tra bốn điều:
 
 Nguồn (**đo**):
 
-- `data/predictions/test-phase2.summary.json` và `test-phase2.log`;
+- `data/predictions/phase2/test/test-phase2.summary.json` và `test-phase2.log`;
 - các file `test.*.{3b-e2,1.5b-e2}*.{ex.json,ex-details.jsonl,jsonl.meta.json}`.
 
 Kiểm định McNemar chính xác (hai phía) tính trên từng câu, so với cấu hình tương ứng của phase 1
@@ -1193,18 +1193,18 @@ Template xa, số câu đúng:
 
 | File | Nội dung |
 |---|---|
-| `src/eth_nl2sql/train_templates.py` | **Đã có (S1).** `TRAIN_TEMPLATES`, dùng chung các dataclass và hằng thời gian với `benchmark_templates.py` |
-| `src/eth_nl2sql/template_signature.py` | **Đã có (S1).** Chữ ký câu mẫu, kiểm tra R1–R3 và R5. CLI `uv run python -m eth_nl2sql.template_signature [--report PATH]` |
-| `src/eth_nl2sql/benchmark_validate.py` | **Đã sửa (S1).** `TIE_BREAKERS` thêm `hour`, `number` và `token_address` cho gold của train. Không gold nào của benchmark kết thúc `ORDER BY` bằng ba cột này, nên benchmark không đổi |
-| `src/eth_nl2sql/train_build.py` | **Đã có (S2).** `uv run python -m eth_nl2sql.train_build [--count-scale 0.1] [--out-dir …] [--holdout 20]`, cùng cách chạy với benchmark (quyết định 5 của [benchmark.md](benchmark.md)). Các bước: kiểm tra rò rỉ; giá trị điền trừ thực thể giữ riêng và mọi giá trị điền mang tên chúng, cộng `token_out`; sinh câu bằng `benchmark_build.generate` theo từng variant; bỏ câu trùng dev; linking thật và lọc L1; loại câu còn nêu tên thực thể giữ riêng; dựng prompt. Ghi `data/train/{train.jsonl, dropped.jsonl, sft.jsonl, manifest.json}`. Mỗi dòng của `dropped.jsonl` có kèm cách bộ linking đọc câu (`linked`) và nguyên nhân lỗi đã biết (`cause`: thực thể đọc thành token hoặc ngược lại) |
+| `src/eth_nl2sql/training/templates.py` | **Đã có (S1).** `TRAIN_TEMPLATES`, dùng chung các dataclass và hằng thời gian với `benchmark/templates.py` |
+| `src/eth_nl2sql/training/signature.py` | **Đã có (S1).** Chữ ký câu mẫu, kiểm tra R1–R3 và R5. CLI `uv run eth-nl2sql check-train-signatures [--report PATH]` |
+| `src/eth_nl2sql/benchmark/validate.py` | **Đã sửa (S1).** `TIE_BREAKERS` thêm `hour`, `number` và `token_address` cho gold của train. Không gold nào của benchmark kết thúc `ORDER BY` bằng ba cột này, nên benchmark không đổi |
+| `src/eth_nl2sql/training/build.py` | **Đã có (S2).** `uv run eth-nl2sql build-train [--count-scale 0.1] [--out-dir …] [--holdout 20]`, cùng cách chạy với benchmark (quyết định 5 của [benchmark.md](benchmark.md)). Các bước: kiểm tra rò rỉ; giá trị điền trừ thực thể giữ riêng và mọi giá trị điền mang tên chúng, cộng `token_out`; sinh câu bằng `benchmark.build.generate` theo từng variant; bỏ câu trùng dev; linking thật và lọc L1; loại câu còn nêu tên thực thể giữ riêng; dựng prompt. Ghi `data/train/{train.jsonl, dropped.jsonl, sft.jsonl, manifest.json}`. Mỗi dòng của `dropped.jsonl` có kèm cách bộ linking đọc câu (`linked`) và nguyên nhân lỗi đã biết (`cause`: thực thể đọc thành token hoặc ngược lại) |
 | `kaggle/phase2-train/` | **Đã có (S5).** `config.json` (đóng băng ở S3); `train_lora.py` với ba lệnh `prepare-dataset`, `prepare` (dựng thư mục kernel) và `train` (`--model`, `--max-steps`); `kernel-metadata.json` (private, GPU T4, có internet); `pyproject.toml` và `uv.lock` (môi trường local, torch CPU); `requirements.lock` (cho Kaggle); `tests/` (14 test, khoảng 12 phút trên CPU, chạy bằng `uv run --project kaggle/phase2-train pytest kaggle/phase2-train/tests`). Chi tiết ở mục 4 |
-| `kaggle/phase2-train/` (S7) | **Đã có (S7, sau khi thấy test phase 1).** Thay cho `kaggle/phase2-fp16-generate/`: lệnh `prepare-dev-prompts`, `prepare-generate` và `generate` của `train_lora.py`, cùng `kernel-metadata.fp16.json`; `tests/test_generate_fp16.py` (4 test). `generate-sql --replies` đưa câu trả lời fp16 về cùng định dạng dự đoán `{question_id, decision, sql, attempts}`. `scripts/phase2_quant.sh` chạy phần local. Chi tiết ở mục 5.4 |
-| `sql_generation.py` / `cli.py` | **Đã có (S5).** `generate-sql --adapter PATH`: kiểm tra `GET /lora-adapters` của server có đúng một adapter là file này (kể cả ở scale 0), rồi ghi SHA256 của adapter, hệ số và danh sách `/lora-adapters` vào `.meta.json`. Tên file dự đoán thêm `.<adapter>` (kèm `.scale<k>` khi hệ số khác 1). Server có nạp adapter mà lệnh không có `--adapter` thì lệnh dừng, để không lần chạy nào bị ghi nhầm là base. Thêm `--no-repair` (một lần thử) |
-| `execution_evaluation.py` / `cli.py` | **Đã có (S5).** `evaluate-sql --train-manifest data/train/manifest.json` thêm phần chia `by_train_exposure`, tính theo mention gold. `held_out`: có ít nhất một đích là thực thể giữ riêng, ví/contract hay token mang tên chúng (`holdout.removed`), hoặc lớp mà `top_n` thành viên có thực thể giữ riêng. `not_held_out`: có đích có tên nhưng không đích nào bị giữ riêng; cả 79 thực thể còn lại đều có trong train. `no_named_target`: câu không có đích có tên (câu thường, địa chỉ gõ sẵn, NIL). Trên dev: 19 / 126 / 32 câu |
-| `tests/test_template_signature.py`, `tests/test_train_templates.py` | **Đã có (S1).** Chuẩn hoá SQL, các kiểu vi phạm và gần, mọi câu mẫu train cho bản ghi hợp lệ, bộ linking đọc đúng (R9), không trùng với cách bộ linking đọc câu dev/test |
-| `tests/test_train_build.py` | **Đã có (S2).** Rút và lọc thực thể giữ riêng; số câu mỗi variant; `token_out`; mọi lý do loại của L1 (bộ linking giả lập); phân loại lỗi thực thể/token. Hai lần chạy trên DB mẫu có KB làm giàu: prompt train giống hệt prompt `generate-sql`, B8 đọc lại đúng gold, manifest khớp với file; thực thể giữ riêng không bị nêu tên ở đâu |
-| `scripts/phase2_dev.sh` | **Đã có (S5).** Chấm dev hai checkpoint của một model, không cần trông, chạy tiếp được sau khi đứt: kiểm tra bản đóng băng và SHA256 của adapter so với `run.json`; kiểm tra runtime ở hệ số 0 (5.2); dev với từng adapter; chấm điểm với `--train-manifest`; chọn checkpoint theo 5.3; ghi `data/predictions/dev-phase2-<model>.summary.json` |
-| `scripts/phase2_test.sh` | **Đã có (S8, sau khi thấy test phase 1).** Chạy test phase 2 một lần, không cần trông. Kiểm tra trước: bản đóng băng; checkpoint đã chọn trên dev và SHA256 của GGUF; file prompt và linking test giống hệt S4; chạy lại dev với 3B + `3b-e2` phải giống hệt S6. Sau đó sinh SQL cho bốn cấu hình của 5.5 (`--allow-test --adapter`), chấm với `--train-manifest`, so với phase 1 bằng McNemar và ghi `data/predictions/test-phase2.summary.json`. `--check` chỉ kiểm tra điều kiện |
+| `kaggle/phase2-train/` (S7) | **Đã có (S7, sau khi thấy test phase 1).** Thay cho `kaggle/phase2-fp16-generate/`: lệnh `prepare-dev-prompts`, `prepare-generate` và `generate` của `train_lora.py`, cùng `kernel-metadata.fp16.json`; `tests/test_generate_fp16.py` (4 test). `generate-sql --replies` đưa câu trả lời fp16 về cùng định dạng dự đoán `{question_id, decision, sql, attempts}`. `scripts/phase2/quant.sh` chạy phần local. Chi tiết ở mục 5.4 |
+| `sql/generation.py` / `cli.py` | **Đã có (S5).** `generate-sql --adapter PATH`: kiểm tra `GET /lora-adapters` của server có đúng một adapter là file này (kể cả ở scale 0), rồi ghi SHA256 của adapter, hệ số và danh sách `/lora-adapters` vào `.meta.json`. Tên file dự đoán thêm `.<adapter>` (kèm `.scale<k>` khi hệ số khác 1). Server có nạp adapter mà lệnh không có `--adapter` thì lệnh dừng, để không lần chạy nào bị ghi nhầm là base. Thêm `--no-repair` (một lần thử) |
+| `sql/evaluation.py` / `cli.py` | **Đã có (S5).** `evaluate-sql --train-manifest data/train/manifest.json` thêm phần chia `by_train_exposure`, tính theo mention gold. `held_out`: có ít nhất một đích là thực thể giữ riêng, ví/contract hay token mang tên chúng (`holdout.removed`), hoặc lớp mà `top_n` thành viên có thực thể giữ riêng. `not_held_out`: có đích có tên nhưng không đích nào bị giữ riêng; cả 79 thực thể còn lại đều có trong train. `no_named_target`: câu không có đích có tên (câu thường, địa chỉ gõ sẵn, NIL). Trên dev: 19 / 126 / 32 câu |
+| `tests/test_signature.py`, `tests/test_training_templates.py` | **Đã có (S1).** Chuẩn hoá SQL, các kiểu vi phạm và gần, mọi câu mẫu train cho bản ghi hợp lệ, bộ linking đọc đúng (R9), không trùng với cách bộ linking đọc câu dev/test |
+| `tests/test_training_build.py` | **Đã có (S2).** Rút và lọc thực thể giữ riêng; số câu mỗi variant; `token_out`; mọi lý do loại của L1 (bộ linking giả lập); phân loại lỗi thực thể/token. Hai lần chạy trên DB mẫu có KB làm giàu: prompt train giống hệt prompt `generate-sql`, B8 đọc lại đúng gold, manifest khớp với file; thực thể giữ riêng không bị nêu tên ở đâu |
+| `scripts/phase2/dev.sh` | **Đã có (S5).** Chấm dev hai checkpoint của một model, không cần trông, chạy tiếp được sau khi đứt: kiểm tra bản đóng băng và SHA256 của adapter so với `run.json`; kiểm tra runtime ở hệ số 0 (5.2); dev với từng adapter; chấm điểm với `--train-manifest`; chọn checkpoint theo 5.3; ghi `data/predictions/phase2/dev/dev-phase2-<model>.summary.json` |
+| `scripts/phase2/test.sh` | **Đã có (S8, sau khi thấy test phase 1).** Chạy test phase 2 một lần, không cần trông. Kiểm tra trước: bản đóng băng; checkpoint đã chọn trên dev và SHA256 của GGUF; file prompt và linking test giống hệt S4; chạy lại dev với 3B + `3b-e2` phải giống hệt S6. Sau đó sinh SQL cho bốn cấu hình của 5.5 (`--allow-test --adapter`), chấm với `--train-manifest`, so với phase 1 bằng McNemar và ghi `data/predictions/phase2/test/test-phase2.summary.json`. `--check` chỉ kiểm tra điều kiện |
 | README | Mục "Fine-tune LoRA (phase 2)": lệnh sinh, đăng dataset, huấn luyện, chuyển adapter, đánh giá |
 
 Mỗi dòng của `sft.jsonl` có dạng:
@@ -1235,15 +1235,15 @@ uv run eth-nl2sql evaluate-sql --gold data/benchmark/dev.jsonl --predictions dat
 
 | Bước | Việc | Cần người dùng |
 |---|---|---|
-| S0 | **Xong (2026-11-04).** Chốt phase 1: cấu hình mặc định là 3B, theo quyết định 1–13. `data/predictions/phase1-freeze.json` ghi SHA256 của KB, model, 18 file code, file prompt/linking và 7 lần chạy dev, kèm EX. Trước khi chạy S4, chạy lại dev với cấu hình mặc định để kiểm tra câu trả lời giống hệt bản đã chốt | |
-| S1 | **Xong, đã duyệt (2026-11-05).** Viết `train_templates.py` và `template_signature.py`, kèm test; chạy R1–R3, R5, R9 trên danh mục; chạy thử trên DB thật; rà soát độc lập (mục 2.5). Quyết định 24–27 | |
-| S2 | **Xong (2026-11-05).** `train_build` chạy thử với `--count-scale 0.1`, rồi chạy đủ; báo số câu bị loại theo lý do và phân bố độ dài token (mục 2.6) | Xem báo cáo lọc |
+| S0 | **Xong (2026-11-04).** Chốt phase 1: cấu hình mặc định là 3B, theo quyết định 1–13. `data/predictions/phase1/dev/phase1-freeze.json` ghi SHA256 của KB, model, 18 file code, file prompt/linking và 7 lần chạy dev, kèm EX. Trước khi chạy S4, chạy lại dev với cấu hình mặc định để kiểm tra câu trả lời giống hệt bản đã chốt | |
+| S1 | **Xong, đã duyệt (2026-11-05).** Viết `training/templates.py` và `training/signature.py`, kèm test; chạy R1–R3, R5, R9 trên danh mục; chạy thử trên DB thật; rà soát độc lập (mục 2.5). Quyết định 24–27 | |
+| S2 | **Xong (2026-11-05).** `build-train` chạy thử với `--count-scale 0.1`, rồi chạy đủ; báo số câu bị loại theo lý do và phân bố độ dài token (mục 2.6) | Xem báo cáo lọc |
 | S3 | **Xong (2026-11-05 22:42).** Đóng băng (R7): `kaggle/phase2-train/config.json` (cấu hình quyết định 18) và `data/train/freeze.json` (SHA256 của dữ liệu train, cấu hình, 21 file code, KB, bản chốt phase 1; `test_read_before_freeze: false`) | |
-| S4 | **Xong (2026-11-06, 00:24–04:18).** Chạy test phase 1 **một lần** cho 7 cấu hình: 3B mặc định, `--no-placeholder-check`, oracle, `--schema linked`, `--no-evidence`, `--literal`, và 1.5B. Script `scripts/phase1_test.sh` chạy không cần trông, mất 233 phút trên GTX 1650. Script kiểm tra bản đóng băng, chạy lại dev (177/177 câu trả lời giống hệt bản đã chốt), link test, dựng prompt, sinh SQL, chấm điểm và ghi tóm tắt vào `data/predictions/test-phase1.summary.json`. EX test: 3B 0,768, oracle 0,790, 1.5B 0,613. Chi tiết ở [proposed-method.md](proposed-method.md) §8 | Người dùng cho phép `--allow-test` (2026-11-05) |
+| S4 | **Xong (2026-11-06, 00:24–04:18).** Chạy test phase 1 **một lần** cho 7 cấu hình: 3B mặc định, `--no-placeholder-check`, oracle, `--schema linked`, `--no-evidence`, `--literal`, và 1.5B. Script `scripts/phase1/test.sh` chạy không cần trông, mất 233 phút trên GTX 1650. Script kiểm tra bản đóng băng, chạy lại dev (177/177 câu trả lời giống hệt bản đã chốt), link test, dựng prompt, sinh SQL, chấm điểm và ghi tóm tắt vào `data/predictions/phase1/test/test-phase1.summary.json`. EX test: 3B 0,768, oracle 0,790, 1.5B 0,613. Chi tiết ở [proposed-method.md](proposed-method.md) §8 | Người dùng cho phép `--allow-test` (2026-11-05) |
 | S5 | **Xong (2026-11-07 – 2026-11-08), sau khi thấy test phase 1.** Dataset private `aohkvd/eth-nl2sql-phase2-sft`. Kernel `aohkvd/eth-nl2sql-phase2-train`: version 1 lỗi `torchao`; version 2 chạy thử 50 bước (162 s/bước, chậm vì attention rơi về kernel math); version 3 lỗi ở `check_attention`; version 4 kiểm tốc độ 10 bước sau khi sửa (72,6 s/bước); version 5 chạy đủ 2 epoch trong 4,46 giờ (65,9 s/bước) (mục 4). Kiểm tra runtime: 177/177 câu trả lời ở hệ số 0 giống hệt phase 1. EX dev: e1 0,955, e2 0,960 → chọn **`1.5b-e2`** (mục 5.6). Dùng 7,53 giờ GPU | Người dùng cho phép đăng dataset, push kernel và tải 3,09 GB trên Kaggle (2026-11-07); chọn ngưỡng tốc độ cho lần chạy đủ (2026-11-08) |
 | S6 | **Xong (2026-11-08), sau khi thấy test phase 1.** Kernel version 6 kiểm 10 bước (114,6 s/bước, đạt ngưỡng ≤ 145 s); version 7 chạy đủ 2 epoch trong 7,79 giờ (116,0 s/bước) (mục 4). Kiểm tra runtime: 177/177 câu trả lời ở hệ số 0 giống hệt phase 1. EX dev: e1 và e2 cùng 0,977 → chọn **`3b-e2`** (mục 5.7). Quota sau S6: 15,88 giờ | Người dùng cho phép S6 với cùng quy tắc ngưỡng (2026-11-08) |
 | S7 | **Xong (2026-11-08), sau khi thấy test phase 1.** Dataset private `aohkvd/eth-nl2sql-phase2-dev-prompts` (161 prompt `sql` của dev). Kernel `aohkvd/eth-nl2sql-phase2-fp16` version 1 sinh fp16 trong 0,91 giờ; Q4_K_M chạy ở local. Dev, một lần thử, không kiểm tra placeholder: base Q4_K_M 136, fp16 94; + `3b-e2` Q4_K_M 173, fp16 168 (mục 5.4) | Người dùng cho phép ("làm S7", 2026-11-08) |
-| S8 | **Xong (2026-11-08 22:13 – 2026-11-09 00:07), sau khi thấy test phase 1.** `scripts/phase2_test.sh` chạy một lần, 114 phút, chạy lại dev giống hệt S6 (177/177). EX test: 3B + `3b-e2` 0,814 (phase 1: 0,768; p = 0,024), oracle 0,823, `--no-placeholder-check` 0,814, 1.5B + `1.5b-e2` 0,808 (phase 1: 0,613). Template gần 172/180, template xa 63/116 như phase 1 (mục 5.8) | Người dùng cho phép `--allow-test` ("chạy s8", 2026-11-08) |
+| S8 | **Xong (2026-11-08 22:13 – 2026-11-09 00:07), sau khi thấy test phase 1.** `scripts/phase2/test.sh` chạy một lần, 114 phút, chạy lại dev giống hệt S6 (177/177). EX test: 3B + `3b-e2` 0,814 (phase 1: 0,768; p = 0,024), oracle 0,823, `--no-placeholder-check` 0,814, 1.5B + `1.5b-e2` 0,808 (phase 1: 0,613). Template gần 172/180, template xa 63/116 như phase 1 (mục 5.8) | Người dùng cho phép `--allow-test` ("chạy s8", 2026-11-08) |
 | S9 | **Xong (2026-11-09).** Kết quả ở mục 5.8, [proposed-method.md](proposed-method.md) §8 và README | |
 
 Sau S4, mọi thay đổi kế hoạch phase 2 phải ghi rõ là "sau khi thấy test phase 1".

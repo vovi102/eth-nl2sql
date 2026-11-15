@@ -298,14 +298,14 @@ Mỗi cấu hình chạy cho cả phase 1 và phase 2. Ngoại lệ (quyết đ�
 | KB đã duyệt | 169/1.080 thực thể (4 đợt; đợt 2 duyệt tạm thời; đợt 3–4 bổ sung thành viên các lớp được hỏi và thực thể hoạt động cao cho benchmark), 21 lớp, 43.717 địa chỉ, 47.533 alias (số dòng trong `link`) |
 | `link.token_stats` (prior cho token) | Xong (95.473 token) |
 | `property_senses` | Xong: 36 nghĩa, 115 cụm từ, đã duyệt và nạp vào `link`; thêm cột `evidence_hint` (2026-11-03, 2 nghĩa; người dùng duyệt câu chữ 2026-11-04) |
-| Bộ linking B1–B5 | Xong (`link-question`, `evaluate-linking`; `src/eth_nl2sql/entity_linking*.py`): khớp 8 ví dụ của [linking-labels.md](linking-labels.md) §7. Dev (177 câu), sau khi sửa theo lỗi thấy trên dev nên lạc quan: mention F1 chặt 1,000 (ban đầu 0,944), accuracy@1 1,000 (0,942), property F1 0,998 (0,965). Test (328 câu, chạy một lần ở S4, 2026-11-06; `data/linking/test.report.json`): mention F1 chặt 0,982 (P 0,974, R 0,990), accuracy@1 0,990 (287/290), recall@5 0,997, NIL 1,000 (16/16), lớp 1,000 (42/42), property F1 0,967, thời gian 1,000 |
-| Chọn schema B6, dựng prompt B7 | Xong (`build-prompts`, `src/eth_nl2sql/prompt_builder.py`), định dạng ở mục 5. Trên dev, mọi vị từ WHERE của gold SQL có nguyên văn trong evidence (có test) |
-| Hậu xử lý B8, bộ chấm EX | Xong (`src/eth_nl2sql/sql_execution.py`, `execution_evaluation.py`, lệnh `evaluate-sql`), quy ước ở mục 7. Tự kiểm: gold làm dự đoán cho EX 1,000 trên dev (177/177) |
+| Bộ linking B1–B5 | Xong (`link-question`, `evaluate-linking`; `src/eth_nl2sql/linking/*.py`): khớp 8 ví dụ của [linking-labels.md](linking-labels.md) §7. Dev (177 câu), sau khi sửa theo lỗi thấy trên dev nên lạc quan: mention F1 chặt 1,000 (ban đầu 0,944), accuracy@1 1,000 (0,942), property F1 0,998 (0,965). Test (328 câu, chạy một lần ở S4, 2026-11-06; `data/linking/test.report.json`): mention F1 chặt 0,982 (P 0,974, R 0,990), accuracy@1 0,990 (287/290), recall@5 0,997, NIL 1,000 (16/16), lớp 1,000 (42/42), property F1 0,967, thời gian 1,000 |
+| Chọn schema B6, dựng prompt B7 | Xong (`build-prompts`, `src/eth_nl2sql/sql/prompt.py`), định dạng ở mục 5. Trên dev, mọi vị từ WHERE của gold SQL có nguyên văn trong evidence (có test) |
+| Hậu xử lý B8, bộ chấm EX | Xong (`src/eth_nl2sql/sql/execution.py`, `sql/evaluation.py`, lệnh `evaluate-sql`), quy ước ở mục 7. Tự kiểm: gold làm dự đoán cho EX 1,000 trên dev (177/177) |
 | Runtime model local | Xong: llama.cpp b12032 (commit `dde879b`) tự biên dịch với CUDA 12.8 cho GTX 1650 (sm_75), vì bản build sẵn cần glibc 2.38; Qwen2.5-Coder 1.5B/3B Instruct GGUF Q4_K_M chính thức, đã ghim revision và SHA256 (README). `n_ctx` 8192, mọi layer trên GPU, flash attention; 3B dùng khoảng 2,3 GB VRAM |
-| Sinh SQL + B8 (`generate-sql`, `src/eth_nl2sql/sql_generation.py`) | Xong; client tách riêng để phase 2 dùng lại. Kết quả dev ở bảng dưới |
+| Sinh SQL + B8 (`generate-sql`, `src/eth_nl2sql/sql/generation.py`) | Xong; client tách riêng để phase 2 dùng lại. Kết quả dev ở bảng dưới |
 | Định dạng nhãn linking (gold và đầu ra bộ linking) | Xong: [linking-labels.md](linking-labels.md) |
 | Benchmark (template, nhãn gold) | Xong: 505 câu, 40 template đã duyệt, dev 177 / test 328 chia theo template (`data/benchmark/`, [benchmark.md](benchmark.md)); tập 169 thực thể sau đợt duyệt 3–4; sinh lại 2026-11-03 để bỏ câu hoà ở `LIMIT` (thay 4 câu dev, 2 câu test) |
-| Phase 2 (LoRA) | Đã lập kế hoạch và chốt quyết định 14–23 (2026-11-04, [phase2-plan.md](phase2-plan.md)). S0 xong: phase 1 được chốt trong `data/predictions/phase1-freeze.json` (SHA256 của KB, model, code, prompt/linking và 7 lần chạy dev). `property_senses.csv` đã đổi lúc 2026-11-04 19:53, sau benchmark và prompt dev, nhưng chỉ ở các cột không nạp vào `link`: link lại dev và dựng lại 5 file prompt dev cho file giống hệt từng byte. S1 xong, người dùng duyệt 2026-11-05 (quyết định 24–27): 30 template train-only (`train_templates.py`) và bộ kiểm tra rò rỉ (`template_signature.py`), 0 vi phạm ([phase2-plan.md](phase2-plan.md) §2.1, §2.5). S2 xong (2026-11-05): `data/train/`, 1.968 ví dụ (98 val), 4.277–4.624 token mỗi ví dụ, 20 thực thể giữ riêng không bị nêu tên ([phase2-plan.md](phase2-plan.md) §2.6). S3 xong (2026-11-05 22:42): đóng băng dữ liệu train và cấu hình huấn luyện (`data/train/freeze.json`). S4 xong (2026-11-06): test phase 1, kết quả ở bảng dưới. S5 xong (2026-11-08, sau khi thấy test phase 1): LoRA cho 1.5B trên Kaggle (2 epoch, 4,46 giờ trên một T4), chọn checkpoint `1.5b-e2`, EX dev 0,960 (kết quả ở dưới; [phase2-plan.md](phase2-plan.md) §4, §5.6). S6 xong (2026-11-08): LoRA cho 3B (7,79 giờ trên một T4), chọn `3b-e2`, EX dev 0,977 ([phase2-plan.md](phase2-plan.md) §5.7). S7 xong (2026-11-08): ablation lượng tử hoá trên dev ([phase2-plan.md](phase2-plan.md) §5.4). S8 xong (2026-11-09): test phase 2 chạy một lần, EX 3B + LoRA 0,814, 1.5B + LoRA 0,808 (kết quả ở dưới; [phase2-plan.md](phase2-plan.md) §5.8). S9 xong: kết quả đã ghi vào đây, phase2-plan và README |
+| Phase 2 (LoRA) | Đã lập kế hoạch và chốt quyết định 14–23 (2026-11-04, [phase2-plan.md](phase2-plan.md)). S0 xong: phase 1 được chốt trong `data/predictions/phase1/dev/phase1-freeze.json` (SHA256 của KB, model, code, prompt/linking và 7 lần chạy dev). `property_senses.csv` đã đổi lúc 2026-11-04 19:53, sau benchmark và prompt dev, nhưng chỉ ở các cột không nạp vào `link`: link lại dev và dựng lại 5 file prompt dev cho file giống hệt từng byte. S1 xong, người dùng duyệt 2026-11-05 (quyết định 24–27): 30 template train-only (`training/templates.py`) và bộ kiểm tra rò rỉ (`training/signature.py`), 0 vi phạm ([phase2-plan.md](phase2-plan.md) §2.1, §2.5). S2 xong (2026-11-05): `data/train/`, 1.968 ví dụ (98 val), 4.277–4.624 token mỗi ví dụ, 20 thực thể giữ riêng không bị nêu tên ([phase2-plan.md](phase2-plan.md) §2.6). S3 xong (2026-11-05 22:42): đóng băng dữ liệu train và cấu hình huấn luyện (`data/train/freeze.json`). S4 xong (2026-11-06): test phase 1, kết quả ở bảng dưới. S5 xong (2026-11-08, sau khi thấy test phase 1): LoRA cho 1.5B trên Kaggle (2 epoch, 4,46 giờ trên một T4), chọn checkpoint `1.5b-e2`, EX dev 0,960 (kết quả ở dưới; [phase2-plan.md](phase2-plan.md) §4, §5.6). S6 xong (2026-11-08): LoRA cho 3B (7,79 giờ trên một T4), chọn `3b-e2`, EX dev 0,977 ([phase2-plan.md](phase2-plan.md) §5.7). S7 xong (2026-11-08): ablation lượng tử hoá trên dev ([phase2-plan.md](phase2-plan.md) §5.4). S8 xong (2026-11-09): test phase 2 chạy một lần, EX 3B + LoRA 0,814, 1.5B + LoRA 0,808 (kết quả ở dưới; [phase2-plan.md](phase2-plan.md) §5.8). S9 xong: kết quả đã ghi vào đây, phase2-plan và README |
 
 **Kết quả phase 1 trên dev (2026-11-04).** Benchmark sau khi bỏ câu hoà ở `LIMIT`
 ([benchmark.md](benchmark.md) §6, bước 6). Zero-shot, giải mã tham lam, kiểm tra placeholder và
@@ -340,7 +340,7 @@ trên benchmark cũ, còn 4 câu hoà):
   lấy từ ví dụ giá trị của cột `token_address`, hoặc địa chỉ bịa), hoặc lọc theo
   `name`/`symbol`; EX giảm 23 câu.
 - **Quy tắc from/to trong system prompt bị bỏ.** Hai cách viết (nguyên văn ở
-  `data/predictions/rejected-direction-rule/RULES.txt`) sửa được 3–5 câu `entity_top_callers`.
+  `data/predictions/phase1/dev-history/rejected-direction-rule/RULES.txt`) sửa được 3–5 câu `entity_top_callers`.
   Nhưng chúng làm số câu tự viết địa chỉ thay cho `{E1}` tăng từ 21 lên 70–78, và làm sai thêm
   các template khác. Có vẻ model 3B rất nhạy với một dòng nói về địa chỉ trong system prompt.
 - **`evidence_hint`.** Ghi chú gắn vào nghĩa property chỉ hiện trong câu có nghĩa đó, nên không
@@ -382,10 +382,10 @@ trên benchmark cũ, còn 4 câu hoà):
   `--schema linked` có prompt ngắn hơn, nhưng prefix chung chỉ là system prompt, nên mỗi câu
   phải xử lý khoảng 1,4 nghìn token và mất 8,2 s.
 
-**Kết quả phase 1 trên test (2026-11-06, S4).** Chạy một lần bằng `scripts/phase1_test.sh`
+**Kết quả phase 1 trên test (2026-11-06, S4).** Chạy một lần bằng `scripts/phase1/test.sh`
 (233 phút, không bước nào lỗi), sau khi đóng băng phase 2 ở S3. Trước khi đọc test, script chạy
 lại dev với cấu hình mặc định: 177/177 câu trả lời giống hệt bản đã chốt. Mọi tham số như trên
-dev. Nguồn: `data/predictions/test-phase1.summary.json`, các file `test.*.ex.json`,
+dev. Nguồn: `data/predictions/phase1/test/test-phase1.summary.json`, các file `test.*.ex.json`,
 `test.*.ex-details.jsonl` và `test.*.jsonl.meta.json`. Kiểm định McNemar chính xác (hai phía)
 tính trên từng câu.
 
@@ -488,7 +488,7 @@ bộ linking và `generate-sql` giữ nguyên.
 Trước khi chấm, adapter của mỗi model được nạp ở hệ số 0: cả 177/177 câu trả lời giống hệt phase
 1 của model đó. Vậy mọi khác biệt ở dưới đến từ adapter, không từ runtime.
 
-Nguồn: `data/predictions/dev-phase2-{1.5b,3b}.summary.json` và các file
+Nguồn: `data/predictions/phase2/dev/dev-phase2-{1.5b,3b}.summary.json` và các file
 `dev.*.{1.5b,3b}-{e1,e2}.ex.json` (**đo**); chi tiết ở [phase2-plan.md](phase2-plan.md) §5.6,
 §5.7.
 
@@ -531,7 +531,7 @@ Nguồn: `data/predictions/dev-phase2-{1.5b,3b}.summary.json` và các file
 
 **Ablation lượng tử hoá (S7, 2026-11-08, sau khi thấy test phase 1).** 3B fp16 (transformers trên
 một T4 của Kaggle) so với Q4_K_M (llama-server ở local). Cả hai dùng cùng prompt và cùng B8; dev,
-một lần thử, không kiểm tra placeholder. Nguồn: `data/predictions/dev-phase2-quant.summary.json`
+một lần thử, không kiểm tra placeholder. Nguồn: `data/predictions/phase2/quant/dev-phase2-quant.summary.json`
 (**đo**); chi tiết ở [phase2-plan.md](phase2-plan.md) §5.4.
 
 | | Q4_K_M | fp16 |
@@ -548,10 +548,10 @@ một lần thử, không kiểm tra placeholder. Nguồn: `data/predictions/dev
   đưa vào template xa có thật ở fp16 (5/14 câu đúng) và Q4_K_M chỉ che bớt (10/14).
 
 **Kết quả phase 2 trên test (S8, 2026-11-08 – 2026-11-09, sau khi thấy test phase 1).** Chạy một
-lần bằng `scripts/phase2_test.sh` (114 phút, không bước nào lỗi), với checkpoint đã chọn trên dev
+lần bằng `scripts/phase2/test.sh` (114 phút, không bước nào lỗi), với checkpoint đã chọn trên dev
 (`3b-e2`, `1.5b-e2`). Script kiểm tra trước ba điều: file prompt và linking test giống hệt S4;
 chạy lại dev với 3B + `3b-e2` cho 177/177 câu trả lời giống hệt S6; mọi tham số khác như phase 1.
-Nguồn: `data/predictions/test-phase2.summary.json` và các file `test.*.{3b-e2,1.5b-e2}*` (**đo**);
+Nguồn: `data/predictions/phase2/test/test-phase2.summary.json` và các file `test.*.{3b-e2,1.5b-e2}*` (**đo**);
 các phần chia của phase 1 là **tự tính** từ `ex-details` của S4. Kiểm định McNemar chính xác
 (hai phía) so với cấu hình tương ứng của phase 1. Chi tiết ở [phase2-plan.md](phase2-plan.md)
 §5.8.

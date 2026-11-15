@@ -12,7 +12,7 @@ câu theo [linking-labels.md](linking-labels.md), cộng `gold_sql`, `template_i
 | 2 | Lớp được hỏi | Chỉ các lớp mà mọi thành viên có tập địa chỉ **đóng**: `dex`, `dex-aggregator`, `bridge`, `lending`, `layer-2` (sau đợt duyệt 3: 9–15 thành viên mỗi lớp). `liquid-staking` và `nft-marketplace` chỉ có 2 thành viên (eth-labels thiếu Rocket Pool, LooksRare, ...) nên không hỏi. Không hỏi `cex`, `block-builder`, `erc4337-bundler`, `mev-bot`, `market-maker`, `stablecoin` (có thành viên tập mở: hỏi theo lớp chính là hỏi tổng theo cả sàn) |
 | 3 | Lớp ít thành viên | Đợt duyệt 3 bổ sung thành viên còn `pending` cho các lớp ở dòng 2. Câu ghi số rõ thì N nhỏ hơn số thành viên |
 | 4 | Property nhập nhằng | Thêm cụm từ trỏ nhiều nghĩa vào `data/schema/property_phrases.csv` (đã duyệt): "khối lượng/volume/amount/giá trị/value" → `eth_amount` hoặc `token_amount`; "số lượt/how many times" → `tx_count` hoặc `transfer_count`. Nghĩa chọn theo loại thực thể đã link |
-| 5 | Chạy bộ sinh | `uv run python -m eth_nl2sql.benchmark_build`, không thêm lệnh vào `cli.py` |
+| 5 | Chạy bộ sinh | Ban đầu `uv run python -m eth_nl2sql.benchmark_build`, không thêm lệnh vào `cli.py`. Từ khi sắp lại repo (2026-11-16): `uv run eth-nl2sql build-benchmark`, lệnh này chỉ chuyển tham số cho `main()` của `benchmark/build.py` |
 | 6 | Phiên bản KB | `data/benchmark/manifest.json` ghi SHA256 từng CSV (`data/entity_knowledge_base/*.csv`, `data/schema/property_*.csv`) và SHA256 của `dev.jsonl`/`test.jsonl`; mỗi bản ghi có `knowledge_base_version` (SHA256 của danh sách hash các CSV) |
 | 7 | Quy mô và chia tập | Khoảng 500 câu từ khoảng 40 template. Chia theo template, khoảng 1/3 dev, 2/3 test; mỗi tập có đủ 4 đặc thù, VI/EN, NIL và unsupported |
 
@@ -207,7 +207,7 @@ Mỗi template sinh câu VI và EN tỉ lệ 1:1. Đặc thù của từng câu 
    điều đó.
 
 4. **Gắn nhãn khả năng phân biệt** (2026-11-01; gắn nhãn, không lọc). Sau khi sinh, mỗi câu có
-   gold SQL được chạy thêm các biến thể sai (`benchmark_validate.wrong_variants`):
+   gold SQL được chạy thêm các biến thể sai (`benchmark.validate.wrong_variants`):
    - `status`: bỏ điều kiện `receipt_status`;
    - `direction`: đổi `to_address` ↔ `from_address` ở chỗ so với địa chỉ đã link;
    - `time`: bỏ điều kiện thời gian, trừ khi khoảng thời gian là cả tháng 9 (khi đó hai câu như
@@ -224,7 +224,7 @@ Mỗi template sinh câu VI và EN tỉ lệ 1:1. Đặc thù của từng câu 
 
 6. **Không hoà ở `LIMIT`** (2026-11-03, người dùng chọn). Câu hỏi top-k hay "lớn nhất" không
    nói cách phá hoà. Nếu kết quả gold đổi khi đảo chiều khoá phá hoà cuối cùng của `ORDER BY`
-   (`benchmark_validate.reversed_tie_break`), một câu SQL đúng mà phá hoà cách khác sẽ bị chấm
+   (`benchmark.validate.reversed_tie_break`), một câu SQL đúng mà phá hoà cách khác sẽ bị chấm
    sai, và chấm sai hay đúng còn tuỳ lần chạy, vì DuckDB chạy song song. Câu như vậy được thay
    giống bước 5: tối đa 20 ứng viên cùng template, cùng cách diễn đạt và cùng ngôn ngữ, rút bằng
    RNG riêng; ứng viên phải không hoà và vẫn giữ ưu tiên mềm của bước 5. Không tìm được thì giữ
@@ -252,24 +252,24 @@ layer-2 12. Các thực thể còn `pending` sau đợt 4 là nguồn câu NIL `
 ## 8. Sinh và kết quả (2026-11-01)
 
 ```bash
-uv run python -m eth_nl2sql.benchmark_build                 # data/benchmark/{dev,test}.jsonl, manifest.json
-uv run python -m eth_nl2sql.benchmark_build --count-scale 0.1 --out-dir /tmp/bench   # chạy thử
+uv run eth-nl2sql build-benchmark                 # data/benchmark/{dev,test}.jsonl, manifest.json
+uv run eth-nl2sql build-benchmark --count-scale 0.1 --out-dir /tmp/bench   # chạy thử
 ```
 
-Mã nguồn: `benchmark_templates.py` (danh mục, render, nghĩa ngầm), `benchmark_validate.py` (kiểm
-bản ghi, SQLGlot, chạy SQL), `benchmark_build.py` (chọn giá trị điền, thành viên lớp, sinh, chia,
+Mã nguồn: `benchmark/templates.py` (danh mục, render, nghĩa ngầm), `benchmark/validate.py` (kiểm
+bản ghi, SQLGlot, chạy SQL), `benchmark/build.py` (chọn giá trị điền, thành viên lớp, sinh, chia,
 ghi file). Seed cố định 20261101; chạy lại trên cùng KB và database cho cùng kết quả.
 
 - **505 câu** (VI 260, EN 245), mỗi câu đều qua: kiểm bản ghi theo `linking-labels.md`; SQLGlot
   parse được bằng DuckDB và Postgres; chạy trên `main` dưới 10 giây với kết quả khác rỗng/0. Toàn
   bộ chạy mất khoảng 4 phút.
 - **Chia theo template**: dev 177 câu (14 template), test 328 câu (26 template); cả hai tập có đủ 8
-  nhóm, 4 đặc thù, VI/EN. `test.jsonl` chỉ dùng cho đánh giá cuối (`entity_linking_evaluation`
+  nhóm, 4 đặc thù, VI/EN. `test.jsonl` chỉ dùng cho đánh giá cuối (`linking.evaluation`
   từ chối đọc file này nếu không bật `allow_test`).
 - Đặc thù (`manifest.json` → `phenomena`): nhiều địa chỉ 137, alias 154, lớp 70, property nhập
   nhằng 60. NIL 24 câu (`not_in_kb` 16, `not_reviewed` 8), unsupported 24 câu.
 - `manifest.json` ghi SHA256 từng CSV (`knowledge_base_files`, cùng khoá đường dẫn với
-  `entity_linking_evaluation.knowledge_base_version`), SHA256 của dev/test, số câu bị loại theo lý
+  `linking.evaluation.knowledge_base_version`), SHA256 của dev/test, số câu bị loại theo lý
   do, top-10 thành viên của mỗi lớp.
 
 **Khả năng phân biệt** (2026-11-01). Lần sinh lại đầu tiên chỉ gắn nhãn: câu hỏi và gold không
