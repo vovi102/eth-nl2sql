@@ -30,7 +30,7 @@ TOKENIZER_FILES = ("tokenizer.json", "tokenizer_config.json", "vocab.json", "mer
 def phase1_meta(size: str) -> Path:
     """The meta file of the phase-1 dev run of 1.5b or 3b: it keeps the GGUF's chat template."""
     name = f"dev.predictions.prompts.qwen2.5-coder-{size}-instruct-q4_k_m.jsonl.meta.json"
-    return REPO / "data/predictions" / name
+    return REPO / "data/predictions/phase1/dev" / name
 
 
 def need(path: Path) -> None:

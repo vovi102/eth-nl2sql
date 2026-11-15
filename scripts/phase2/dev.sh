@@ -2,8 +2,8 @@
 # S5/S6 of docs/phase2-plan.md §7: a trained model's two checkpoints on dev, unattended, on the
 # local GTX 1650. Test is never read.
 #
-#   bash scripts/phase2_dev.sh 1.5b            # or 3b
-#   bash scripts/phase2_dev.sh 1.5b --check    # only the preconditions (no GPU)
+#   bash scripts/phase2/dev.sh 1.5b            # or 3b
+#   bash scripts/phase2/dev.sh 1.5b --check    # only the preconditions (no GPU)
 #
 # Input: the output of the Kaggle run, downloaded with
 #   kaggle kernels output aohkvd/eth-nl2sql-phase2-train -p models/lora/<key>-run
@@ -18,11 +18,12 @@
 #    checkpoint by §5.3: the higher dev EX, epoch 2 on a tie (decision 23).
 # A step whose output is complete is skipped, so running the script again resumes.
 #
-# Log: data/predictions/dev-phase2-<key>.log; summary: data/predictions/dev-phase2-<key>.summary.json
+# Log: data/predictions/phase2/dev/dev-phase2-<key>.log; summary: dev-phase2-<key>.summary.json
+# beside it.
 set -euo pipefail
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/../.."
 
-KEY=${1:?usage: phase2_dev.sh 1.5b|3b [--check]}
+KEY=${1:?usage: scripts/phase2/dev.sh 1.5b|3b [--check]}
 case $KEY in
   1.5b) MODEL=qwen2.5-coder-1.5b-instruct-q4_k_m ;;
   3b) MODEL=qwen2.5-coder-3b-instruct-q4_k_m ;;
@@ -30,11 +31,11 @@ case $KEY in
 esac
 LLAMA=${LLAMA:-$HOME/opt/llama.cpp/src-b12032/build/bin/llama-server}
 PORT=8080
-P=data/predictions
+P=data/predictions/phase2/dev
 L=models/lora/$KEY-run/gguf
 LOG=$P/dev-phase2-$KEY.log
 PROMPTS=data/prompts/dev.predictions.prompts.jsonl
-FROZEN_RUN=$P/dev.predictions.prompts.$MODEL.jsonl
+FROZEN_RUN=data/predictions/phase1/dev/dev.predictions.prompts.$MODEL.jsonl
 SERVER_PID=""
 SERVER_ARGS=""
 
@@ -117,7 +118,7 @@ if [ ! -s "$CHECK.meta.json" ]; then
   ensure_server scale0 --lora-scaled "$PWD/$L/$KEY-e2.gguf:0"
   log "runtime check: $KEY-e2 at scale 0 on dev"
   uv run eth-nl2sql generate-sql --prompts $PROMPTS --adapter "$L/$KEY-e2.gguf" \
-    > "$P/dev.phase2-$KEY.scale0.log" 2>&1
+    --output "$CHECK" > "$P/dev.phase2-$KEY.scale0.log" 2>&1
 fi
 uv run python - "$FROZEN_RUN" "$CHECK" <<'PY' | tee -a "$LOG"
 import json, sys
@@ -147,7 +148,7 @@ for e in 1 2; do
   ensure_server e$e --lora "$PWD/$L/$KEY-e$e.gguf"
   log "$KEY-e$e: generating -> $OUT"
   uv run eth-nl2sql generate-sql --prompts $PROMPTS --adapter "$L/$KEY-e$e.gguf" \
-    > "$P/dev.phase2-$KEY-e$e.log" 2>&1
+    --output "$OUT" > "$P/dev.phase2-$KEY-e$e.log" 2>&1
   log "$KEY-e$e: done"
 done
 stop_server
@@ -171,7 +172,8 @@ import json, sys
 from pathlib import Path
 
 key, model = sys.argv[1:]
-P = Path("data/predictions")
+P = Path("data/predictions/phase2/dev")
+P1 = Path("data/predictions/phase1/dev")
 
 def overall(stem):
     rep = json.loads((P / f"{stem}.ex.json").read_text())
@@ -180,7 +182,7 @@ def overall(stem):
             "by_train_exposure": rep.get("by_train_exposure")}
 
 stem = f"dev.predictions.prompts.{model}"
-phase1 = json.loads((P / f"{stem}.ex.json").read_text())["overall"]
+phase1 = json.loads((P1 / f"{stem}.ex.json").read_text())["overall"]
 runs = {f"e{e}": overall(f"{stem}.{key}-e{e}") for e in (1, 2)}
 scale0 = overall(f"{stem}.{key}-e2.scale0")
 # §5.3, decision 23: the higher dev EX; a tie goes to epoch 2.

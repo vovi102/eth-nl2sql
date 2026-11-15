@@ -2,8 +2,8 @@
 # S7 of docs/phase2-plan.md §7: the quantization ablation of §5.4, on dev, with 3B only,
 # unattended on the local GTX 1650. Test is never read.
 #
-#   bash scripts/phase2_quant.sh            # after the fp16 kernel output is downloaded
-#   bash scripts/phase2_quant.sh --check    # only the preconditions (no GPU)
+#   bash scripts/phase2/quant.sh            # after the fp16 kernel output is downloaded
+#   bash scripts/phase2/quant.sh --check    # only the preconditions (no GPU)
 #
 # Input: the output of the fp16 kernel (`train_lora.py generate`), downloaded with
 #   kaggle kernels output aohkvd/eth-nl2sql-phase2-fp16 -p models/lora/3b-fp16
@@ -15,16 +15,17 @@
 # output is there, the script runs the two Q4_K_M runs only and stops.
 # A step whose output is complete is skipped, so running the script again resumes.
 #
-# Log: data/predictions/dev-phase2-quant.log; summary: data/predictions/dev-phase2-quant.summary.json
+# Log: data/predictions/phase2/quant/dev-phase2-quant.log; summary: dev-phase2-quant.summary.json
+# beside it.
 set -euo pipefail
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/../.."
 
 MODEL=qwen2.5-coder-3b-instruct-q4_k_m
 FP16=qwen2.5-coder-3b-instruct-fp16
 ADAPTER=3b-e2
 LLAMA=${LLAMA:-$HOME/opt/llama.cpp/src-b12032/build/bin/llama-server}
 PORT=8080
-P=data/predictions
+P=data/predictions/phase2/quant
 L=models/lora/3b-run/gguf
 F=models/lora/3b-fp16
 LOG=$P/dev-phase2-quant.log
@@ -212,7 +213,7 @@ for label, a, b in [("quantization, base: fp16 vs Q4", "q4_base", "fp16_base"),
     same = sum(sql[a][q] == sql[b][q] for q in sql[a] if sql[a][q] is not None)
     asked = sum(sql[a][q] is not None for q in sql[a])
     summary["pairs"][label] = mcnemar(ok[a], ok[b]) | {"same_sql": f"{same}/{asked}"}
-Path("data/predictions/dev-phase2-quant.summary.json").write_text(
+Path("data/predictions/phase2/quant/dev-phase2-quant.summary.json").write_text(
     json.dumps(summary, indent=1) + "\n")
 print(" ".join(f"{n} {r['correct']}/177" for n, r in summary["runs"].items()))
 for label, pair in summary["pairs"].items():

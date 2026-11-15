@@ -2,8 +2,8 @@
 # S8 of docs/phase2-plan.md §7: phase 2 on the test split, once, unattended, with the
 # checkpoints chosen on dev (§5.3). About 2 hours on the GTX 1650; nothing leaves the machine.
 #
-#   bash scripts/phase2_test.sh           # the whole run
-#   bash scripts/phase2_test.sh --check   # only the preconditions (no GPU, no test)
+#   bash scripts/phase2/test.sh           # the whole run
+#   bash scripts/phase2/test.sh --check   # only the preconditions (no GPU, no test)
 #
 # 1. Preconditions: the S3 freeze still holds; the chosen checkpoints (dev-phase2-<model>.summary
 #    .json) are the GGUF adapters of run.json; the test linking and prompt files are byte for byte
@@ -16,13 +16,13 @@
 # 4. Stops llama-server, scores every run (evaluate-sql --train-manifest), writes a summary that
 #    sets each run beside its phase-1 counterpart.
 #
-# Log: data/predictions/test-phase2.log; summary: data/predictions/test-phase2.summary.json.
+# Log: data/predictions/phase2/test/test-phase2.log; summary: test-phase2.summary.json beside it.
 set -euo pipefail
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/../.."
 
 LLAMA=${LLAMA:-$HOME/opt/llama.cpp/src-b12032/build/bin/llama-server}
 PORT=8080
-P=data/predictions
+P=data/predictions/phase2/test
 LOG=$P/test-phase2.log
 M3=qwen2.5-coder-3b-instruct-q4_k_m
 M15=qwen2.5-coder-1.5b-instruct-q4_k_m
@@ -79,17 +79,17 @@ if bad:
     sys.exit(f"the S3 freeze no longer matches: {bad}")
 chosen = []
 for key in ("3b", "1.5b"):
-    name = json.loads(Path(f"data/predictions/dev-phase2-{key}.summary.json").read_text())["chosen"]
+    name = json.loads(Path(f"data/predictions/phase2/dev/dev-phase2-{key}.summary.json").read_text())["chosen"]
     run = json.loads(Path(f"models/lora/{key}-run/run.json").read_text())
     trained = {c["name"]: c for c in run["checkpoints"]}[name]
     if sha(f"models/lora/{key}-run/gguf/{name}.gguf") != trained["gguf_sha256"]:
         sys.exit(f"{name}.gguf is not the GGUF of run.json")
     chosen.append(name)
 # The same test inputs as the phase-1 run (S4).
-P = Path("data/predictions")
+P1 = Path("data/predictions/phase1/test")
 for stem in ("test.predictions.prompts.qwen2.5-coder-3b-instruct-q4_k_m",
              "test.prompts.qwen2.5-coder-3b-instruct-q4_k_m"):
-    meta = json.loads((P / f"{stem}.jsonl.meta.json").read_text())
+    meta = json.loads((P1 / f"{stem}.jsonl.meta.json").read_text())
     if sha(meta["prompts"]) != meta["prompts_sha256"] or sha(meta["linking"]) != meta["linking_sha256"]:
         sys.exit(f"{meta['prompts']} or {meta['linking']} changed since the phase-1 test run")
 print(f"S3 freeze holds; chosen on dev: {', '.join(chosen)}; test inputs as in S4",
@@ -118,12 +118,12 @@ if [ -f "$P/test-phase2.started" ]; then
   log "resuming a run started on $(cat "$P/test-phase2.started"): dev check passed then"
 else
   ensure_server dev $M3 --lora "$PWD/$L3"
-  mkdir -p "$P/recheck-phase2"
-  RECHECK=$P/recheck-phase2/dev.predictions.prompts.$M3.$A3.jsonl
+  mkdir -p "$P/recheck"
+  RECHECK=$P/recheck/dev.predictions.prompts.$M3.$A3.jsonl
   log "dev check: 3B + $A3 on dev (about 14 min)"
   uv run eth-nl2sql generate-sql --prompts data/prompts/dev.predictions.prompts.jsonl \
-    --adapter "$L3" --output "$RECHECK" > "$P/recheck-phase2/dev.$A3.log" 2>&1
-  uv run python - "$P/dev.predictions.prompts.$M3.$A3.jsonl" "$RECHECK" <<'PY' | tee -a "$LOG"
+    --adapter "$L3" --output "$RECHECK" > "$P/recheck/dev.$A3.log" 2>&1
+  uv run python - "data/predictions/phase2/dev/dev.predictions.prompts.$M3.$A3.jsonl" "$RECHECK" <<'PY' | tee -a "$LOG"
 import json, sys
 
 def replies(path):
@@ -200,7 +200,8 @@ import json, math, sys
 from pathlib import Path
 
 a3, a15 = sys.argv[1:]
-P = Path("data/predictions")
+P = Path("data/predictions/phase2/test")
+P1 = Path("data/predictions/phase1/test")  # the phase-1 counterparts
 M3, M15 = "qwen2.5-coder-3b-instruct-q4_k_m", "qwen2.5-coder-1.5b-instruct-q4_k_m"
 runs = {  # name: (phase 2, phase 1)
     "3b": (f"test.predictions.prompts.{M3}.{a3}", f"test.predictions.prompts.{M3}"),
@@ -210,9 +211,9 @@ runs = {  # name: (phase 2, phase 1)
     "1.5b": (f"test.predictions.prompts.{M15}.{a15}", f"test.predictions.prompts.{M15}"),
 }
 
-def correct(stem):
+def correct(folder, stem):
     return {json.loads(line)["question_id"]: json.loads(line)["correct"]
-            for line in open(P / f"{stem}.ex-details.jsonl")}
+            for line in open(folder / f"{stem}.ex-details.jsonl")}
 
 def mcnemar(a, b):
     better = sum(1 for q in a if not a[q] and b[q])
@@ -229,11 +230,11 @@ for name, (two, one) in runs.items():
         print(f"{name:<26} no result")
         continue
     rep = json.loads(path.read_text())
-    old = json.loads((P / f"{one}.ex.json").read_text())["overall"]
+    old = json.loads((P1 / f"{one}.ex.json").read_text())["overall"]
     o = rep["overall"]
     summary[name] = {"ex": o["ex"], "correct": o["correct"], "questions": o["questions"],
                      "phase1": {"ex": old["ex"], "correct": old["correct"]},
-                     "vs_phase1": mcnemar(correct(one), correct(two)),
+                     "vs_phase1": mcnemar(correct(P1, one), correct(P, two)),
                      "by_train_exposure": rep.get("by_train_exposure")}
     print(f"{name:<26} EX {o['ex']:.3f}  {o['correct']}/{o['questions']}  "
           f"(phase 1 {old['correct']}; {summary[name]['vs_phase1']})")

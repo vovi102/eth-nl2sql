@@ -1,9 +1,14 @@
 #!/usr/bin/env bash
 # Local runtime pre-check with a random adapter of the real 1.5B shapes (no training): scale 0
 # must reproduce the frozen phase-1 1.5B dev replies; scale 1 must change some.
+#
+#   bash scripts/phase2/precheck.sh DIR   # DIR: absolute, holds gguf/random-1.5b.gguf
+#
+# The adapter comes from scripts/phase2/random_adapter.py, converted with convert_lora_to_gguf.py.
+# Outputs go to DIR; those of the 2026-11-07 run are kept in data/predictions/phase2/precheck/.
 set -euo pipefail
 S=$1
-cd /home/khoavd/WORKSPACE/thesis/eth-nl2sql
+cd "$(dirname "$0")/../.."
 M=qwen2.5-coder-1.5b-instruct-q4_k_m
 A=$S/gguf/random-1.5b.gguf
 ~/opt/llama.cpp/src-b12032/build/bin/llama-server -m $PWD/models/$M.gguf --lora-scaled "$A:0" \
@@ -14,7 +19,7 @@ for _ in $(seq 1 300); do curl -s -m 2 http://127.0.0.1:8080/health | grep -q '"
 curl -s http://127.0.0.1:8080/lora-adapters; echo
 uv run eth-nl2sql generate-sql --prompts data/prompts/dev.predictions.prompts.jsonl \
   --adapter "$A" --output $S/precheck.scale0.jsonl > $S/precheck.scale0.log 2>&1
-uv run python - data/predictions/dev.predictions.prompts.$M.jsonl $S/precheck.scale0.jsonl <<'PY'
+uv run python - data/predictions/phase1/dev/dev.predictions.prompts.$M.jsonl $S/precheck.scale0.jsonl <<'PY'
 import json, sys
 def replies(p):
     return {r["question_id"]: (r["decision"], [a.get("reply") for a in r["attempts"]])
@@ -28,7 +33,7 @@ curl -s -X POST http://127.0.0.1:8080/lora-adapters -H 'Content-Type: applicatio
 curl -s http://127.0.0.1:8080/lora-adapters; echo
 uv run eth-nl2sql generate-sql --prompts data/prompts/dev.predictions.prompts.jsonl \
   --adapter "$A" --limit 5 --output $S/precheck.scale1.jsonl > $S/precheck.scale1.log 2>&1
-uv run python - data/predictions/dev.predictions.prompts.$M.jsonl $S/precheck.scale1.jsonl <<'PY'
+uv run python - data/predictions/phase1/dev/dev.predictions.prompts.$M.jsonl $S/precheck.scale1.jsonl <<'PY'
 import json, sys
 def replies(p):
     return {r["question_id"]: [a.get("reply") for a in r["attempts"]]

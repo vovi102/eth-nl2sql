@@ -17,8 +17,9 @@ from conftest import REPO, TRAIN_DIR, need
 DEV_PROMPTS = REPO / "data/prompts/dev.predictions.prompts.jsonl"
 # Replies of llama-server (3B + LoRA e2, S6): what a reply of the fine-tuned model looks like.
 Q4_REPLIES = (
-    REPO / "data/predictions/dev.predictions.prompts.qwen2.5-coder-3b-instruct-q4_k_m.3b-e2.jsonl"
-)  # noqa: E501
+    REPO / "data/predictions/phase2/dev"
+    / "dev.predictions.prompts.qwen2.5-coder-3b-instruct-q4_k_m.3b-e2.jsonl"
+)
 
 
 def sql_prompts(n: int | None = None) -> list[dict]:

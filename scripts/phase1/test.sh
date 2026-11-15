@@ -2,26 +2,28 @@
 # S4 of docs/phase2-plan.md §7: phase 1 on the test split, once, unattended. About 4 hours on
 # the GTX 1650; nothing leaves the machine.
 #
-#   bash eth-nl2sql/scripts/phase1_test.sh           # the whole run
-#   bash eth-nl2sql/scripts/phase1_test.sh --check   # only the preconditions (no GPU, no test)
+#   bash scripts/phase1/test.sh           # the whole run
+#   bash scripts/phase1/test.sh --check   # only the preconditions (no GPU, no test)
 #
 # 1. Preconditions: the S3 freeze (data/train/freeze.json) still matches the train data and the
 #    training configuration; port 8080 is free.
 # 2. Dev check: the default 3B configuration on dev must give exactly the replies of the frozen
-#    phase-1 run (data/predictions/phase1-freeze.json). Otherwise it stops before reading test.
+#    phase-1 run (data/predictions/phase1/dev/phase1-freeze.json). Otherwise it stops before
+#    reading test.
 # 3. Links test and builds its 5 prompt files: linker (default), linked schema, no evidence,
 #    literal, oracle (gold linking).
 # 4. Generates with 3B (6 configurations), then 1.5B (default). A configuration whose
 #    predictions are complete is skipped, so running the script again after a crash resumes.
 # 5. Stops llama-server, scores every run with evaluate-sql, writes a summary.
 #
-# Log: data/predictions/test-phase1.log; summary: data/predictions/test-phase1.summary.json.
+# Log: data/predictions/phase1/test/test-phase1.log; summary: test-phase1.summary.json beside it.
 set -euo pipefail
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/../.."
 
 LLAMA=${LLAMA:-$HOME/opt/llama.cpp/src-b12032/build/bin/llama-server}
 PORT=8080
-P=data/predictions
+P=data/predictions/phase1/test
+DEV=data/predictions/phase1/dev  # the frozen phase-1 dev runs
 LOG=$P/test-phase1.log
 M3=qwen2.5-coder-3b-instruct-q4_k_m
 M15=qwen2.5-coder-1.5b-instruct-q4_k_m
@@ -102,7 +104,7 @@ else
   log "dev check: default 3B configuration on dev (about 13 min)"
   uv run eth-nl2sql generate-sql --prompts data/prompts/dev.predictions.prompts.jsonl \
     --output "$RECHECK" > "$P/recheck/dev.3b.log" 2>&1
-  uv run python - "$P/dev.predictions.prompts.$M3.jsonl" "$RECHECK" <<'PY' | tee -a "$LOG"
+  uv run python - "$DEV/dev.predictions.prompts.$M3.jsonl" "$RECHECK" <<'PY' | tee -a "$LOG"
 import json, sys
 
 def replies(path):
@@ -214,7 +216,7 @@ uv run python - <<'PY' | tee -a "$LOG"
 import json
 from pathlib import Path
 
-P = Path("data/predictions")
+P = Path("data/predictions/phase1/test")
 M3, M15 = "qwen2.5-coder-3b-instruct-q4_k_m", "qwen2.5-coder-1.5b-instruct-q4_k_m"
 runs = {
     "3b": f"test.predictions.prompts.{M3}",
