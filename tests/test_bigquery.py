@@ -110,6 +110,12 @@ def test_month_window() -> None:
     assert Window.month("2026-12").end == date(2027, 1, 1)
 
 
+def test_window_label_names_the_months() -> None:
+    assert Window.month("2026-09").label == "September 2026"
+    assert Window(date(2026, 9, 1), date(2026, 11, 1)).label == "September–October 2026"
+    assert Window(date(2026, 12, 1), date(2027, 2, 1)).label == "December 2026–January 2027"
+
+
 def test_verify_accepts_matching_files(out: Path) -> None:
     totals = verify_extract(out)
     assert totals == {name: len(next(iter(cols.values()))) for name, cols in ROWS.items()}

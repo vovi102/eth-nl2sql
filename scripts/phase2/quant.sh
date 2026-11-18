@@ -17,6 +17,8 @@
 #
 # Log: data/predictions/phase2/quant/dev-phase2-quant.log; summary: dev-phase2-quant.summary.json
 # beside it.
+# --class-rank data: the September runs ranked class members by the calls of all the data
+# (docs/multi-month-plan.md D3); the CLI default ranks by the question's time range.
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 
@@ -135,13 +137,13 @@ START=$(date +%s)
 if [ ! -s "$OUT_Q4_BASE.meta.json" ]; then
   ensure_server base
   log "Q4_K_M base -> $OUT_Q4_BASE"
-  uv run eth-nl2sql generate-sql --prompts $PROMPTS "${FLAGS[@]}" --output "$OUT_Q4_BASE" \
+  uv run eth-nl2sql generate-sql --class-rank data --prompts $PROMPTS "${FLAGS[@]}" --output "$OUT_Q4_BASE" \
     > "$P/dev.phase2-quant.q4-base.log" 2>&1
 fi
 if [ ! -s "$OUT_Q4_LORA.meta.json" ]; then
   ensure_server lora --lora "$PWD/$L/$ADAPTER.gguf"
   log "Q4_K_M + $ADAPTER -> $OUT_Q4_LORA"
-  uv run eth-nl2sql generate-sql --prompts $PROMPTS --adapter "$L/$ADAPTER.gguf" "${FLAGS[@]}" \
+  uv run eth-nl2sql generate-sql --class-rank data --prompts $PROMPTS --adapter "$L/$ADAPTER.gguf" "${FLAGS[@]}" \
     --output "$OUT_Q4_LORA" > "$P/dev.phase2-quant.q4-lora.log" 2>&1
 fi
 stop_server
@@ -156,7 +158,7 @@ for pair in "$FP16:$OUT_FP_BASE" "$FP16.$ADAPTER:$OUT_FP_LORA"; do
   out=${pair#*:}
   if [ ! -s "$out.meta.json" ]; then
     log "fp16 $name -> $out"
-    uv run eth-nl2sql generate-sql --prompts $PROMPTS --replies "$F/replies.$name.jsonl" \
+    uv run eth-nl2sql generate-sql --class-rank data --prompts $PROMPTS --replies "$F/replies.$name.jsonl" \
       "${FLAGS[@]}" --output "$out" > "$P/dev.phase2-quant.$name.log" 2>&1
   fi
 done
@@ -169,7 +171,7 @@ for run in "$OUT_Q4_BASE" "$OUT_Q4_LORA" "$OUT_FP_BASE" "$OUT_FP_LORA"; do
     continue
   fi
   log "score: $run"
-  uv run eth-nl2sql evaluate-sql --gold data/benchmark/dev.jsonl --predictions "$run" \
+  uv run eth-nl2sql evaluate-sql --class-rank data --gold data/benchmark/dev.jsonl --predictions "$run" \
     --train-manifest data/train/manifest.json --report "$base.ex.json" \
     --details "$base.ex-details.jsonl" > "$base.ex.log" 2>&1
 done

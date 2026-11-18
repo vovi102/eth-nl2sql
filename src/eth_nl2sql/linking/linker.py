@@ -10,9 +10,12 @@ carries its top-5 `candidates` with scores, for recall@5.
   matched exactly against alias_norm, then fuzzily (rapidfuzz). The longest mention wins.
   Type words ("sàn", "ví", "token", ...) next to a mention are not looked up but hint its type.
 - B3: score = string match + type compatibility + activity prior (log of token callers or of
-  September calls), the prior normalized within each type of a mention's candidates. Below the
-  threshold, or for a name the reviewed knowledge base lacks, the mention is NIL.
-- B4: a class mention keeps its target and top-N; `class_members` ranks the members.
+  calls in all the data), the prior normalized within each type of a mention's candidates.
+  Below the threshold, or for a name the reviewed knowledge base lacks, the mention is NIL.
+- B4: a class mention keeps its target and top-N; `class_members` ranks the members by calls,
+  under one of two rules (`CLASS_RANKS`, docs/multi-month-plan.md D3): "question" counts the
+  calls of the question's time range, "data" those of all the data. The September experiments
+  used "data" (then all of September), so they reproduce only with it.
 - B5: phrases of property_phrases -> senses, the sense chosen by the linked entity types, plus
   implicit senses; unsupported senses go to `unsupported`.
 """
@@ -23,6 +26,7 @@ import re
 import unicodedata
 from collections import defaultdict
 from dataclasses import dataclass, field
+from datetime import date, datetime
 
 from rapidfuzz import fuzz, process
 
@@ -33,6 +37,7 @@ from eth_nl2sql.linking.time_expr import fold, parse_time
 MAX_NGRAM = 5
 TOP_K = 5  # candidates kept per mention
 DEFAULT_TOP_N = 5  # "major DEXs" without a number (linking-labels.md §2)
+CLASS_RANKS = ("question", "data")  # calls that rank class members: the question's or all
 LINK_THRESHOLD = 0.9  # string-match score under which a mention is NIL
 FUZZY_CUTOFF = 80  # rapidfuzz ratio for a fuzzy candidate at all
 FUZZY_MIN_CHARS = 5
@@ -199,8 +204,11 @@ def _upper_evidence(text: str) -> bool:
 class EntityLinker:
     """Holds the resources and the indexes built from them; `link` is cheap per question."""
 
-    def __init__(self, resources: LinkingResources) -> None:
+    def __init__(self, resources: LinkingResources, class_rank: str = "question") -> None:
+        if class_rank not in CLASS_RANKS:
+            raise ValueError(f"class_rank must be one of {CLASS_RANKS}, not {class_rank!r}")
         self.resources = resources
+        self.class_rank = class_rank
         self.parent = {c: p for p, kids in resources.children.items() for c in kids}
 
         self.class_aliases: dict[tuple[str, ...], set[str]] = defaultdict(set)
@@ -495,6 +503,10 @@ class EntityLinker:
                 warning = f"open_address_set:{m['target']}"
                 if warning not in warnings:
                     warnings.append(warning)
+        if time:
+            outside = self._outside_data(time)
+            if outside:
+                warnings.append(f"time_outside_data:{outside}")
         record = {} if question_id is None else {"question_id": question_id}
         return record | {
             "question": question,
@@ -692,9 +704,35 @@ class EntityLinker:
                 properties.append({"sense_id": sid, "span": None, "text": None, "implicit": True})
         return properties, unsupported
 
+    def _outside_data(self, time: dict) -> str | None:
+        """'all' when the time range holds no day of the data, 'part' when only some, else None."""
+        start, end = (datetime.fromisoformat(time[k]).date() for k in ("start", "end"))
+        data = self.resources.data_window
+        if end <= data.start or start >= data.end:
+            return "all"
+        if start < data.start or end > data.end:
+            return "part"
+        return None
+
     # ---- B4 and B8: placeholders -> addresses ----------------------------------------
 
-    def class_members(self, class_id: str, top_n: int) -> list[tuple[str, list[str]]]:
+    def rank_window(self, record: dict) -> tuple[date, date] | None:
+        """The days whose calls rank the class members of the record: its time range under the
+        "question" rule, cut to the data; None (all the data) under "data", for a question
+        without time, or for a range that covers all the data."""
+        time = record.get("time")
+        if self.class_rank == "data" or not time:
+            return None
+        data = self.resources.data_window
+        start, end = (datetime.fromisoformat(time[k]).date() for k in ("start", "end"))
+        start, end = max(start, data.start), min(end, data.end)
+        if (start, end) == (data.start, data.end) or start >= end:
+            return None
+        return start, end
+
+    def class_members(
+        self, class_id: str, top_n: int, window: tuple[date, date] | None = None
+    ) -> list[tuple[str, list[str]]]:
         """Top-N members of a class with their addresses (linking-labels.md §2).
 
         Members carry the class at entity level; a group (MEV Bot) has no reviewed class, so it
@@ -704,7 +742,8 @@ class EntityLinker:
         member, so a member holds the addresses of the entities in its tree that have the
         class: Uniswap Protocol (Permit2) has none, by review, so it does not inflate Uniswap's
         rank. Token contracts are left out (decision c of linking-labels.md: USDC is no bridge
-        address of Circle CCTP). Ranked by September calls (to_address), ties by id.
+        address of Circle CCTP). Ranked by calls (to_address) in [start, end) of `window`, or in
+        all the data without one, ties by id.
         """
         res = self.resources
         members: dict[str, set[str]] = defaultdict(set)
@@ -731,7 +770,7 @@ class EntityLinker:
                 }
         ranked = sorted(
             members.items(),
-            key=lambda m: (-sum(res.address_calls.get(a, 0) for a in m[1]), m[0]),
+            key=lambda m: (-sum(res.calls(a, window) for a in m[1]), m[0]),
         )
         return [(eid, sorted(addresses)) for eid, addresses in ranked[:top_n]]
 
@@ -745,7 +784,7 @@ class EntityLinker:
             if m["type"] == "entity":
                 out[name] = self.resources.addresses_of(m["target"])
             elif m["type"] == "class":
-                members = self.class_members(m["target"], m["top_n"])
+                members = self.class_members(m["target"], m["top_n"], self.rank_window(record))
                 out[name] = sorted({a for _, addresses in members for a in addresses})
             else:
                 out[name] = [m["target"]]

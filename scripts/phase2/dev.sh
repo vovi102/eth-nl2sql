@@ -20,6 +20,8 @@
 #
 # Log: data/predictions/phase2/dev/dev-phase2-<key>.log; summary: dev-phase2-<key>.summary.json
 # beside it.
+# --class-rank data: the September runs ranked class members by the calls of all the data
+# (docs/multi-month-plan.md D3); the CLI default ranks by the question's time range.
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 
@@ -117,7 +119,7 @@ CHECK=$P/dev.predictions.prompts.$MODEL.$KEY-e2.scale0.jsonl
 if [ ! -s "$CHECK.meta.json" ]; then
   ensure_server scale0 --lora-scaled "$PWD/$L/$KEY-e2.gguf:0"
   log "runtime check: $KEY-e2 at scale 0 on dev"
-  uv run eth-nl2sql generate-sql --prompts $PROMPTS --adapter "$L/$KEY-e2.gguf" \
+  uv run eth-nl2sql generate-sql --class-rank data --prompts $PROMPTS --adapter "$L/$KEY-e2.gguf" \
     --output "$CHECK" > "$P/dev.phase2-$KEY.scale0.log" 2>&1
 fi
 uv run python - "$FROZEN_RUN" "$CHECK" <<'PY' | tee -a "$LOG"
@@ -147,7 +149,7 @@ for e in 1 2; do
   fi
   ensure_server e$e --lora "$PWD/$L/$KEY-e$e.gguf"
   log "$KEY-e$e: generating -> $OUT"
-  uv run eth-nl2sql generate-sql --prompts $PROMPTS --adapter "$L/$KEY-e$e.gguf" \
+  uv run eth-nl2sql generate-sql --class-rank data --prompts $PROMPTS --adapter "$L/$KEY-e$e.gguf" \
     --output "$OUT" > "$P/dev.phase2-$KEY-e$e.log" 2>&1
   log "$KEY-e$e: done"
 done
@@ -162,7 +164,7 @@ for run in "$CHECK" "$P/dev.predictions.prompts.$MODEL.$KEY-e1.jsonl" \
     continue
   fi
   log "score: $run"
-  uv run eth-nl2sql evaluate-sql --gold data/benchmark/dev.jsonl --predictions "$run" \
+  uv run eth-nl2sql evaluate-sql --class-rank data --gold data/benchmark/dev.jsonl --predictions "$run" \
     --train-manifest data/train/manifest.json --report "$base.ex.json" \
     --details "$base.ex-details.jsonl" > "$base.ex.log" 2>&1
 done

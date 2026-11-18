@@ -23,21 +23,29 @@ SOURCE_TABLES = {
     "amended_tokens": "amended_tokens",
 }
 
-# BigQuery publishes no table descriptions; these state what the database holds.
-TABLE_DESCRIPTIONS = {
-    "blocks": "Every Ethereum block of September 2026 (UTC).",
-    "transactions": "Every transaction of September 2026 (UTC), with its receipt.",
-    "token_transfers": "Every decoded ERC-20/ERC-721 Transfer event of September 2026 (UTC).",
-    "contracts": (
-        "Contracts that September 2026 touched (called, created, or emitting token transfers); "
-        "one row per deployment."
-    ),
-    "tokens": (
-        "Metadata of every token with a transfer in September 2026, as of the extraction "
-        "(tokens_latest)."
-    ),
-    "amended_tokens": "Hand-corrected symbol, name and decimals of tokens.",
-}
+
+def table_descriptions(period: str, months: int = 1) -> dict[str, str]:
+    """What the database holds; BigQuery publishes no table descriptions.
+
+    period is Window.label ("September 2026"). With several months, a token seen by more than
+    one extract keeps the row of the newest one (duckdb_build), hence "the latest extraction".
+    """
+    extraction = "the extraction" if months == 1 else "the latest extraction"
+    return {
+        "blocks": f"Every Ethereum block of {period} (UTC).",
+        "transactions": f"Every transaction of {period} (UTC), with its receipt.",
+        "token_transfers": f"Every decoded ERC-20/ERC-721 Transfer event of {period} (UTC).",
+        "contracts": (
+            f"Contracts that {period} touched (called, created, or emitting token transfers); "
+            "one row per deployment."
+        ),
+        "tokens": (
+            f"Metadata of every token with a transfer in {period}, as of {extraction} "
+            "(tokens_latest)."
+        ),
+        "amended_tokens": "Hand-corrected symbol, name and decimals of tokens.",
+    }
+
 
 PROJECT_COLUMNS = {
     ("transactions", "blob_count"): (

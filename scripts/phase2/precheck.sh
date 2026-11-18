@@ -6,6 +6,8 @@
 #
 # The adapter comes from scripts/phase2/random_adapter.py, converted with convert_lora_to_gguf.py.
 # Outputs go to DIR; those of the 2026-11-07 run are kept in data/predictions/phase2/precheck/.
+# --class-rank data: the September runs ranked class members by the calls of all the data
+# (docs/multi-month-plan.md D3); the CLI default ranks by the question's time range.
 set -euo pipefail
 S=$1
 cd "$(dirname "$0")/../.."
@@ -17,7 +19,7 @@ PID=$!
 trap 'kill $PID 2>/dev/null; wait $PID 2>/dev/null || true' EXIT
 for _ in $(seq 1 300); do curl -s -m 2 http://127.0.0.1:8080/health | grep -q '"ok"' && break; sleep 1; done
 curl -s http://127.0.0.1:8080/lora-adapters; echo
-uv run eth-nl2sql generate-sql --prompts data/prompts/dev.predictions.prompts.jsonl \
+uv run eth-nl2sql generate-sql --class-rank data --prompts data/prompts/dev.predictions.prompts.jsonl \
   --adapter "$A" --output $S/precheck.scale0.jsonl > $S/precheck.scale0.log 2>&1
 uv run python - data/predictions/phase1/dev/dev.predictions.prompts.$M.jsonl $S/precheck.scale0.jsonl <<'PY'
 import json, sys
@@ -31,7 +33,7 @@ PY
 curl -s -X POST http://127.0.0.1:8080/lora-adapters -H 'Content-Type: application/json' \
   -d '[{"id": 0, "scale": 1.0}]'; echo
 curl -s http://127.0.0.1:8080/lora-adapters; echo
-uv run eth-nl2sql generate-sql --prompts data/prompts/dev.predictions.prompts.jsonl \
+uv run eth-nl2sql generate-sql --class-rank data --prompts data/prompts/dev.predictions.prompts.jsonl \
   --adapter "$A" --limit 5 --output $S/precheck.scale1.jsonl > $S/precheck.scale1.log 2>&1
 uv run python - data/predictions/phase1/dev/dev.predictions.prompts.$M.jsonl $S/precheck.scale1.jsonl <<'PY'
 import json, sys

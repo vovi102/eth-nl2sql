@@ -31,7 +31,7 @@ from eth_nl2sql.linking.evaluation import (
     read_records,
     write_records,
 )
-from eth_nl2sql.linking.linker import EntityLinker
+from eth_nl2sql.linking.linker import CLASS_RANKS, EntityLinker
 from eth_nl2sql.linking.resources import load_resources
 from eth_nl2sql.sql.evaluation import (
     GoldError,
@@ -117,7 +117,8 @@ def _linking(args: argparse.Namespace) -> int:
             predictions = read_records(args.predictions, allow_test=args.allow_test)
         else:
             linker = EntityLinker(
-                load_resources(args.db, args.knowledge_base_dir, memory_limit=args.memory_limit)
+                load_resources(args.db, args.knowledge_base_dir, memory_limit=args.memory_limit),
+                class_rank=args.class_rank,
             )
             out = args.output or DEFAULT_LINKING_DIR / f"{args.gold.stem}.predictions.jsonl"
             predictions = _link_file(linker, gold, out, args)
@@ -138,7 +139,8 @@ def _linking(args: argparse.Namespace) -> int:
         print("error: give either a question or --input", file=sys.stderr)
         return 2
     linker = EntityLinker(
-        load_resources(args.db, args.knowledge_base_dir, memory_limit=args.memory_limit)
+        load_resources(args.db, args.knowledge_base_dir, memory_limit=args.memory_limit),
+        class_rank=args.class_rank,
     )
     if args.input:
         records = read_records(args.input, allow_test=args.allow_test)
@@ -174,7 +176,8 @@ def _build_prompts(args: argparse.Namespace) -> int:
     records = read_records(args.input, allow_test=args.allow_test)
     options, tag = _prompt_options(args)
     linker = EntityLinker(
-        load_resources(args.db, args.knowledge_base_dir, memory_limit=args.memory_limit)
+        load_resources(args.db, args.knowledge_base_dir, memory_limit=args.memory_limit),
+        class_rank=args.class_rank,
     )
     builder = PromptBuilder(linker, load_schema(args.db))
     prompts = [builder.build(r, options) for r in records]
@@ -183,6 +186,7 @@ def _build_prompts(args: argparse.Namespace) -> int:
     meta = {
         "input": str(args.input),
         "options": vars(options),
+        "class_rank": args.class_rank,
         "knowledge_base_version": knowledge_base_version(
             args.knowledge_base_dir, args.property_senses_dir
         ),
@@ -216,7 +220,8 @@ def _evaluate_sql(args: argparse.Namespace) -> int:
         print("error: give --predictions or --self-check", file=sys.stderr)
         return 2
     linker = EntityLinker(
-        load_resources(args.db, args.knowledge_base_dir, memory_limit=args.memory_limit)
+        load_resources(args.db, args.knowledge_base_dir, memory_limit=args.memory_limit),
+        class_rank=args.class_rank,
     )
     with SqlRunner(args.db, timeout=args.timeout, memory_limit=args.memory_limit) as runner:
         results = run_questions(gold, predictions, linking, linker, runner)
@@ -224,8 +229,12 @@ def _evaluate_sql(args: argparse.Namespace) -> int:
     exposure = None
     if args.train_manifest:
         held_out = held_out_targets(json.loads(args.train_manifest.read_text()))
-        exposure = {g["question_id"]: train_exposure(g, held_out, linker.class_members)
-                    for g in gold}  # fmt: skip
+        exposure = {
+            g["question_id"]: train_exposure(
+                g, held_out, lambda c, n, g=g: linker.class_members(c, n, linker.rank_window(g))
+            )
+            for g in gold
+        }
     rep = report(results, gold, manifest, exposure)
     if exposure is not None:
         rep["train_manifest"] = str(args.train_manifest)
@@ -296,7 +305,8 @@ def _generate_sql(args: argparse.Namespace) -> int:
           f"fixed prefix {len(prefix)} tokens -> {out}")  # fmt: skip
 
     linker = EntityLinker(
-        load_resources(args.db, args.knowledge_base_dir, memory_limit=args.memory_limit)
+        load_resources(args.db, args.knowledge_base_dir, memory_limit=args.memory_limit),
+        class_rank=args.class_rank,
     )
 
     def progress(i: int, p: dict) -> None:
@@ -430,11 +440,17 @@ def main(argv: list[str] | None = None) -> int:
     sub = parser.add_subparsers(dest="command", required=True)
 
     for name, help_text in (
-        ("build-db", "load one month of Parquet into DuckDB and verify it against BigQuery"),
-        ("verify-db", "re-verify an existing database against the month's Parquet"),
+        ("build-db", "load months of Parquet into DuckDB and verify them against BigQuery"),
+        ("verify-db", "re-verify an existing database against the months' Parquet"),
     ):
         p = sub.add_parser(name, help=help_text)
-        p.add_argument("--raw-dir", type=Path, default=DEFAULT_MONTH_DIR)
+        p.add_argument(
+            "--raw-dir",
+            type=Path,
+            nargs="+",
+            default=[DEFAULT_MONTH_DIR],
+            help="one extract directory per month; several months must follow each other",
+        )
         p.add_argument("--db", type=Path, default=DEFAULT_DB)
         p.add_argument("--memory-limit", default="4GB")
         if name == "build-db":
@@ -599,6 +615,11 @@ def main(argv: list[str] | None = None) -> int:
         p.add_argument(
             "--allow-test", action="store_true", help="final evaluation only: allow test.jsonl"
         )
+        p.add_argument(
+            "--class-rank", choices=CLASS_RANKS, default="question",
+            help="calls that rank the members of a class: those of the question's time range "
+            "(default), or those of all the data (`data`: the rule of the September experiments)",
+        )  # fmt: skip
 
     for name, (_, help_text) in BUILDERS.items():
         sub.add_parser(name, help=help_text, add_help=False)  # listed only; dispatched above

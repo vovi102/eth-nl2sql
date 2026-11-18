@@ -14,25 +14,33 @@ the data cannot tell, or that it does not know the name (linking-labels.md §5, 
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import date, timedelta
 from pathlib import Path
 
 import duckdb
 
+from eth_nl2sql.ingest.bigquery import MONTH_NAMES
 from eth_nl2sql.ingest.bigquery_schema import SOURCE_TABLES
 from eth_nl2sql.linking.linker import EntityLinker, substitute_placeholders
 
 SCHEMA_MODES = ("full", "linked")
 ADDRESS_MENTIONS = ("entity", "address", "class", "literal_address")
 
-SYSTEM_PROMPT = """\
+SYSTEM_PROMPT_TEMPLATE = """\
 You write one DuckDB SQL query that answers a question about Ethereum mainnet data of \
-September 2026.
+{period}.
 Rules:
 - Use only the tables of the schema, without a schema prefix.
 - Timestamps are UTC.
 - Never filter tokens or entities by symbol or name; use the addresses the evidence gives.
 - Use standard SQL: no QUALIFY, no EXCLUDE, no list functions.
 - Reply with the query in a ```sql code block and nothing else."""
+
+
+def system_prompt(period: str) -> str:
+    """The system message for data of `period` (Window.label, e.g. "September 2026")."""
+    return SYSTEM_PROMPT_TEMPLATE.format(period=period)
+
 
 PLACEHOLDER_RULE = (
     "- Write a placeholder such as {E1} exactly as the evidence gives it, where a list of "
@@ -110,6 +118,7 @@ class PromptBuilder:
         self.linker = linker
         self.schema = schema
         res = linker.resources
+        self.period = res.data_window.label  # "September 2026", "September–October 2026"
         self.address_names = {
             a["address"]: (a["name_tag"], eid, a["is_contract"])
             for eid, rows in res.entity_addresses.items()
@@ -126,7 +135,7 @@ class PromptBuilder:
                 return out | {"decision": abstain[0], "answer": abstain[1]}
 
         tables = self._tables(record, options)
-        system = SYSTEM_PROMPT
+        system = system_prompt(self.period)
         if options.evidence and options.placeholders:
             system += "\n" + PLACEHOLDER_RULE
         parts = [f"### Schema\n{self.schema.ddl(tables)}"]
@@ -192,7 +201,7 @@ class PromptBuilder:
             key = m.get("placeholder") or m["target"]
             if m["type"] != "nil" and key not in seen:
                 seen.add(key)
-                lines.append(f'-- "{m["text"]}": {self._describe(m)}')
+                lines.append(f'-- "{m["text"]}": {self._describe(m, record)}')
 
         addressed = [m for m in record["mentions"] if m["type"] in ADDRESS_MENTIONS]
         tokens = [m for m in record["mentions"] if m["type"] == "token"]
@@ -223,16 +232,36 @@ class PromptBuilder:
                 f"AND {column} < TIMESTAMP '{end}'"
             )
         else:
-            lines.append("-- No time range: use all rows (the data holds September 2026 only).")
+            lines.append(f"-- No time range: use all rows (the data holds {self.period} only).")
         for w in record["warnings"]:
             if w.startswith("open_address_set:"):
                 lines.append(
                     "-- Warning: only the known addresses of this entity are listed; "
                     "the answer is a lower bound."
                 )
+            elif w == "time_outside_data:all":
+                lines.append(
+                    f"-- Warning: the data holds {self.period} only; this time range has no rows."
+                )
+            elif w == "time_outside_data:part":
+                lines.append(
+                    f"-- Warning: the data holds {self.period} only; the rows of this time range "
+                    "outside it are missing."
+                )
         return lines
 
-    def _describe(self, m: dict) -> str:
+    def _ranked_by(self, window: tuple[date, date] | None) -> str:
+        """How class members were ranked: "by calls in September" for all of a one-month
+        database (the text of the September experiments), else the period or the range."""
+        if window:
+            start, end = window
+            return f"by calls from {start} to {end - timedelta(days=1)}"
+        data = self.linker.resources.data_window
+        if (data.end - timedelta(days=1)).replace(day=1) == data.start.replace(day=1):
+            return f"by calls in {MONTH_NAMES[data.start.month - 1]}"
+        return f"by calls in {self.period}"
+
+    def _describe(self, m: dict, record: dict) -> str:
         res = self.linker.resources
         ph = "{" + m["placeholder"] + "}" if m.get("placeholder") else None
         if m["type"] == "literal_address":
@@ -255,7 +284,8 @@ class PromptBuilder:
             closed = "all" if e["address_set"] == "closed" else "the known"
             return f"{ph} = {closed} {n} addresses of {e['name']} ({e['kind']}{classes})"
         c = res.classes[m["target"]]
-        members = self.linker.class_members(m["target"], m["top_n"])
+        window = self.linker.rank_window(record)
+        members = self.linker.class_members(m["target"], m["top_n"], window)
         names = ", ".join(res.entities[eid]["name"] for eid, _ in members)
         n = len({a for _, addresses in members for a in addresses})
         why = (
@@ -265,7 +295,7 @@ class PromptBuilder:
         )
         return (
             f"{ph} = the {n} addresses of the top {m['top_n']} members of the class "
-            f'"{c["name_en"]}" by calls in September ({why}): {names}'
+            f'"{c["name_en"]}" {self._ranked_by(window)} ({why}): {names}'
         )
 
 

@@ -6,10 +6,11 @@ them, `candidates` aside. They need data/db/ethereum.duckdb and are skipped with
 
 from __future__ import annotations
 
+from datetime import date
 from pathlib import Path
 
 import pytest
-from conftest import FAKE, ROUTER, TOKEN
+from conftest import FAKE, OTHER, ROUTER, TOKEN, with_second_dex
 
 from eth_nl2sql.knowledge import entities as knowledge_base
 from eth_nl2sql.linking.linker import (
@@ -151,6 +152,51 @@ def test_placeholders_follow_order_and_share_targets(linker: EntityLinker) -> No
     assert addresses == {"E1": [TOKEN], "E2": [ROUTER]}
     sql = substitute_placeholders("to_address IN {E2} AND token_address IN {E1}", addresses)
     assert sql == f"to_address IN ('{ROUTER}') AND token_address IN ('{TOKEN}')"
+
+
+def test_resources_know_the_data_window(linker: EntityLinker) -> None:
+    window = linker.resources.data_window
+    assert (window.start, window.end) == (date(2026, 9, 1), date(2026, 9, 3))
+
+
+@pytest.mark.parametrize(
+    ("question", "question_rule", "data_rule"),
+    [
+        ("Top 1 DEX received how much ETH on September 2?", [OTHER], [ROUTER]),
+        ("Top 1 DEX received how much ETH on September 1?", [ROUTER], [ROUTER]),
+        ("Top 1 DEX received how much ETH?", [ROUTER], [ROUTER]),  # no time: all the data
+        ("Top 1 DEX received how much ETH in September?", [ROUTER], [ROUTER]),  # = all the data
+        ("Top 1 DEX received how much ETH from September 2 to 9?", [OTHER], [ROUTER]),  # cut
+    ],
+)
+def test_class_members_ranked_by_the_question_or_by_all_the_data(
+    db: Path, knowledge_base_dir: Path, question: str, question_rule: list, data_rule: list
+) -> None:
+    for rule, expected in (("question", question_rule), ("data", data_rule)):
+        linker = with_second_dex(
+            EntityLinker(load_resources(db, knowledge_base_dir), class_rank=rule)
+        )
+        assert linker.placeholder_addresses(linker.link(question)) == {"E1": expected}, rule
+
+
+def test_class_rank_is_checked(db: Path, knowledge_base_dir: Path) -> None:
+    with pytest.raises(ValueError, match="class_rank"):
+        EntityLinker(load_resources(db, knowledge_base_dir), class_rank="month")
+
+
+@pytest.mark.parametrize(
+    ("question", "warnings"),
+    [
+        ("Swapper nhận bao nhiêu ETH ngày 2/9?", []),
+        ("Swapper nhận bao nhiêu ETH từ 2/9 đến 4/9?", ["time_outside_data:part"]),
+        ("Swapper nhận bao nhiêu ETH trong tháng 10?", ["time_outside_data:all"]),
+        ("Swapper nhận bao nhiêu ETH?", []),
+    ],
+)
+def test_time_outside_the_data_is_a_warning(
+    linker: EntityLinker, question: str, warnings: list
+) -> None:
+    assert linker.link(question)["warnings"] == warnings
 
 
 # ---- the real database --------------------------------------------------------------------

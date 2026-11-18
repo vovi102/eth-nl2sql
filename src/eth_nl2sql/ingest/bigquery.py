@@ -30,6 +30,10 @@ log = logging.getLogger(__name__)
 
 SOURCE = "bigquery-public-data.crypto_ethereum"
 ROW_GROUP_ROWS = 500_000
+MONTH_NAMES = (
+    "January", "February", "March", "April", "May", "June", "July", "August", "September",
+    "October", "November", "December",
+)  # fmt: skip
 
 
 class ExtractError(RuntimeError):
@@ -177,6 +181,18 @@ class Window:
     @property
     def tag(self) -> str:
         return self.start.strftime("%Y%m")
+
+    @property
+    def label(self) -> str:
+        """The months covered: 'September 2026', 'September–October 2026', or
+        'December 2026–January 2027' (English names, whatever the locale)."""
+        last = self.end - timedelta(days=1)
+        first_name, last_name = MONTH_NAMES[self.start.month - 1], MONTH_NAMES[last.month - 1]
+        if (self.start.year, self.start.month) == (last.year, last.month):
+            return f"{first_name} {last.year}"
+        if self.start.year == last.year:
+            return f"{first_name}–{last_name} {last.year}"
+        return f"{first_name} {self.start.year}–{last_name} {last.year}"
 
 
 def _parity_sql(spec: Spec, table: str, quote: str) -> str:

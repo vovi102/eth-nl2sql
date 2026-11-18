@@ -285,8 +285,12 @@ def build(
     if leakage["violations"]:
         raise ValueError(f"leakage check: {leakage['violations']}")
 
-    # the linker and the schema open their own connections first (one DuckDB configuration)
-    linker = EntityLinker(load_resources(db, knowledge_base_dir, memory_limit=memory_limit))
+    # the linker and the schema open their own connections first (one DuckDB configuration).
+    # The phase-2 train data (September) ranked class members by all the data, as the gold of
+    # benchmark/build.py does (docs/multi-month-plan.md D3).
+    linker = EntityLinker(
+        load_resources(db, knowledge_base_dir, memory_limit=memory_limit), class_rank="data"
+    )
     builder = PromptBuilder(linker, load_schema(db))
     con = duckdb.connect(str(db), read_only=True)
     con.execute(f"SET memory_limit = '{memory_limit}'")

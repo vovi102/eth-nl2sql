@@ -17,6 +17,8 @@
 #    sets each run beside its phase-1 counterpart.
 #
 # Log: data/predictions/phase2/test/test-phase2.log; summary: test-phase2.summary.json beside it.
+# --class-rank data: the September runs ranked class members by the calls of all the data
+# (docs/multi-month-plan.md D3); the CLI default ranks by the question's time range.
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 
@@ -121,7 +123,7 @@ else
   mkdir -p "$P/recheck"
   RECHECK=$P/recheck/dev.predictions.prompts.$M3.$A3.jsonl
   log "dev check: 3B + $A3 on dev (about 14 min)"
-  uv run eth-nl2sql generate-sql --prompts data/prompts/dev.predictions.prompts.jsonl \
+  uv run eth-nl2sql generate-sql --class-rank data --prompts data/prompts/dev.predictions.prompts.jsonl \
     --adapter "$L3" --output "$RECHECK" > "$P/recheck/dev.$A3.log" 2>&1
   uv run python - "data/predictions/phase2/dev/dev.predictions.prompts.$M3.$A3.jsonl" "$RECHECK" <<'PY' | tee -a "$LOG"
 import json, sys
@@ -153,7 +155,7 @@ generate() {  # tag, server tag, model, adapter, prompts, output, extra generate
   fi
   ensure_server "$server" "$model" --lora "$PWD/$adapter" || { FAILED+=("$tag"); return 0; }
   log "$tag: generating -> $out"
-  if uv run eth-nl2sql generate-sql --allow-test --prompts "$prompts" --adapter "$adapter" \
+  if uv run eth-nl2sql generate-sql --class-rank data --allow-test --prompts "$prompts" --adapter "$adapter" \
     --output "$out" "$@" > "$P/test.phase2-$tag.log" 2>&1; then
     log "$tag: done"
   else
@@ -184,7 +186,7 @@ score() {  # predictions, extra evaluate-sql arguments
     return 0
   fi
   log "score: $pred"
-  uv run eth-nl2sql evaluate-sql --allow-test --gold data/benchmark/test.jsonl \
+  uv run eth-nl2sql evaluate-sql --class-rank data --allow-test --gold data/benchmark/test.jsonl \
     --predictions "$pred" --train-manifest data/train/manifest.json --report "$base.ex.json" \
     --details "$base.ex-details.jsonl" "$@" > "$base.ex.log" 2>&1 \
     || { log "score: FAILED, see $base.ex.log"; FAILED+=("score $pred"); }

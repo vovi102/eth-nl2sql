@@ -1,0 +1,613 @@
+{
+  "source": "bigquery-public-data.crypto_ethereum",
+  "window": {
+    "start": "2026-10-01",
+    "end_exclusive": "2026-11-01"
+  },
+  "project": "nl2sparql-thesis",
+  "queries": {
+    "blocks": "SELECT number, `hash`, parent_hash, timestamp, miner, size, gas_limit, gas_used,\ntransaction_count, base_fee_per_gas, blob_gas_used, excess_blob_gas\nFROM `bigquery-public-data.crypto_ethereum.blocks`\nWHERE timestamp >= TIMESTAMP '2026-10-01 00:00:00+00' AND timestamp < TIMESTAMP '2026-11-01 00:00:00+00'",
+    "transactions": "SELECT `hash`, nonce, transaction_index, from_address, to_address,\nCAST(value AS STRING) AS value, gas, gas_price, max_fee_per_gas,\nmax_priority_fee_per_gas, transaction_type, receipt_status, receipt_gas_used,\nreceipt_cumulative_gas_used, receipt_effective_gas_price, receipt_contract_address,\nmax_fee_per_blob_gas, receipt_blob_gas_price, receipt_blob_gas_used,\nARRAY_LENGTH(blob_versioned_hashes) AS blob_count, block_number, block_timestamp\nFROM `bigquery-public-data.crypto_ethereum.transactions`\nWHERE block_timestamp >= TIMESTAMP '2026-10-01 00:00:00+00' AND block_timestamp < TIMESTAMP '2026-11-01 00:00:00+00'",
+    "token_transfers": "SELECT transaction_hash, log_index, token_address, from_address, to_address, value,\nblock_number, block_timestamp\nFROM `bigquery-public-data.crypto_ethereum.token_transfers`\nWHERE block_timestamp >= TIMESTAMP '2026-10-01 00:00:00+00' AND block_timestamp < TIMESTAMP '2026-11-01 00:00:00+00'",
+    "contracts": "SELECT address, is_erc20, is_erc721, block_number, block_timestamp\nFROM `bigquery-public-data.crypto_ethereum.contracts`\nWHERE block_timestamp < TIMESTAMP '2026-11-01 00:00:00+00' AND address IN (\nSELECT to_address FROM `bigquery-public-data.crypto_ethereum.transactions` WHERE block_timestamp >= TIMESTAMP '2026-10-01 00:00:00+00' AND block_timestamp < TIMESTAMP '2026-11-01 00:00:00+00'\nUNION DISTINCT SELECT receipt_contract_address FROM `bigquery-public-data.crypto_ethereum.transactions` WHERE block_timestamp >= TIMESTAMP '2026-10-01 00:00:00+00' AND block_timestamp < TIMESTAMP '2026-11-01 00:00:00+00'\nUNION DISTINCT SELECT token_address FROM `bigquery-public-data.crypto_ethereum.token_transfers` WHERE block_timestamp >= TIMESTAMP '2026-10-01 00:00:00+00' AND block_timestamp < TIMESTAMP '2026-11-01 00:00:00+00')",
+    "tokens": "SELECT address, symbol, name, decimals, decimals_int, total_supply, token_standard,\nARRAY_TO_STRING(token_standards, '|') AS token_standards,\nARRAY_TO_STRING(protocols, '|') AS protocols, is_erc20, is_erc721, is_erc1155,\nimplementation_address, proxy_standard, creator_address, creation_transaction_hash,\nblock_number, block_timestamp\nFROM `bigquery-public-data.crypto_ethereum.tokens_latest`\nWHERE address IN (SELECT token_address FROM `bigquery-public-data.crypto_ethereum.token_transfers` WHERE block_timestamp >= TIMESTAMP '2026-10-01 00:00:00+00' AND block_timestamp < TIMESTAMP '2026-11-01 00:00:00+00')",
+    "amended_tokens": "SELECT address, symbol, name, decimals\nFROM `bigquery-public-data.crypto_ethereum.amended_tokens`\nWHERE address IN (SELECT token_address FROM `bigquery-public-data.crypto_ethereum.token_transfers` WHERE block_timestamp >= TIMESTAMP '2026-10-01 00:00:00+00' AND block_timestamp < TIMESTAMP '2026-11-01 00:00:00+00')"
+  },
+  "jobs": {
+    "blocks/all": {
+      "job_id": "7c03d61e-cff2-4663-bcf9-0a69f60a24b9",
+      "bytes_processed": 57960000,
+      "bytes_billed": 58720256,
+      "parity_job_id": "047d8152-855b-4c59-8b5a-f40731843ba5",
+      "parity_bytes_billed": 10485760,
+      "rows": 222451,
+      "finished_at": "2026-11-16T16:48:35.998000+00:00"
+    },
+    "transactions/2026-10-03": {
+      "job_id": "3128e248-20e1-41d6-b939-2b569f740b6f",
+      "bytes_processed": 511946556,
+      "bytes_billed": 512753664,
+      "parity_job_id": "c6ffb061-d418-4435-b9d6-ef13e2fbad73",
+      "parity_bytes_billed": 225443840,
+      "rows": 1562292,
+      "finished_at": "2026-11-16T16:48:38.036000+00:00"
+    },
+    "transactions/2026-10-01": {
+      "job_id": "950da135-7261-41ac-ac04-4cd1886a36af",
+      "bytes_processed": 637376692,
+      "bytes_billed": 637534208,
+      "parity_job_id": "b314d2e6-1b9f-4e33-bce6-2fe6df005f8d",
+      "parity_bytes_billed": 295698432,
+      "rows": 2036041,
+      "finished_at": "2026-11-16T16:48:40.632000+00:00"
+    },
+    "transactions/2026-10-04": {
+      "job_id": "d8f90430-be3d-401c-b7a2-78b92d1ebfad",
+      "bytes_processed": 575746756,
+      "bytes_billed": 576716800,
+      "parity_job_id": "e64695d8-f4bc-4301-a1cc-788e6448f97a",
+      "parity_bytes_billed": 221249536,
+      "rows": 1526358,
+      "finished_at": "2026-11-16T16:48:54.104000+00:00"
+    },
+    "transactions/2026-10-02": {
+      "job_id": "7c68ffe9-8681-4844-9d36-b0e895615784",
+      "bytes_processed": 669013604,
+      "bytes_billed": 670040064,
+      "parity_job_id": "80cb899e-eb78-4ba1-8611-33a580089ed7",
+      "parity_bytes_billed": 270532608,
+      "rows": 1875646,
+      "finished_at": "2026-11-16T16:48:37.221000+00:00"
+    },
+    "transactions/2026-10-05": {
+      "job_id": "f84c8524-4b2b-4fc1-b176-b7aff055b808",
+      "bytes_processed": 548516144,
+      "bytes_billed": 549453824,
+      "parity_job_id": "c78561cc-8c71-4e0e-949e-478dc07ea060",
+      "parity_bytes_billed": 255852544,
+      "rows": 1774270,
+      "finished_at": "2026-11-16T16:49:13.938000+00:00"
+    },
+    "transactions/2026-10-07": {
+      "job_id": "b24b543a-01df-41aa-862a-341128953a20",
+      "bytes_processed": 647067012,
+      "bytes_billed": 648019968,
+      "parity_job_id": "8c39a1ed-8b01-4f26-aa90-bc1bc8e20e1c",
+      "parity_bytes_billed": 284164096,
+      "rows": 1963594,
+      "finished_at": "2026-11-16T16:49:31.679000+00:00"
+    },
+    "transactions/2026-10-06": {
+      "job_id": "4703f9a2-1f27-4f8f-9c39-e4e67cdc14b4",
+      "bytes_processed": 706853072,
+      "bytes_billed": 707788800,
+      "parity_job_id": "9538c453-ddd7-4aa6-911f-00f3b2834f08",
+      "parity_bytes_billed": 283115520,
+      "rows": 1957602,
+      "finished_at": "2026-11-16T16:49:27.540000+00:00"
+    },
+    "transactions/2026-10-08": {
+      "job_id": "96e38a10-b2fd-46ff-bdcf-779522aab76e",
+      "bytes_processed": 617857508,
+      "bytes_billed": 618659840,
+      "parity_job_id": "400f9d79-848b-4be1-8839-14f4504a2e8e",
+      "parity_bytes_billed": 266338304,
+      "rows": 1837570,
+      "finished_at": "2026-11-16T16:49:48.907000+00:00"
+    },
+    "transactions/2026-10-09": {
+      "job_id": "676e5e55-510d-455c-bd3f-113854eccaf2",
+      "bytes_processed": 570548184,
+      "bytes_billed": 571473920,
+      "parity_job_id": "b5ec3ac7-3095-4605-a868-d57e3c5dfe14",
+      "parity_bytes_billed": 260046848,
+      "rows": 1801067,
+      "finished_at": "2026-11-16T16:49:57.165000+00:00"
+    },
+    "transactions/2026-10-11": {
+      "job_id": "7ba64301-ea84-43ac-bac2-d4f1998f1fc7",
+      "bytes_processed": 564757416,
+      "bytes_billed": 565182464,
+      "parity_job_id": "ab2d1d83-a3e0-45d5-b9d9-f83aef48bacf",
+      "parity_bytes_billed": 230686720,
+      "rows": 1597680,
+      "finished_at": "2026-11-16T16:50:15.761000+00:00"
+    },
+    "transactions/2026-10-10": {
+      "job_id": "059a87d5-62cf-4fad-a391-8ff7963b181b",
+      "bytes_processed": 540038192,
+      "bytes_billed": 541065216,
+      "parity_job_id": "c03c953b-8be9-4071-88b0-18670870abb7",
+      "parity_bytes_billed": 236978176,
+      "rows": 1645365,
+      "finished_at": "2026-11-16T16:50:16.133000+00:00"
+    },
+    "transactions/2026-10-12": {
+      "job_id": "08b10875-9629-4313-942c-872274b97258",
+      "bytes_processed": 587672676,
+      "bytes_billed": 588251136,
+      "parity_job_id": "b5972081-00d7-4258-a7a2-6f7fda982df1",
+      "parity_bytes_billed": 272629760,
+      "rows": 1882099,
+      "finished_at": "2026-11-16T16:50:29.703000+00:00"
+    },
+    "transactions/2026-10-13": {
+      "job_id": "69d019b6-92e9-40c9-9f4f-8a25ca8f02be",
+      "bytes_processed": 641286084,
+      "bytes_billed": 641728512,
+      "parity_job_id": "2b073f34-33d4-4ed1-9f21-6a66e3bccfd9",
+      "parity_bytes_billed": 281018368,
+      "rows": 1938056,
+      "finished_at": "2026-11-16T16:50:40.932000+00:00"
+    },
+    "transactions/2026-10-14": {
+      "job_id": "51a54228-bbb6-430e-b55a-99e960a8a92f",
+      "bytes_processed": 607594436,
+      "bytes_billed": 608174080,
+      "parity_job_id": "38039ebb-ac3b-4b17-901b-6401ad449721",
+      "parity_bytes_billed": 261095424,
+      "rows": 1803484,
+      "finished_at": "2026-11-16T16:50:50.439000+00:00"
+    },
+    "transactions/2026-10-15": {
+      "job_id": "ddf90001-72a1-43a4-ac16-e4816f8ea8fa",
+      "bytes_processed": 598524448,
+      "bytes_billed": 598736896,
+      "parity_job_id": "5ab87b1e-e4ab-4234-abc7-e9d6dd8a5964",
+      "parity_bytes_billed": 268435456,
+      "rows": 1857648,
+      "finished_at": "2026-11-16T16:50:50.589000+00:00"
+    },
+    "transactions/2026-10-16": {
+      "job_id": "06ae2685-78e7-41da-b54c-8d8094c96b86",
+      "bytes_processed": 689346680,
+      "bytes_billed": 689963008,
+      "parity_job_id": "cade3d5d-edf0-49d7-ac71-2a0c190da64a",
+      "parity_bytes_billed": 255852544,
+      "rows": 1770145,
+      "finished_at": "2026-11-16T16:51:15.802000+00:00"
+    },
+    "transactions/2026-10-17": {
+      "job_id": "fd23b295-440a-49dd-82a5-34f698524ce6",
+      "bytes_processed": 477739116,
+      "bytes_billed": 478150656,
+      "parity_job_id": "8225e190-2b3a-4e72-9f40-01c529384552",
+      "parity_bytes_billed": 226492416,
+      "rows": 1563246,
+      "finished_at": "2026-11-16T16:51:26.857000+00:00"
+    },
+    "transactions/2026-10-18": {
+      "job_id": "83236bb5-84c4-4e9c-b5e9-cae42a7735c3",
+      "bytes_processed": 598091144,
+      "bytes_billed": 598736896,
+      "parity_job_id": "23f73e2f-f3b4-4d3b-a033-b209aaf2d492",
+      "parity_bytes_billed": 230686720,
+      "rows": 1595980,
+      "finished_at": "2026-11-16T16:51:36.110000+00:00"
+    },
+    "transactions/2026-10-19": {
+      "job_id": "10aa48f0-fcbd-4e43-9f68-b59d55e6cf51",
+      "bytes_processed": 642688788,
+      "bytes_billed": 642777088,
+      "parity_job_id": "5818caf4-00a9-48c0-a63f-b8cceb380780",
+      "parity_bytes_billed": 252706816,
+      "rows": 1748461,
+      "finished_at": "2026-11-16T16:51:35.053000+00:00"
+    },
+    "transactions/2026-10-20": {
+      "job_id": "80e9396a-89eb-4fac-b7cd-70f5fe77673e",
+      "bytes_processed": 571022752,
+      "bytes_billed": 571473920,
+      "parity_job_id": "ca5ad408-fc8b-42b2-8822-40fa399ee98c",
+      "parity_bytes_billed": 266338304,
+      "rows": 1837571,
+      "finished_at": "2026-11-16T16:51:56.666000+00:00"
+    },
+    "transactions/2026-10-22": {
+      "job_id": "dd5bf7bd-bbef-47b7-b9fb-303de1d574bd",
+      "bytes_processed": 593262552,
+      "bytes_billed": 593494016,
+      "parity_job_id": "6ab15e79-a076-4a69-9aa7-11876c2650ef",
+      "parity_bytes_billed": 262144000,
+      "rows": 1812374,
+      "finished_at": "2026-11-16T16:52:15.552000+00:00"
+    },
+    "transactions/2026-10-21": {
+      "job_id": "a48e34b2-751a-4de9-878b-fe1cf6ea63f8",
+      "bytes_processed": 652395572,
+      "bytes_billed": 653262848,
+      "parity_job_id": "e512ce33-fb4d-45e9-92f0-60741b198273",
+      "parity_bytes_billed": 272629760,
+      "rows": 1883714,
+      "finished_at": "2026-11-16T16:52:15.773000+00:00"
+    },
+    "transactions/2026-10-23": {
+      "job_id": "4663b741-6848-46b6-852e-66ecb637b5b8",
+      "bytes_processed": 668053240,
+      "bytes_billed": 668991488,
+      "parity_job_id": "b6fe24a1-0d76-412f-b46d-31bd586ee1f6",
+      "parity_bytes_billed": 272629760,
+      "rows": 1886320,
+      "finished_at": "2026-11-16T16:52:18.132000+00:00"
+    },
+    "transactions/2026-10-24": {
+      "job_id": "c16da495-cdb7-417d-bade-df502dc1b1c2",
+      "bytes_processed": 581394608,
+      "bytes_billed": 581959680,
+      "parity_job_id": "705c2c2d-ae2b-4e01-9c9a-3c585fd31074",
+      "parity_bytes_billed": 248512512,
+      "rows": 1721702,
+      "finished_at": "2026-11-16T16:52:37.312000+00:00"
+    },
+    "transactions/2026-10-25": {
+      "job_id": "d2edbc6e-650d-404e-80df-9d1adc90b0cd",
+      "bytes_processed": 477514816,
+      "bytes_billed": 478150656,
+      "parity_job_id": "252074f1-4f30-43ca-9f2c-8e7534a80974",
+      "parity_bytes_billed": 222298112,
+      "rows": 1540685,
+      "finished_at": "2026-11-16T16:52:56.704000+00:00"
+    },
+    "transactions/2026-10-27": {
+      "job_id": "25367cf8-7c7e-4ca6-b86f-6e7cf2b81b91",
+      "bytes_processed": 600390520,
+      "bytes_billed": 600834048,
+      "parity_job_id": "73a3c5ab-c77e-43e8-9f30-dc5fbf717a26",
+      "parity_bytes_billed": 272629760,
+      "rows": 1889215,
+      "finished_at": "2026-11-16T16:53:01.029000+00:00"
+    },
+    "transactions/2026-10-26": {
+      "job_id": "e1729537-733f-4ce7-b9e5-d2cfce92df5e",
+      "bytes_processed": 621017924,
+      "bytes_billed": 621805568,
+      "parity_job_id": "e96488f9-c189-4064-bb9e-cb03c9369096",
+      "parity_bytes_billed": 257949696,
+      "rows": 1790542,
+      "finished_at": "2026-11-16T16:53:06.238000+00:00"
+    },
+    "transactions/2026-10-28": {
+      "job_id": "43b484ae-55e0-4020-b1f3-962fb8d155ed",
+      "bytes_processed": 733460924,
+      "bytes_billed": 734003200,
+      "parity_job_id": "47a8e5c9-c64f-4e4e-9031-e6789dc49c04",
+      "parity_bytes_billed": 289406976,
+      "rows": 1996106,
+      "finished_at": "2026-11-16T16:53:23.136000+00:00"
+    },
+    "transactions/2026-10-29": {
+      "job_id": "72f3dc01-9f21-4af4-92bb-563948cc0548",
+      "bytes_processed": 578078696,
+      "bytes_billed": 578813952,
+      "parity_job_id": "df6cfc4b-cf1b-4829-a53e-aa17690bc447",
+      "parity_bytes_billed": 253755392,
+      "rows": 1761646,
+      "finished_at": "2026-11-16T16:53:30.877000+00:00"
+    },
+    "transactions/2026-10-30": {
+      "job_id": "4a5df7c7-1210-4e72-93e7-5cb19982d51f",
+      "bytes_processed": 661726324,
+      "bytes_billed": 662700032,
+      "parity_job_id": "5e1fb4db-1049-461d-a730-9770bc537246",
+      "parity_bytes_billed": 271581184,
+      "rows": 1881506,
+      "finished_at": "2026-11-16T16:53:45.272000+00:00"
+    },
+    "transactions/2026-10-31": {
+      "job_id": "f69368d8-36ea-4995-b58a-4ee24f2a54d5",
+      "bytes_processed": 561918116,
+      "bytes_billed": 562036736,
+      "parity_job_id": "b2e3b71c-94a1-471c-be07-ebab6afddee8",
+      "parity_bytes_billed": 234881024,
+      "rows": 1627096,
+      "finished_at": "2026-11-16T16:53:48.425000+00:00"
+    },
+    "token_transfers/2026-10-01": {
+      "job_id": "af0fd672-f93f-49b8-88f0-74bd04084f36",
+      "bytes_processed": 1012843003,
+      "bytes_billed": 1012924416,
+      "parity_job_id": "75e74dee-aace-4262-a39c-a72ce759a23e",
+      "parity_bytes_billed": 522190848,
+      "rows": 3461091,
+      "finished_at": "2026-11-16T16:54:06.365000+00:00"
+    },
+    "token_transfers/2026-10-02": {
+      "job_id": "1c080fb7-85d1-4a3a-b8c8-62963ee3abe6",
+      "bytes_processed": 1147045390,
+      "bytes_billed": 1147142144,
+      "parity_job_id": "87782160-4f57-4e9b-974d-17b2c8ca8507",
+      "parity_bytes_billed": 621805568,
+      "rows": 4145489,
+      "finished_at": "2026-11-16T16:54:09.997000+00:00"
+    },
+    "token_transfers/2026-10-04": {
+      "job_id": "3ca24062-6be6-473b-97a3-23f7df80c572",
+      "bytes_processed": 1136553552,
+      "bytes_billed": 1136656384,
+      "parity_job_id": "9a11d751-0b03-43eb-8aad-351a9e172820",
+      "parity_bytes_billed": 555745280,
+      "rows": 3693478,
+      "finished_at": "2026-11-16T16:54:27.662000+00:00"
+    },
+    "token_transfers/2026-10-03": {
+      "job_id": "37e776c1-ada5-4094-aa6a-9bf948d2e018",
+      "bytes_processed": 1251198707,
+      "bytes_billed": 1251999744,
+      "parity_job_id": "cd8c1ee5-6f42-4ede-9537-017320c7beda",
+      "parity_bytes_billed": 640679936,
+      "rows": 4266535,
+      "finished_at": "2026-11-16T16:54:25.841000+00:00"
+    },
+    "token_transfers/2026-10-05": {
+      "job_id": "211048dd-91b2-4185-81b0-581a1308a580",
+      "bytes_processed": 1036767346,
+      "bytes_billed": 1037041664,
+      "parity_job_id": "7551d129-cac6-4d30-b350-e2fea92e0d6e",
+      "parity_bytes_billed": 519045120,
+      "rows": 3441161,
+      "finished_at": "2026-11-16T16:55:08.054000+00:00"
+    },
+    "token_transfers/2026-10-06": {
+      "job_id": "86299ada-e290-43bb-8c70-898ba76953fe",
+      "bytes_processed": 1136755308,
+      "bytes_billed": 1137704960,
+      "parity_job_id": "acb54b61-f6ec-4b33-b78d-cd2a80b2184d",
+      "parity_bytes_billed": 523239424,
+      "rows": 3462888,
+      "finished_at": "2026-11-16T16:55:26.780000+00:00"
+    },
+    "token_transfers/2026-10-07": {
+      "job_id": "fa7de82d-0f8b-4843-bacb-a097633e044e",
+      "bytes_processed": 989477163,
+      "bytes_billed": 989855744,
+      "parity_job_id": "d60ffb20-8dd2-45c4-b363-add000a0b3f5",
+      "parity_bytes_billed": 497025024,
+      "rows": 3291364,
+      "finished_at": "2026-11-16T16:55:32.226000+00:00"
+    },
+    "token_transfers/2026-10-08": {
+      "job_id": "11266f68-7410-48f9-bd58-52bbd5d2b22e",
+      "bytes_processed": 1046089057,
+      "bytes_billed": 1046478848,
+      "parity_job_id": "fc4756ba-c17a-488e-b466-a36c9211a604",
+      "parity_bytes_billed": 527433728,
+      "rows": 3481818,
+      "finished_at": "2026-11-16T16:55:38.857000+00:00"
+    },
+    "token_transfers/2026-10-09": {
+      "job_id": "ca715297-5eb4-4b3d-9040-a3f30d2fdb72",
+      "bytes_processed": 1143972266,
+      "bytes_billed": 1143996416,
+      "parity_job_id": "79fb459a-d895-4a47-9d4b-ebca51f468ef",
+      "parity_bytes_billed": 605028352,
+      "rows": 4061969,
+      "finished_at": "2026-11-16T16:56:06.780000+00:00"
+    },
+    "token_transfers/2026-10-11": {
+      "job_id": "5363e8d6-bb2f-46f8-9417-c204e871fb7b",
+      "bytes_processed": 1163954722,
+      "bytes_billed": 1164967936,
+      "parity_job_id": "2cacec81-66d8-47f2-8007-8f61d6c48e42",
+      "parity_bytes_billed": 533725184,
+      "rows": 3547416,
+      "finished_at": "2026-11-16T16:56:33.882000+00:00"
+    },
+    "token_transfers/2026-10-10": {
+      "job_id": "1b8a067b-e2e7-4407-8bf9-3856d8ec5f1f",
+      "bytes_processed": 1149222214,
+      "bytes_billed": 1149239296,
+      "parity_job_id": "43028784-921e-46db-8429-772210010297",
+      "parity_bytes_billed": 662700032,
+      "rows": 4425087,
+      "finished_at": "2026-11-16T16:56:26.754000+00:00"
+    },
+    "token_transfers/2026-10-12": {
+      "job_id": "853ed89a-c247-4577-b235-b23a6aee0e68",
+      "bytes_processed": 960740268,
+      "bytes_billed": 961544192,
+      "parity_job_id": "b04c7a3e-9efd-4fe0-8908-e026afc0426f",
+      "parity_bytes_billed": 551550976,
+      "rows": 3667176,
+      "finished_at": "2026-11-16T16:56:40.950000+00:00"
+    },
+    "token_transfers/2026-10-13": {
+      "job_id": "76a08857-a268-47af-9697-a358bd70ea55",
+      "bytes_processed": 1089517191,
+      "bytes_billed": 1090519040,
+      "parity_job_id": "d8fcf8a8-cb22-40ff-91ca-b5af74c436d2",
+      "parity_bytes_billed": 559939584,
+      "rows": 3720949,
+      "finished_at": "2026-11-16T16:57:18.491000+00:00"
+    },
+    "token_transfers/2026-10-15": {
+      "job_id": "fec85847-8d6d-459a-b3b6-bf49e575189a",
+      "bytes_processed": 1047227570,
+      "bytes_billed": 1047527424,
+      "parity_job_id": "5a4918db-b081-4ea6-be04-1b4f966054a4",
+      "parity_bytes_billed": 596639744,
+      "rows": 3980273,
+      "finished_at": "2026-11-16T16:57:41.640000+00:00"
+    },
+    "token_transfers/2026-10-14": {
+      "job_id": "47d907e7-5b26-4659-bdcb-678fa3788a52",
+      "bytes_processed": 1428432896,
+      "bytes_billed": 1429209088,
+      "parity_job_id": "81e83f4d-96dd-4f83-b4fc-160496fc3ae8",
+      "parity_bytes_billed": 696254464,
+      "rows": 4684081,
+      "finished_at": "2026-11-16T16:57:36.463000+00:00"
+    },
+    "token_transfers/2026-10-16": {
+      "job_id": "01d6e0e7-b65d-4369-81b4-fef6c7bcf136",
+      "bytes_processed": 1394996265,
+      "bytes_billed": 1395654656,
+      "parity_job_id": "cb52fb9d-c1e8-4d23-abe4-0d1eb3a9b550",
+      "parity_bytes_billed": 741343232,
+      "rows": 4997418,
+      "finished_at": "2026-11-16T16:57:47.307000+00:00"
+    },
+    "token_transfers/2026-10-17": {
+      "job_id": "316291eb-c3d2-4f10-a571-c0c8c57e75fb",
+      "bytes_processed": 1465058237,
+      "bytes_billed": 1465909248,
+      "parity_job_id": "ad3318b7-6e4d-46e1-87b1-7030a48829ed",
+      "parity_bytes_billed": 786432000,
+      "rows": 5324951,
+      "finished_at": "2026-11-16T16:58:23.165000+00:00"
+    },
+    "token_transfers/2026-10-18": {
+      "job_id": "6b1e8769-f1b9-4524-8957-3df34f647baa",
+      "bytes_processed": 1211965852,
+      "bytes_billed": 1212153856,
+      "parity_job_id": "363609a3-efed-43b0-9063-ea7a8931d80a",
+      "parity_bytes_billed": 644874240,
+      "rows": 4345015,
+      "finished_at": "2026-11-16T16:58:56.488000+00:00"
+    },
+    "token_transfers/2026-10-19": {
+      "job_id": "ffb34535-e392-426f-9191-b1fe54fb956b",
+      "bytes_processed": 1794098809,
+      "bytes_billed": 1794113536,
+      "parity_job_id": "ff4d93b1-9b0e-4521-9611-6230a21e21a0",
+      "parity_bytes_billed": 869269504,
+      "rows": 5914274,
+      "finished_at": "2026-11-16T16:58:56.782000+00:00"
+    },
+    "token_transfers/2026-10-20": {
+      "job_id": "e46afd88-58ec-48cc-921c-f3e22afba52a",
+      "bytes_processed": 1570871433,
+      "bytes_billed": 1571815424,
+      "parity_job_id": "71deb5f1-2694-4489-ad71-b5a8c686e33b",
+      "parity_bytes_billed": 925892608,
+      "rows": 6307161,
+      "finished_at": "2026-11-16T16:59:15.753000+00:00"
+    },
+    "token_transfers/2026-10-21": {
+      "job_id": "14b37518-f8e9-4ffd-a561-74c40673c862",
+      "bytes_processed": 1192311279,
+      "bytes_billed": 1193279488,
+      "parity_job_id": "143c4e21-44b5-4a0a-b9ea-8168dab22503",
+      "parity_bytes_billed": 584056832,
+      "rows": 3885587,
+      "finished_at": "2026-11-16T16:59:49.302000+00:00"
+    },
+    "token_transfers/2026-10-22": {
+      "job_id": "c9606300-f9f5-4ec6-89a9-a1e182e70e92",
+      "bytes_processed": 1194317110,
+      "bytes_billed": 1194328064,
+      "parity_job_id": "cb241540-1c78-48b0-b814-2d791994a7b4",
+      "parity_bytes_billed": 602931200,
+      "rows": 4013000,
+      "finished_at": "2026-11-16T17:00:12.645000+00:00"
+    },
+    "token_transfers/2026-10-23": {
+      "job_id": "70bb6305-a1b6-4a1b-a75d-be7010be39c3",
+      "bytes_processed": 1306203475,
+      "bytes_billed": 1306525696,
+      "parity_job_id": "62e53cce-3a01-481e-bf6e-796a5338d1d0",
+      "parity_bytes_billed": 703594496,
+      "rows": 4680655,
+      "finished_at": "2026-11-16T17:00:36.384000+00:00"
+    },
+    "token_transfers/2026-10-25": {
+      "job_id": "e14e2534-77f2-497d-b43b-bc17d3aca748",
+      "bytes_processed": 1194891770,
+      "bytes_billed": 1195376640,
+      "parity_job_id": "9346039d-fd54-4f17-9038-298f8e0ac8bf",
+      "parity_bytes_billed": 675282944,
+      "rows": 4499904,
+      "finished_at": "2026-11-16T17:00:56.641000+00:00"
+    },
+    "token_transfers/2026-10-24": {
+      "job_id": "47063f61-a554-4f01-a6c3-476571f76933",
+      "bytes_processed": 1604898041,
+      "bytes_billed": 1605369856,
+      "parity_job_id": "cdb35d4b-ca5a-4b1e-8948-88c0e2bd10ee",
+      "parity_bytes_billed": 756023296,
+      "rows": 5037705,
+      "finished_at": "2026-11-16T17:00:51.289000+00:00"
+    },
+    "token_transfers/2026-10-26": {
+      "job_id": "294731f8-5a31-4ddd-9907-cc0a446cd1e8",
+      "bytes_processed": 1584552565,
+      "bytes_billed": 1585446912,
+      "parity_job_id": "c23b902f-f989-4b86-b694-b53d067cada5",
+      "parity_bytes_billed": 822083584,
+      "rows": 5426103,
+      "finished_at": "2026-11-16T17:01:21.160000+00:00"
+    },
+    "token_transfers/2026-10-27": {
+      "job_id": "27940fb0-7599-4555-86f0-7c6b7a678967",
+      "bytes_processed": 1217149118,
+      "bytes_billed": 1217396736,
+      "parity_job_id": "515dfd27-9264-4222-b75c-eba1cb0dafc9",
+      "parity_bytes_billed": 665845760,
+      "rows": 4438698,
+      "finished_at": "2026-11-16T17:01:59.723000+00:00"
+    },
+    "token_transfers/2026-10-28": {
+      "job_id": "8bba4e10-86c4-49da-94c3-d00e6be9193c",
+      "bytes_processed": 1070824678,
+      "bytes_billed": 1071644672,
+      "parity_job_id": "bb217fc9-c43c-44ae-a59f-08f7505faaa7",
+      "parity_bytes_billed": 600834048,
+      "rows": 3998549,
+      "finished_at": "2026-11-16T17:02:10.535000+00:00"
+    },
+    "token_transfers/2026-10-29": {
+      "job_id": "72ec5348-c0f4-4eb3-91d3-c0218fb8a9d3",
+      "bytes_processed": 1318113123,
+      "bytes_billed": 1319108608,
+      "parity_job_id": "3116df95-7fad-4d82-b0f3-3193f1eeccfe",
+      "parity_bytes_billed": 612368384,
+      "rows": 4073111,
+      "finished_at": "2026-11-16T17:02:16.992000+00:00"
+    },
+    "contracts/all": {
+      "job_id": "d77be3f0-50bd-45f0-88a5-fe844c372be1",
+      "bytes_processed": 17664019774,
+      "bytes_billed": 17664311296,
+      "parity_job_id": "abccb9e9-f8ce-4d3c-8c79-8626304ca28f",
+      "parity_bytes_billed": 18874368,
+      "rows": 349803,
+      "finished_at": "2026-11-16T17:03:51.314000+00:00"
+    },
+    "tokens/all": {
+      "job_id": "37c14ef0-eec4-44dd-882b-327813b6a7e0",
+      "bytes_processed": 11922185645,
+      "bytes_billed": 11922309120,
+      "parity_job_id": "84ed0033-78e9-4774-a72f-9c3050261123",
+      "parity_bytes_billed": 10485760,
+      "rows": 106146,
+      "finished_at": "2026-11-16T17:03:51.129000+00:00"
+    },
+    "token_transfers/2026-10-30": {
+      "job_id": "9876c3b0-a895-4e57-a8ff-9207431f81e8",
+      "bytes_processed": 911202196,
+      "bytes_billed": 911212544,
+      "parity_job_id": "a2b30d57-5bca-48eb-8f5b-8781b35ea775",
+      "parity_bytes_billed": 466616320,
+      "rows": 3092409,
+      "finished_at": "2026-11-16T17:03:05.766000+00:00"
+    },
+    "amended_tokens/all": {
+      "job_id": "4e9cd537-9299-4773-bf4d-dbf6091d340e",
+      "bytes_processed": 8084399507,
+      "bytes_billed": 8084520960,
+      "parity_job_id": "556f0b57-cd54-4951-9971-9711e8dce2aa",
+      "parity_bytes_billed": 10485760,
+      "rows": 106146,
+      "finished_at": "2026-11-16T17:04:04.589000+00:00"
+    },
+    "token_transfers/2026-10-31": {
+      "job_id": "42b73632-c843-4cdd-98cd-5d4830685fab",
+      "bytes_processed": 986023987,
+      "bytes_billed": 986710016,
+      "parity_job_id": "0021eaac-d8bd-41a6-ba6b-340299162f92",
+      "parity_bytes_billed": 488636416,
+      "rows": 3246316,
+      "finished_at": "2026-11-16T17:03:30.917000+00:00"
+    }
+  },
+  "completed_at": "2026-11-16T17:10:31+00:00"
+}

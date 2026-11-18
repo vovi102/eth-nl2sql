@@ -1,7 +1,8 @@
 """The resources of entity linking, loaded once into memory.
 
-Everything comes from the link schema of data/db/ethereum.duckdb, plus September's call counts
-of every knowledge-base address (main.transactions, about half a second). The connection is
+Everything comes from the link schema of data/db/ethereum.duckdb, plus the call counts of every
+knowledge-base address per UTC day (main.transactions) and the data window (meta.build). The
+connection is
 read-only and closed as soon as the tables are in memory, so another process can reload the
 link schema (load-knowledge-base) between two runs. Unreviewed entities, needed only to tell
 'not_reviewed' from 'not_in_kb', are read from the knowledge-base CSVs.
@@ -12,10 +13,12 @@ from __future__ import annotations
 import math
 from collections import defaultdict
 from dataclasses import dataclass, field
+from datetime import date
 from pathlib import Path
 
 import duckdb
 
+from eth_nl2sql.ingest.bigquery import Window
 from eth_nl2sql.knowledge.entities import (
     ALIASES,
     ENTITIES,
@@ -44,7 +47,9 @@ class LinkingResources:
     tokens_by_norm: dict[str, list[str]]  # normalized symbol or name -> token addresses
     senses: dict[str, dict]  # sense_id -> property_senses row
     phrases: list[dict]  # property_phrases rows
-    address_calls: dict[str, int]  # September transactions whose to_address is the address
+    address_calls: dict[str, int]  # transactions of all the data whose to_address is the address
+    address_daily_calls: dict[str, dict[date, int]]  # the same per UTC day, days with calls only
+    data_window: Window  # the days the database holds (meta.build)
     unreviewed: dict[str, set[str]]  # alias_norm -> unreviewed (pending) entity ids
     _activity: dict[str, int] = field(default_factory=dict, repr=False)
 
@@ -64,8 +69,16 @@ class LinkingResources:
             {a["address"] for e in self.subtree(entity_id) for a in self.entity_addresses[e]}
         )
 
+    def calls(self, address: str, window: tuple[date, date] | None = None) -> int:
+        """Transactions calling the address in [start, end), or in all the data."""
+        if window is None:
+            return self.address_calls.get(address, 0)
+        start, end = window
+        days = self.address_daily_calls.get(address, {})
+        return sum(n for d, n in days.items() if start <= d < end)
+
     def activity(self, entity_id: str) -> int:
-        """September calls (to_address) of every address of the entity."""
+        """Calls (to_address) in all the data of every address of the entity."""
         if entity_id not in self._activity:
             self._activity[entity_id] = sum(
                 self.address_calls.get(a, 0) for a in self.addresses_of(entity_id)
@@ -125,12 +138,19 @@ def load_resources(
         )
         sense_rows = _rows(con, "SELECT * FROM link.property_senses")
         phrase_rows = _rows(con, "SELECT * FROM link.property_phrases")
-        address_calls = dict(
-            con.execute(
-                """SELECT to_address, count(*) FROM main.transactions
-                WHERE to_address IN (SELECT address FROM link.entity_addresses) GROUP BY 1"""
-            ).fetchall()
-        )
+        daily = con.execute(
+            """SELECT to_address, CAST(block_timestamp AS DATE), count(*) FROM main.transactions
+            WHERE to_address IN (SELECT address FROM link.entity_addresses) GROUP BY 1, 2"""
+        ).fetchall()
+        build = dict(con.execute("SELECT key, value FROM meta.build").fetchall())
+    address_daily_calls: dict[str, dict[date, int]] = defaultdict(dict)
+    address_calls: dict[str, int] = defaultdict(int)
+    for address, day, n in daily:
+        address_daily_calls[address][day] = n
+        address_calls[address] += n
+    data_window = Window(
+        date.fromisoformat(build["window_start"]), date.fromisoformat(build["window_end_exclusive"])
+    )
 
     canonical = {e["entity_id"]: e["canonical_id"] for e in entity_rows}
     entities: dict[str, dict] = {}
@@ -169,6 +189,8 @@ def load_resources(
         tokens_by_norm=dict(tokens_by_norm),
         senses={s["sense_id"]: s for s in sense_rows},
         phrases=phrase_rows,
-        address_calls=address_calls,
+        address_calls=dict(address_calls),
+        address_daily_calls=dict(address_daily_calls),
+        data_window=data_window,
         unreviewed=_unreviewed(Path(knowledge_base_dir), set(address_owner)),
     )

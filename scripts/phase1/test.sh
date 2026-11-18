@@ -17,6 +17,8 @@
 # 5. Stops llama-server, scores every run with evaluate-sql, writes a summary.
 #
 # Log: data/predictions/phase1/test/test-phase1.log; summary: test-phase1.summary.json beside it.
+# --class-rank data: the September runs ranked class members by the calls of all the data
+# (docs/multi-month-plan.md D3); the CLI default ranks by the question's time range.
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 
@@ -102,7 +104,7 @@ else
   mkdir -p "$P/recheck"
   RECHECK=$P/recheck/dev.predictions.prompts.$M3.jsonl
   log "dev check: default 3B configuration on dev (about 13 min)"
-  uv run eth-nl2sql generate-sql --prompts data/prompts/dev.predictions.prompts.jsonl \
+  uv run eth-nl2sql generate-sql --class-rank data --prompts data/prompts/dev.predictions.prompts.jsonl \
     --output "$RECHECK" > "$P/recheck/dev.3b.log" 2>&1
   uv run python - "$DEV/dev.predictions.prompts.$M3.jsonl" "$RECHECK" <<'PY' | tee -a "$LOG"
 import json, sys
@@ -136,7 +138,7 @@ build() {  # output, then build-prompts arguments
   shift
   if [ ! -s "$out" ]; then
     log "prompts: $out"
-    uv run eth-nl2sql build-prompts --allow-test "$@" --output "$out" >> "$LOG" 2>&1
+    uv run eth-nl2sql build-prompts --class-rank data --allow-test "$@" --output "$out" >> "$LOG" 2>&1
   fi
 }
 LINKED=data/linking/test.predictions.jsonl
@@ -156,7 +158,7 @@ generate() {  # model, tag, prompts, output, extra generate-sql arguments
   fi
   ensure_server "$model" || { FAILED+=("$tag"); return 0; }
   log "$tag: generating -> $out"
-  if uv run eth-nl2sql generate-sql --allow-test --prompts "$prompts" --output "$out" "$@" \
+  if uv run eth-nl2sql generate-sql --class-rank data --allow-test --prompts "$prompts" --output "$out" "$@" \
     > "$P/test.$tag.log" 2>&1; then
     log "$tag: done"
   else
@@ -199,7 +201,7 @@ score() {  # predictions, extra evaluate-sql arguments
     return 0
   fi
   log "score: $pred"
-  uv run eth-nl2sql evaluate-sql --allow-test --gold data/benchmark/test.jsonl \
+  uv run eth-nl2sql evaluate-sql --class-rank data --allow-test --gold data/benchmark/test.jsonl \
     --predictions "$pred" --report "$base.ex.json" --details "$base.ex-details.jsonl" "$@" \
     > "$base.ex.log" 2>&1 || { log "score: FAILED, see $base.ex.log"; FAILED+=("score $pred"); }
 }

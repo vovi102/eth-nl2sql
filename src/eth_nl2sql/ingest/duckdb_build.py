@@ -1,24 +1,39 @@
-"""Build the DuckDB database from one month of Parquet and verify it against the extract.
+"""Build the DuckDB database from one or more months of Parquet and verify it against the extracts.
 
 Three schemas:
 
-- main: the month's tables with the names, columns and values of the extract, i.e. of
+- main: the months' tables with the names, columns and values of the extract, i.e. of
   bigquery-public-data.crypto_ethereum. Only timestamps (UTC TIMESTAMP) and
   transactions.value (BigQuery NUMERIC, DECIMAL(38,0)) get native types; token amounts stay
   text, as in BigQuery, because they reach 78 digits. Gold SQL only touches these tables.
 - link: the reviewed entity knowledge base (data/entity_knowledge_base), per-token activity
   and the property-sense dictionary (data/schema/property_*.csv), the input of linking. It
   can be reloaded without rebuilding main.
-- meta: BigQuery's column descriptions, two example values per column, build provenance.
+- meta: BigQuery's column descriptions, two example values per column, build provenance
+  (window_start and window_end_exclusive bound the data).
+
+Several months must follow each other with no gap; each is one extract directory. The
+tables with a time column (blocks, transactions, token_transfers) do not overlap between
+months and are concatenated. The others hold what each month's extract saw, so they overlap
+(docs/multi-month-plan.md, D2):
+
+- contracts: every distinct row; a key (address, block_number) with two different rows stops
+  the build;
+- tokens, amended_tokens: an address seen by several extracts keeps the row of the newest
+  one, i.e. tokens_latest as of the latest extraction.
+
+With one month every table is loaded from its files unchanged, as before multi-month support.
 
 The build writes a new file and replaces the database only when every check passes:
 
 - the Parquet files match SHA256SUMS;
-- every parity.json aggregate, recomputed on the stored tables with the SQL BigQuery ran,
-  equals BigQuery's value (row and key counts, sums, per day);
-- each table's fingerprint (row count + sum of row hashes) equals its Parquet files', with
-  numbers compared as the text they were extracted as, so no value changed, vanished or
-  doubled on the way in;
+- every parity.json aggregate equals BigQuery's value (row and key counts, sums, per day). It
+  is recomputed with the SQL BigQuery ran on the stored tables, except for the tables merged
+  from several months, where it is recomputed on each month's files;
+- each table's fingerprint (row count + sum of row hashes) equals the one of its Parquet
+  files, merged as above, with numbers compared as the text they were extracted as, so no
+  value changed, vanished or doubled on the way in;
+- block numbers have no gap and merged tables have unique keys;
 - no dangling foreign keys: transactions -> blocks, token_transfers -> blocks and transactions.
 """
 
@@ -31,13 +46,14 @@ import os
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from datetime import date, datetime, timezone
+from itertools import pairwise
 from pathlib import Path
 
 import duckdb
 import pyarrow as pa
 
-from eth_nl2sql.ingest.bigquery import SPECS, Window, _files, duckdb_parity
-from eth_nl2sql.ingest.bigquery_schema import SOURCE_TABLES, TABLE_DESCRIPTIONS, column_descriptions
+from eth_nl2sql.ingest.bigquery import SPEC_BY_NAME, SPECS, Window, _files, duckdb_parity
+from eth_nl2sql.ingest.bigquery_schema import SOURCE_TABLES, column_descriptions, table_descriptions
 from eth_nl2sql.knowledge import entities as knowledge_base
 from eth_nl2sql.knowledge import property_senses
 
@@ -58,6 +74,8 @@ FOREIGN_KEYS = (
     ("transactions", "block_number", "blocks", "number"),
     ("token_transfers", "block_number", "blocks", "number"),
 )
+# Tables without a time column whose months overlap, merged so the newest extract wins.
+NEWEST_WINS = {"tokens": "address", "amended_tokens": "address"}
 EXAMPLE_ROWS = 200_000  # example values come from the first rows of each table
 
 
@@ -97,8 +115,53 @@ def month_window(raw_dir: Path) -> Window:
     return Window(date.fromisoformat(window["start"]), date.fromisoformat(window["end_exclusive"]))
 
 
-def _table_files(raw_dir: Path, window: Window) -> dict[str, list[Path]]:
-    return {s.name: [p for _, p in sorted(_files(s, raw_dir, window).items())] for s in SPECS}
+@dataclass(frozen=True)
+class Month:
+    raw_dir: Path
+    window: Window
+
+
+def months_of(raw_dirs: Path | str | list[Path]) -> list[Month]:
+    """The extract directories in time order; they must follow each other with no gap."""
+    dirs = [raw_dirs] if isinstance(raw_dirs, (str, Path)) else list(raw_dirs)
+    if not dirs:
+        raise DatabaseError("no raw directory given")
+    months = sorted((Month(Path(d), month_window(d)) for d in dirs), key=lambda m: m.window.start)
+    for a, b in pairwise(months):
+        if a.window.end != b.window.start:
+            raise DatabaseError(
+                f"months must follow each other: {a.raw_dir} ends on {a.window.end} "
+                f"(exclusive), {b.raw_dir} starts on {b.window.start}"
+            )
+    return months
+
+
+def data_window(months: list[Month]) -> Window:
+    return Window(months[0].window.start, months[-1].window.end)
+
+
+def _table_files(months: list[Month]) -> dict[str, list[list[Path]]]:
+    """Per table, the Parquet files of each month (one list per month, in time order)."""
+    return {
+        s.name: [[p for _, p in sorted(_files(s, m.raw_dir, m.window).items())] for m in months]
+        for s in SPECS
+    }
+
+
+def _source(table: str, by_month: list[list[Path]]) -> str:
+    """A FROM item with the table's Parquet rows of every month, merged (module docstring)."""
+    if len(by_month) == 1 or SPEC_BY_NAME[table].time_column:
+        return _read([p for files in by_month for p in files])
+    if table in NEWEST_WINS:
+        tagged = " UNION ALL BY NAME ".join(
+            f"SELECT *, {i} AS _month FROM {_read(files)}" for i, files in enumerate(by_month)
+        )
+        return (
+            "(SELECT * EXCLUDE (_month, _rank) FROM (SELECT *, row_number() OVER "
+            f"(PARTITION BY {_q(NEWEST_WINS[table])} ORDER BY _month DESC) AS _rank "
+            f"FROM ({tagged})) WHERE _rank = 1)"
+        )
+    return "(" + " UNION BY NAME ".join(f"SELECT * FROM {_read(f)}" for f in by_month) + ")"
 
 
 def _sha256(path: Path) -> str:
@@ -109,14 +172,15 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def check_sources(raw_dir: Path, window: Window) -> dict[str, dict]:
+def check_sources(month: Month) -> dict[str, dict]:
     """Every Parquet file of the month exists and matches SHA256SUMS."""
+    raw_dir = month.raw_dir
     expected = {}
     for line in (raw_dir / "SHA256SUMS").read_text().splitlines():
         if line.strip():
             digest, name = line.split(maxsplit=1)
             expected[name.lstrip("*")] = digest
-    paths = [p for files in _table_files(raw_dir, window).values() for p in files]
+    paths = [p for files in _table_files([month]).values() for p in files[0]]
     names = [str(p.relative_to(raw_dir)) for p in paths]
     missing = [n for n, p in zip(names, paths, strict=True) if not p.is_file() or n not in expected]
     if missing:
@@ -150,13 +214,18 @@ def _columns(con: duckdb.DuckDBPyConnection, table: str, source: str) -> list[Co
     return columns
 
 
-def _load(con: duckdb.DuckDBPyConnection, table: str, files: list[Path]) -> list[Column]:
-    columns = _columns(con, table, _read(files))
+def _load(con: duckdb.DuckDBPyConnection, table: str, by_month: list[list[Path]]) -> list[Column]:
+    source = _source(table, by_month)
+    columns = _columns(con, table, source)
     ddl = ", ".join(f"{_q(c.name)} {c.type}" for c in columns)
     exprs = ", ".join(f"{c.load} AS {_q(c.name)}" for c in columns)
     order = ", ".join(map(_q, ORDER_BY[table]))
     con.execute(f"CREATE TABLE main.{_q(table)} ({ddl})")
-    for path in files:  # one day at a time keeps every sort small
+    if len(by_month) > 1 and not SPEC_BY_NAME[table].time_column:
+        log.info("load %s (merged from %d months)", table, len(by_month))
+        con.execute(f"INSERT INTO main.{_q(table)} SELECT {exprs} FROM {source} ORDER BY {order}")
+        return columns
+    for path in (p for files in by_month for p in files):  # one day at a time: small sorts
         log.info("load %s", path.name)
         con.execute(
             f"INSERT INTO main.{_q(table)} SELECT {exprs} FROM {_read([path])} ORDER BY {order}"
@@ -164,19 +233,28 @@ def _load(con: duckdb.DuckDBPyConnection, table: str, files: list[Path]) -> list
     return columns
 
 
-def _verify(con: duckdb.DuckDBPyConnection, raw_dir: Path) -> dict:
-    """Fingerprints, BigQuery parity and foreign keys of the main schema."""
-    window = month_window(raw_dir)
-    expected = json.loads((raw_dir / "parity.json").read_text())["tables"]
+def _parity_problem(name: str, got: dict, expected: dict, where: str = "") -> list[str]:
+    if got == expected:
+        return []
+    days = sorted(d for d in set(got) | set(expected) if got.get(d) != expected.get(d))
+    return [f"{name}: parity aggregates differ from BigQuery{where} on {days}"]
+
+
+def _verify(con: duckdb.DuckDBPyConnection, raw_dirs: Path | list[Path]) -> dict:
+    """Fingerprints, BigQuery parity, keys and foreign keys of the main schema."""
+    months = months_of(raw_dirs)
+    window = data_window(months)
+    parity = [json.loads((m.raw_dir / "parity.json").read_text())["tables"] for m in months]
+    files = _table_files(months)
     problems: list[str] = []
     tables: dict[str, dict] = {}
     for spec in SPECS:
         log.info("verify %s", spec.name)
-        files = _table_files(raw_dir, window)[spec.name]
-        columns = _columns(con, spec.name, _read(files))
+        source = _source(spec.name, files[spec.name])
+        columns = _columns(con, spec.name, source)
         raw = con.execute(
             f"SELECT count(*), sum(hash({', '.join(c.raw for c in columns)})::HUGEINT) "
-            f"FROM {_read(files)}"
+            f"FROM {source}"
         ).fetchone()
         stored = con.execute(
             f"SELECT count(*), sum(hash({', '.join(c.stored for c in columns)})::HUGEINT) "
@@ -188,21 +266,32 @@ def _verify(con: duckdb.DuckDBPyConnection, raw_dir: Path) -> dict:
                 f"({stored[0]} rows stored, {raw[0]} in Parquet)"
             )
 
-        # The parity SQL is the text BigQuery ran, so numbers go back to the extracted text.
-        numeric = [c.name for c in columns if (spec.name, c.name) in NUMERIC_COLUMNS]
-        source = f"main.{_q(spec.name)}"
-        if numeric:
-            replace = ", ".join(f"CAST({_q(n)} AS VARCHAR) AS {_q(n)}" for n in numeric)
-            source = f"(SELECT * REPLACE ({replace}) FROM {source})"
-        got = duckdb_parity(con, spec, source)
-        if got != expected[spec.name]:
-            days = sorted(
-                d
-                for d in set(got) | set(expected[spec.name])
-                if got.get(d) != expected[spec.name].get(d)
-            )
-            problems.append(f"{spec.name}: parity aggregates differ from BigQuery on {days}")
+        if spec.time_column or len(months) == 1:
+            # The parity SQL is the text BigQuery ran, so numbers go back to the extracted text.
+            numeric = [c.name for c in columns if (spec.name, c.name) in NUMERIC_COLUMNS]
+            table = f"main.{_q(spec.name)}"
+            if numeric:
+                replace = ", ".join(f"CAST({_q(n)} AS VARCHAR) AS {_q(n)}" for n in numeric)
+                table = f"(SELECT * REPLACE ({replace}) FROM {table})"
+            expected = {day: agg for p in parity for day, agg in p[spec.name].items()}
+            problems += _parity_problem(spec.name, duckdb_parity(con, spec, table), expected)
+        else:
+            # A merged table is no month's extract: each month's files must match their parity,
+            # and the stored table is their merge (fingerprint above), with one row per key.
+            for m, by_month, p in zip(months, files[spec.name], parity, strict=True):
+                got = duckdb_parity(con, spec, _read(by_month))
+                problems += _parity_problem(spec.name, got, p[spec.name], f" in {m.raw_dir}")
+            key = spec.key.format(q='"')
+            clashes = con.execute(
+                f"SELECT count(*) - count(DISTINCT {key}) FROM main.{_q(spec.name)}"
+            ).fetchone()[0]
+            if clashes:
+                problems.append(f"{spec.name}: {clashes} keys with different rows across months")
         tables[spec.name] = {"rows": stored[0], "fingerprint": str(stored[1])}
+
+    gap = con.execute("SELECT max(number) - min(number) + 1 - count(*) FROM main.blocks").fetchone()
+    if gap[0]:
+        problems.append(f"blocks: {gap[0]} block numbers missing")
 
     foreign_keys = {}
     for child, col, parent, pcol in FOREIGN_KEYS:
@@ -348,7 +437,9 @@ def load_link(
     return {t: con.execute(f"SELECT count(*) FROM link.{t}").fetchone()[0] for (t,) in tables}
 
 
-def _load_meta(con: duckdb.DuckDBPyConnection, schema_file: Path) -> dict[str, int]:
+def _load_meta(
+    con: duckdb.DuckDBPyConnection, schema_file: Path, table_texts: dict[str, str]
+) -> dict[str, int]:
     descriptions = column_descriptions(schema_file)
     columns = con.execute(
         """SELECT table_name, column_name, column_index, data_type FROM duckdb_columns()
@@ -370,7 +461,7 @@ def _load_meta(con: duckdb.DuckDBPyConnection, schema_file: Path) -> dict[str, i
         "examples VARCHAR[])"
     )
     for table in SOURCE_TABLES:
-        description = TABLE_DESCRIPTIONS[table]
+        description = table_texts[table]
         con.execute(
             "INSERT INTO meta.tables VALUES (?, ?, ?)",
             [table, f"bigquery-public-data.crypto_ethereum.{SOURCE_TABLES[table]}", description],
@@ -407,7 +498,7 @@ def report_path(db_path: Path) -> Path:
 
 
 def build_database(
-    raw_dir: Path,
+    raw_dirs: Path | list[Path],
     db_path: Path,
     *,
     knowledge_base_dir: Path,
@@ -416,26 +507,32 @@ def build_database(
     verify_checksums: bool = True,
     memory_limit: str = "4GB",
 ) -> dict:
-    """Load one month into a fresh DuckDB file; it replaces db_path only if every check passes."""
-    raw_dir, db_path = Path(raw_dir), Path(db_path)
-    window = month_window(raw_dir)
-    sources = check_sources(raw_dir, window) if verify_checksums else {}
+    """Load one or more consecutive months into a fresh DuckDB file; it replaces db_path only
+    if every check passes."""
+    months, db_path = months_of(raw_dirs), Path(db_path)
+    window = data_window(months)
+    sources: dict[str, dict] = {}
+    if verify_checksums:
+        for m in months:  # with several months, names are prefixed by the month's directory
+            prefix = f"{m.raw_dir.name}/" if len(months) > 1 else ""
+            sources |= {prefix + name: info for name, info in check_sources(m).items()}
 
     db_path.parent.mkdir(parents=True, exist_ok=True)
     building = db_path.with_name(db_path.name + ".building")
     building.unlink(missing_ok=True)
     try:
         with _connect(building, memory_limit) as con:
-            for table, files in _table_files(raw_dir, window).items():
-                _load(con, table, files)
-            report = _verify(con, raw_dir)
-            report["meta"] = _load_meta(con, schema_file)
+            for table, by_month in _table_files(months).items():
+                _load(con, table, by_month)
+            report = _verify(con, [m.raw_dir for m in months])
+            texts = table_descriptions(window.label, len(months))
+            report["meta"] = _load_meta(con, schema_file, texts)
             report["link"] = load_link(con, knowledge_base_dir, property_senses_dir)
             con.execute("CREATE TABLE meta.build (key VARCHAR, value VARCHAR)")
             provenance = {
                 "built_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
                 "duckdb_version": duckdb.__version__,
-                "raw_dir": str(raw_dir),
+                "raw_dir": ", ".join(str(m.raw_dir) for m in months),
                 "window_start": window.start.isoformat(),
                 "window_end_exclusive": window.end.isoformat(),
             }
@@ -450,13 +547,15 @@ def build_database(
     return report
 
 
-def verify_database(db_path: Path, raw_dir: Path, *, memory_limit: str = "4GB") -> dict:
+def verify_database(
+    db_path: Path, raw_dirs: Path | list[Path], *, memory_limit: str = "4GB"
+) -> dict:
     """Re-run the fingerprint, parity and foreign-key checks against an existing database."""
     db_path = Path(db_path)
     if not db_path.is_file():
         raise DatabaseError(f"no database at {db_path}")
     with _connect(db_path, memory_limit, read_only=True) as con:
-        return _verify(con, Path(raw_dir))
+        return _verify(con, raw_dirs)
 
 
 def load_knowledge_base(

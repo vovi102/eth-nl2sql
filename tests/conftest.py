@@ -41,6 +41,7 @@ def addr(i: int) -> str:
 
 
 TOKEN, FAKE, ALICE, BOB, ROUTER = addr(1), addr(2), addr(10), addr(11), addr(20)
+OTHER = addr(21)  # a second DEX, added by with_second_dex
 STR, INT, BOOL, TS = pa.string(), pa.int64(), pa.bool_(), pa.timestamp("us", tz="UTC")
 
 
@@ -149,12 +150,12 @@ def month_tables(extra_transfer: bool = False) -> dict[str, dict]:
     return tables
 
 
-def write_month(raw_dir: Path, tables: dict[str, dict]) -> Path:
+def write_month(raw_dir: Path, tables: dict[str, dict], window: Window = WINDOW) -> Path:
     for spec in SPECS:
         cols = tables[spec.name]
         schema = pa.schema([(c, typ) for c, (typ, _) in cols.items()])
         data = pa.table({c: v for c, (_, v) in cols.items()}, schema=schema)
-        for day, path in _files(spec, raw_dir, WINDOW).items():
+        for day, path in _files(spec, raw_dir, window).items():
             rows = data
             if day != "all":
                 times = data.column(spec.time_column).to_pylist()
@@ -163,12 +164,12 @@ def write_month(raw_dir: Path, tables: dict[str, dict]) -> Path:
             path.parent.mkdir(parents=True, exist_ok=True)
             pq.write_table(rows, path)
 
-    window = {"start": WINDOW.start.isoformat(), "end_exclusive": WINDOW.end.isoformat()}
-    (raw_dir / "manifest.json").write_text(json.dumps({"window": window}))
+    bounds = {"start": window.start.isoformat(), "end_exclusive": window.end.isoformat()}
+    (raw_dir / "manifest.json").write_text(json.dumps({"window": bounds}))
     parity = {}
     with duckdb.connect(config={"TimeZone": "UTC"}) as con:
         for spec in SPECS:
-            files = list(_files(spec, raw_dir, WINDOW).values())
+            files = list(_files(spec, raw_dir, window).values())
             source = "read_parquet([" + ", ".join(f"'{p}'" for p in files) + "])"
             parity[spec.name] = duckdb_parity(con, spec, source)
     (raw_dir / "parity.json").write_text(json.dumps({"engine": "test", "tables": parity}))
@@ -362,3 +363,19 @@ def db(month_dir: Path, build, tmp_path: Path) -> Path:
     path = tmp_path / "db" / "ethereum.duckdb"
     build(month_dir, path)
     return path
+
+
+def with_second_dex(linker):
+    """A second DEX, Other: Swapper (ROUTER) is called 5 times on Sept 1, Other 3 times on
+    Sept 2, so Swapper leads over all the data and Other on Sept 2 alone."""
+    res = linker.resources
+    res.entities["other"] = res.entities["swapper"] | {
+        "entity_id": "other",
+        "canonical_id": "other",
+        "name": "Other",
+    }
+    (router,) = res.entity_addresses["swapper"]
+    res.entity_addresses["other"] = [router | {"entity_id": "other", "address": OTHER}]
+    res.address_daily_calls = {ROUTER: {date(2026, 9, 1): 5}, OTHER: {date(2026, 9, 2): 3}}
+    res.address_calls = {ROUTER: 5, OTHER: 3}
+    return linker

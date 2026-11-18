@@ -7,7 +7,7 @@ import re
 from pathlib import Path
 
 import pytest
-from conftest import ALICE, ROUTER, TOKEN
+from conftest import ALICE, ROUTER, TOKEN, with_second_dex
 
 from eth_nl2sql.linking.linker import EntityLinker
 from eth_nl2sql.linking.resources import load_resources
@@ -112,6 +112,52 @@ def test_token_evidence(builder: PromptBuilder) -> None:
 def test_schema_mode_is_checked() -> None:
     with pytest.raises(ValueError):
         PromptOptions(schema="some")
+
+
+def class_line(builder: PromptBuilder, question: str) -> str:
+    prompt = builder.build(builder.linker.link(question))
+    (line,) = [x for x in user_part(prompt, "Evidence").splitlines() if "of the class" in x]
+    return line
+
+
+@pytest.mark.parametrize(
+    ("rule", "question", "line"),
+    [
+        # the text of the September experiments: all of a one-month database
+        ("data", "Top 1 DEX received how much ETH on September 2?",
+         '-- "Top 1 DEX": {E1} = the 1 addresses of the top 1 members of the class '
+         '"decentralized exchange" by calls in September (N = 1 as asked): Swapper'),
+        ("question", "Top 1 DEX received how much ETH on September 2?",
+         '-- "Top 1 DEX": {E1} = the 1 addresses of the top 1 members of the class '
+         '"decentralized exchange" by calls from 2026-09-02 to 2026-09-02 (N = 1 as asked): Other'),
+        ("question", "Top 1 DEX received how much ETH?",
+         '-- "Top 1 DEX": {E1} = the 1 addresses of the top 1 members of the class '
+         '"decentralized exchange" by calls in September (N = 1 as asked): Swapper'),
+    ],
+)  # fmt: skip
+def test_class_evidence_says_how_members_were_ranked(
+    db: Path, knowledge_base_dir: Path, rule: str, question: str, line: str
+) -> None:
+    linker = with_second_dex(EntityLinker(load_resources(db, knowledge_base_dir), class_rank=rule))
+    assert class_line(PromptBuilder(linker, load_schema(db)), question) == line
+
+
+def test_prompt_names_the_months_of_the_data(builder: PromptBuilder) -> None:
+    prompt = builder.build(builder.linker.link("Swapper nhận bao nhiêu ETH trong tháng 10?"))
+    system = prompt["messages"][0]["content"]
+    assert system.startswith(
+        "You write one DuckDB SQL query that answers a question about Ethereum mainnet data of "
+        "September 2026.\nRules:"
+    )
+    assert user_part(prompt, "Evidence").splitlines()[-1] == (
+        "-- Warning: the data holds September 2026 only; this time range has no rows."
+    )
+    # a period that crosses into a month the data lacks
+    builder.period = "September–October 2026"
+    record = builder.linker.link("Swapper nhận bao nhiêu ETH?")
+    assert user_part(builder.build(record), "Evidence").splitlines()[-1] == (
+        "-- No time range: use all rows (the data holds September–October 2026 only)."
+    )
 
 
 # ---- the real database --------------------------------------------------------------------

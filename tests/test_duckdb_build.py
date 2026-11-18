@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime
+from datetime import date, datetime, timezone
 from decimal import Decimal
 from pathlib import Path
 
@@ -9,18 +9,22 @@ import duckdb
 import pyarrow.parquet as pq
 import pytest
 from conftest import (
+    ALICE,
     BOB,
     FAKE,
     ROUTER,
     TOKEN,
     UINT256_MAX,
     WEI_24,
+    addr,
     h,
     month_tables,
+    ts,
     write_month,
     write_sums,
 )
 
+from eth_nl2sql.ingest.bigquery import Window
 from eth_nl2sql.ingest.duckdb_build import (
     DatabaseError,
     load_knowledge_base,
@@ -183,6 +187,145 @@ def test_load_knowledge_base_reloads_only_link(
     ]
     assert json.loads(report_path(db).read_text())["link"]["entities"] == 2
     assert query(db, "SELECT count(*) FROM transactions") == [(3,)]
+
+
+# ---- several months --------------------------------------------------------------------
+
+NEXT_WINDOW = Window(date(2026, 9, 3), date(2026, 9, 5))  # follows the fixture's days 1-2
+NEW_TOKEN = addr(3)
+
+
+def next_month_tables(router_is_erc20: bool = False) -> dict[str, dict]:
+    """Days 3-4, after the fixture month: blocks 103-104 and two transactions. The extract
+    sees TOKEN and ROUTER again (same contract rows, TOKEN with a newer total supply), and a
+    new token; the copycat FAKE is not transferred."""
+    t = month_tables()
+
+    def put(table: str, n: int, **values: list) -> None:
+        for col, (typ, old) in t[table].items():
+            t[table][col] = (typ, values.get(col, old[:n]))
+
+    put(
+        "blocks",
+        2,
+        number=[103, 104],
+        hash=[h(103), h(104)],
+        parent_hash=[h(102), h(103)],
+        timestamp=[ts(3), ts(4)],
+        transaction_count=[1, 1],
+    )
+    put(
+        "transactions",
+        2,
+        hash=[h(4), h(5)],
+        from_address=[ALICE, BOB],
+        to_address=[ROUTER, TOKEN],
+        receipt_contract_address=[None, None],
+        block_number=[103, 104],
+        block_timestamp=[ts(3), ts(4)],
+    )
+    put(
+        "token_transfers",
+        2,
+        transaction_hash=[h(4), h(5)],
+        log_index=[0, 0],
+        token_address=[NEW_TOKEN, TOKEN],
+        from_address=[ROUTER, BOB],
+        to_address=[ALICE, ALICE],
+        value=["9", "7"],
+        block_number=[103, 104],
+        block_timestamp=[ts(3), ts(4)],
+    )
+    created = t["contracts"]["block_timestamp"][1][:2] + [datetime(2025, 1, 1, tzinfo=timezone.utc)]
+    put(
+        "contracts",
+        3,
+        address=[TOKEN, ROUTER, NEW_TOKEN],
+        is_erc20=[True, router_is_erc20, True],
+        is_erc721=[False] * 3,
+        block_number=[4634748, 100, 50],
+        block_timestamp=created,
+    )
+    first = {col: values[0] for col, (_, values) in t["tokens"].items()}
+    rows = [
+        first | {"total_supply": "200000000000000"},
+        first | {"address": NEW_TOKEN, "symbol": "NEW", "name": "New"},
+    ]
+    put("tokens", 2, **{col: [r[col] for r in rows] for col in first})
+    put(
+        "amended_tokens",
+        2,
+        address=[TOKEN, NEW_TOKEN],
+        symbol=["USDT", "NEW"],
+        name=["Tether USD", "New"],
+        decimals=["6", "18"],
+    )
+    return t
+
+
+@pytest.fixture
+def next_month_dir(tmp_path: Path) -> Path:
+    return write_month(tmp_path / "raw-next", next_month_tables(), NEXT_WINDOW)
+
+
+def test_two_months_build_one_database(
+    month_dir: Path, next_month_dir: Path, build, tmp_path: Path
+) -> None:
+    db = tmp_path / "two.duckdb"
+    report = build([next_month_dir, month_dir], db)  # any order: sorted by window
+    assert {t: info["rows"] for t, info in report["tables"].items()} == {
+        "blocks": 5,
+        "transactions": 5,
+        "token_transfers": 6,
+        "contracts": 3,  # TOKEN and ROUTER are seen by both extracts
+        "tokens": 3,
+        "amended_tokens": 3,
+    }
+    assert "raw-next/tokens/tokens_2026-09.parquet" in report["sources"]
+    assert "raw/tokens/tokens_2026-09.parquet" in report["sources"]
+    # A token seen by both extracts keeps the newest row; the copycat keeps its only one.
+    assert query(db, "SELECT address, total_supply FROM tokens ORDER BY address") == [
+        (TOKEN, "200000000000000"),
+        (FAKE, "1"),
+        (NEW_TOKEN, "100000000000000"),
+    ]
+    build_rows = dict(query(db, "SELECT key, value FROM meta.build"))
+    assert (build_rows["window_start"], build_rows["window_end_exclusive"]) == (
+        "2026-09-01",
+        "2026-09-05",
+    )
+    assert query(db, "SELECT description FROM meta.tables WHERE table_name = 'tokens'") == [
+        (
+            "Metadata of every token with a transfer in September 2026, as of the latest "
+            "extraction (tokens_latest).",
+        )
+    ]
+    verify_database(db, [month_dir, next_month_dir])
+
+
+def test_months_must_follow_each_other(month_dir: Path, build, tmp_path: Path) -> None:
+    later = write_month(
+        tmp_path / "later", next_month_tables(), Window(date(2026, 9, 4), date(2026, 9, 6))
+    )
+    with pytest.raises(DatabaseError, match="months must follow each other"):
+        build([month_dir, later], tmp_path / "x.duckdb")
+
+
+def test_contract_rows_that_differ_between_months_stop_the_build(
+    month_dir: Path, build, tmp_path: Path
+) -> None:
+    clash = write_month(tmp_path / "clash", next_month_tables(router_is_erc20=True), NEXT_WINDOW)
+    with pytest.raises(DatabaseError, match="contracts: 1 keys with different rows"):
+        build([month_dir, clash], tmp_path / "x.duckdb")
+    assert not (tmp_path / "x.duckdb").exists()
+
+
+def test_one_month_in_a_list_builds_the_same_tables(
+    month_dir: Path, db: Path, build, tmp_path: Path
+) -> None:
+    again = build([month_dir], tmp_path / "again.duckdb")
+    assert again["tables"] == json.loads(report_path(db).read_text())["tables"]
+    assert "transactions/transactions_2026-09-01.parquet" in again["sources"]
 
 
 def test_checksums_cover_every_file(month_dir: Path) -> None:
