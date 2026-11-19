@@ -1,0 +1,10 @@
+{
+  "knowledge_base_version": {
+    "data/entity_knowledge_base/entity_classes.csv": "f9cf799365ecbda77f51e96b5dddff021a8bfba1faee96c75c29fe21b301301e",
+    "data/entity_knowledge_base/entities.csv": "5e478abf412926164c80ce5a3ce3b1be4c7f44e29a050a7d6ddaf2ce1029e526",
+    "data/entity_knowledge_base/entity_addresses.csv": "60038c74be60a7ff7113b891c1791095f17f4a51a297a1d5fa7fdd02898ff91a",
+    "data/entity_knowledge_base/entity_aliases.csv": "f27579fc7ca7200e200bfe7dc71d8cbccac7e450a613fee1f826458c56dcacb4",
+    "data/schema/property_senses.csv": "a4cbea1cd16df35226671bcbfa3228fdd388761b5d07c09d3cb443a826908f93",
+    "data/schema/property_phrases.csv": "84eb8c8c874ab23846ca1a9d905cce59ed22c7a82b069ede01141621fabb9fa3"
+  }
+}

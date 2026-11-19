@@ -1,0 +1,293 @@
+{
+  "questions": 177,
+  "mentions_strict": {
+    "precision": 0.9560975609756097,
+    "recall": 0.9849246231155779,
+    "f1": 0.9702970297029703,
+    "tp": 196,
+    "pred": 205,
+    "gold": 199
+  },
+  "mentions_loose": {
+    "precision": 0.9560975609756097,
+    "recall": 0.9849246231155779,
+    "f1": 0.9702970297029703,
+    "tp": 196,
+    "pred": 205,
+    "gold": 199
+  },
+  "entity_accuracy_at_1": {
+    "accuracy": 0.9842931937172775,
+    "hits": 188,
+    "total": 191
+  },
+  "entity_accuracy_at_1_by_type": {
+    "address": {
+      "accuracy": 0.975609756097561,
+      "hits": 40,
+      "total": 41
+    },
+    "class": {
+      "accuracy": 1.0,
+      "hits": 28,
+      "total": 28
+    },
+    "entity": {
+      "accuracy": 1.0,
+      "hits": 50,
+      "total": 50
+    },
+    "literal_address": {
+      "accuracy": 1.0,
+      "hits": 12,
+      "total": 12
+    },
+    "token": {
+      "accuracy": 0.9666666666666667,
+      "hits": 58,
+      "total": 60
+    }
+  },
+  "entity_recall_at_5": {
+    "accuracy": 0.9842931937172775,
+    "hits": 188,
+    "total": 191
+  },
+  "nil_accuracy": {
+    "accuracy": 1.0,
+    "hits": 8,
+    "total": 8
+  },
+  "nil_reason_accuracy": {
+    "accuracy": 1.0,
+    "hits": 8,
+    "total": 8
+  },
+  "class_accuracy": {
+    "accuracy": 1.0,
+    "hits": 28,
+    "total": 28
+  },
+  "properties": {
+    "precision": 0.9976798143851509,
+    "recall": 0.9953703703703703,
+    "f1": 0.996523754345307,
+    "tp": 430,
+    "pred": 431,
+    "gold": 432
+  },
+  "properties_explicit": {
+    "precision": 1.0,
+    "recall": 0.9970326409495549,
+    "f1": 0.9985141158989599,
+    "tp": 336,
+    "pred": 336,
+    "gold": 337
+  },
+  "time_accuracy": {
+    "accuracy": 1.0,
+    "hits": 177,
+    "total": 177
+  },
+  "unsupported_accuracy": {
+    "accuracy": 1.0,
+    "hits": 177,
+    "total": 177
+  },
+  "by_lang": {
+    "en": {
+      "questions": 86,
+      "mentions_strict": {
+        "precision": 0.9306930693069307,
+        "recall": 0.9791666666666666,
+        "f1": 0.9543147208121827,
+        "tp": 94,
+        "pred": 101,
+        "gold": 96
+      },
+      "mentions_loose": {
+        "precision": 0.9306930693069307,
+        "recall": 0.9791666666666666,
+        "f1": 0.9543147208121827,
+        "tp": 94,
+        "pred": 101,
+        "gold": 96
+      },
+      "entity_accuracy_at_1": {
+        "accuracy": 0.9782608695652174,
+        "hits": 90,
+        "total": 92
+      },
+      "entity_accuracy_at_1_by_type": {
+        "address": {
+          "accuracy": 0.9473684210526315,
+          "hits": 18,
+          "total": 19
+        },
+        "class": {
+          "accuracy": 1.0,
+          "hits": 14,
+          "total": 14
+        },
+        "entity": {
+          "accuracy": 1.0,
+          "hits": 25,
+          "total": 25
+        },
+        "literal_address": {
+          "accuracy": 1.0,
+          "hits": 6,
+          "total": 6
+        },
+        "token": {
+          "accuracy": 0.9642857142857143,
+          "hits": 27,
+          "total": 28
+        }
+      },
+      "entity_recall_at_5": {
+        "accuracy": 0.9782608695652174,
+        "hits": 90,
+        "total": 92
+      },
+      "nil_accuracy": {
+        "accuracy": 1.0,
+        "hits": 4,
+        "total": 4
+      },
+      "nil_reason_accuracy": {
+        "accuracy": 1.0,
+        "hits": 4,
+        "total": 4
+      },
+      "class_accuracy": {
+        "accuracy": 1.0,
+        "hits": 14,
+        "total": 14
+      },
+      "properties": {
+        "precision": 0.9951456310679612,
+        "recall": 0.9903381642512077,
+        "f1": 0.9927360774818401,
+        "tp": 205,
+        "pred": 206,
+        "gold": 207
+      },
+      "properties_explicit": {
+        "precision": 1.0,
+        "recall": 0.9938271604938271,
+        "f1": 0.9969040247678018,
+        "tp": 161,
+        "pred": 161,
+        "gold": 162
+      },
+      "time_accuracy": {
+        "accuracy": 1.0,
+        "hits": 86,
+        "total": 86
+      },
+      "unsupported_accuracy": {
+        "accuracy": 1.0,
+        "hits": 86,
+        "total": 86
+      }
+    },
+    "vi": {
+      "questions": 91,
+      "mentions_strict": {
+        "precision": 0.9807692307692307,
+        "recall": 0.9902912621359223,
+        "f1": 0.9855072463768114,
+        "tp": 102,
+        "pred": 104,
+        "gold": 103
+      },
+      "mentions_loose": {
+        "precision": 0.9807692307692307,
+        "recall": 0.9902912621359223,
+        "f1": 0.9855072463768114,
+        "tp": 102,
+        "pred": 104,
+        "gold": 103
+      },
+      "entity_accuracy_at_1": {
+        "accuracy": 0.98989898989899,
+        "hits": 98,
+        "total": 99
+      },
+      "entity_accuracy_at_1_by_type": {
+        "address": {
+          "accuracy": 1.0,
+          "hits": 22,
+          "total": 22
+        },
+        "class": {
+          "accuracy": 1.0,
+          "hits": 14,
+          "total": 14
+        },
+        "entity": {
+          "accuracy": 1.0,
+          "hits": 25,
+          "total": 25
+        },
+        "literal_address": {
+          "accuracy": 1.0,
+          "hits": 6,
+          "total": 6
+        },
+        "token": {
+          "accuracy": 0.96875,
+          "hits": 31,
+          "total": 32
+        }
+      },
+      "entity_recall_at_5": {
+        "accuracy": 0.98989898989899,
+        "hits": 98,
+        "total": 99
+      },
+      "nil_accuracy": {
+        "accuracy": 1.0,
+        "hits": 4,
+        "total": 4
+      },
+      "nil_reason_accuracy": {
+        "accuracy": 1.0,
+        "hits": 4,
+        "total": 4
+      },
+      "class_accuracy": {
+        "accuracy": 1.0,
+        "hits": 14,
+        "total": 14
+      },
+      "properties": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "tp": 225,
+        "pred": 225,
+        "gold": 225
+      },
+      "properties_explicit": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "tp": 175,
+        "pred": 175,
+        "gold": 175
+      },
+      "time_accuracy": {
+        "accuracy": 1.0,
+        "hits": 91,
+        "total": 91
+      },
+      "unsupported_accuracy": {
+        "accuracy": 1.0,
+        "hits": 91,
+        "total": 91
+      }
+    }
+  }
+}
