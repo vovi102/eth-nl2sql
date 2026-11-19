@@ -298,7 +298,7 @@ def build(
     # 2. fillers
     files = bb.knowledge_base_files(knowledge_base_dir, property_senses_dir)
     version = bb.knowledge_base_version(files)
-    link = bb.load_link_tables(con)
+    link = bb.load_link_tables(con, class_rank="data")  # the rule of the September data
     fillers = bb.load_fillers(con, link, knowledge_base_dir)
     candidates = holdout_candidates(fillers, link)
     held = holdout_entities(candidates, holdout, seed)

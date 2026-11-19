@@ -12,12 +12,16 @@ import re
 import threading
 import time
 import unicodedata
+from datetime import timedelta
 
 import duckdb
 import sqlglot
 from sqlglot import exp
 
+from eth_nl2sql.ingest.bigquery import Window
 from eth_nl2sql.linking.linker import PLACEHOLDER_RE
+
+SEPTEMBER = Window.month("2026-09")  # the data of the September benchmark, the default
 
 FORBIDDEN_RE = re.compile(r"(?i)\b(QUALIFY|EXCLUDE|list_\w+)\b")
 ORDER_BY_RE = re.compile(r"(?is)\bORDER BY\b(.*?)(?:\bLIMIT\b|$)")
@@ -61,8 +65,16 @@ def _check_span(item: dict, question: str, where: str) -> list[str]:
     return []
 
 
-def check_record(record: dict, senses: dict[str, str]) -> list[str]:
-    """Problems with a record against docs/linking-labels.md; `senses` maps sense_id -> kind."""
+def _bounds(window: Window) -> tuple[str, str]:
+    """The calendar months of the data window (a database holds whole months)."""
+    months = window.months
+    end = (months[-1].replace(day=28) + timedelta(days=4)).replace(day=1)
+    return f"{months[0]}T00:00:00", f"{end}T00:00:00"
+
+
+def check_record(record: dict, senses: dict[str, str], window: Window = SEPTEMBER) -> list[str]:
+    """Problems with a record against docs/linking-labels.md; `senses` maps sense_id -> kind,
+    and the time range must lie in the data `window`."""
     errors = []
     question = record["question"]
     if unicodedata.normalize("NFC", question) != question:
@@ -102,8 +114,9 @@ def check_record(record: dict, senses: dict[str, str]) -> list[str]:
     if record["time"] is not None:
         t = record["time"]
         errors += _check_span(t, question, "time")
-        if not "2026-09-01T00:00:00" <= t["start"] < t["end"] <= "2026-10-01T00:00:00":
-            errors.append(f"time [{t['start']}, {t['end']}) outside September 2026")
+        first, end = _bounds(window)
+        if not first <= t["start"] < t["end"] <= end:
+            errors.append(f"time [{t['start']}, {t['end']}) outside {window.label}")
     answerable = not record["unsupported"] and all(m["type"] != "nil" for m in record["mentions"])
     if answerable != (record["gold_sql"] is not None):
         errors.append("gold_sql must exist exactly when the question is answerable")
@@ -188,7 +201,6 @@ DIRECTION_RE = re.compile(r"\b(to|from)_address (IN \{E\d+\}|= '0x)")
 TIME_RE = re.compile(
     r"\b(block_timestamp|timestamp) >= TIMESTAMP '[^']+' AND \1 < TIMESTAMP '[^']+'"
 )
-WHOLE_MONTH = ("2026-09-01T00:00:00", "2026-10-01T00:00:00")
 
 
 def reversed_tie_break(sql: str) -> str | None:
@@ -207,12 +219,13 @@ def reversed_tie_break(sql: str) -> str | None:
     return tree.sql(dialect="duckdb")
 
 
-def wrong_variants(record: dict) -> dict[str, str]:
+def wrong_variants(record: dict, window: Window = SEPTEMBER) -> dict[str, str]:
     """{check: gold SQL with that mistake} for the checks that apply to the record.
 
     - status: the receipt_status condition dropped (implicit tx_success, or tx_failed).
     - direction: to_address and from_address swapped where they meet the linked address.
-    - time: the time condition dropped, unless the range is all of September (the same query).
+    - time: the time condition dropped, unless the range is all the data `window` (the same
+      query).
     """
     sql = record["gold_sql"]
     out = {}
@@ -224,7 +237,7 @@ def wrong_variants(record: dict) -> dict[str, str]:
             lambda m: f"{swap[m.group(1)]}_address {m.group(2)}", sql
         )
     time = record["time"]
-    if time and (time["start"], time["end"]) != WHOLE_MONTH and TIME_RE.search(sql):
+    if time and (time["start"], time["end"]) != _bounds(window) and TIME_RE.search(sql):
         dropped = TIME_RE.sub("TRUE", sql, count=1)
         out["time"] = dropped.replace("WHERE TRUE AND ", "WHERE ").replace(" AND TRUE", "")
         out["time"] = re.sub(r" WHERE TRUE\b", "", out["time"])

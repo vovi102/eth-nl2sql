@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from datetime import date
+
 import duckdb
 import pytest
 
@@ -15,6 +17,7 @@ from eth_nl2sql.benchmark.validate import (
     substitute_placeholders,
     wrong_variants,
 )
+from eth_nl2sql.ingest.bigquery import Window
 
 SENSES = {
     "eth_amount": "measure",
@@ -177,3 +180,20 @@ def test_reversed_tie_break() -> None:
     assert reversed_tie_break(top) == "SELECT a, n FROM t ORDER BY n DESC, a DESC LIMIT 5"
     assert reversed_tie_break("SELECT a, n FROM t ORDER BY n DESC, a") is None  # every row
     assert reversed_tie_break("SELECT a FROM t ORDER BY a LIMIT 1") is None  # no tie-break
+
+
+TWO_MONTHS = Window(date(2026, 9, 1), date(2026, 11, 1))
+
+
+def test_time_must_lie_in_the_data_window() -> None:
+    r = example_1()
+    r["time"] = r["time"] | {"start": "2026-10-01T00:00:00", "end": "2026-10-08T00:00:00"}
+    assert any("outside September 2026" in e for e in check_record(r, SENSES))
+    assert not any("outside" in e for e in check_record(r, SENSES, TWO_MONTHS))
+
+
+def test_one_month_of_two_is_no_whole_window() -> None:
+    september = {"start": "2026-09-01T00:00:00", "end": "2026-10-01T00:00:00"}
+    assert "time" in wrong_variants({"gold_sql": GOLD, "time": september}, TWO_MONTHS)
+    both = {"start": "2026-09-01T00:00:00", "end": "2026-11-01T00:00:00"}
+    assert "time" not in wrong_variants({"gold_sql": GOLD, "time": both}, TWO_MONTHS)

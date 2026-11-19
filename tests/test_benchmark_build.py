@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import json
+import random
 from collections import Counter
+from datetime import date
 from itertools import product
 from pathlib import Path
 
@@ -13,6 +15,7 @@ from conftest import ROUTER, TOKEN
 
 from eth_nl2sql.benchmark.build import (
     LinkTables,
+    _time,
     build,
     build_record,
     class_members,
@@ -25,6 +28,7 @@ from eth_nl2sql.benchmark.build import (
 )
 from eth_nl2sql.benchmark.templates import GROUPS, TEMPLATES, Fill, time_fill
 from eth_nl2sql.benchmark.validate import check_record, check_sql, substitute_placeholders
+from eth_nl2sql.ingest.bigquery import Window
 from eth_nl2sql.ingest.duckdb_build import load_knowledge_base
 from eth_nl2sql.knowledge import property_senses
 
@@ -193,7 +197,7 @@ def test_build_on_the_fixture_database(
     manifest = build(db, knowledge_base_dir, property_senses_dir, out, count_scale=0.2)
     with duckdb.connect(str(db), read_only=True) as con:
         senses = dict(con.execute("SELECT sense_id, kind FROM link.property_senses").fetchall())
-        link = load_link_tables(con)
+        link = load_link_tables(con, class_rank="data")
     assert link.entities["swapper"]["classes"] == {"dex"}
     records = [
         json.loads(line)
@@ -222,3 +226,52 @@ def test_ties_at_limit() -> None:
     assert not ties_at_limit({"gold_sql": top.format(k=1), "mentions": []}, no_link, con, 5)
     assert not ties_at_limit({"gold_sql": top.format(k=3), "mentions": []}, no_link, con, 5)
     assert not ties_at_limit({"gold_sql": None, "mentions": []}, no_link, con, 5)
+
+
+# ---- several months (docs/multi-month-plan.md D3, D4) --------------------------------------
+
+SEPTEMBER = Window.month("2026-09")
+TWO_MONTHS = Window(date(2026, 9, 1), date(2026, 11, 1))
+
+
+def legacy_time(rng: random.Random, template, lang: str):
+    """_time before multi-month support, for the September benchmark."""
+    kind = rng.choice(template.times)
+    if kind == "range":
+        first = rng.randint(1, 24)
+        return time_fill(kind, lang, first, first + rng.randint(2, 6))
+    return time_fill(kind, lang, rng.randint(1, 30) if kind == "day" else rng.randint(1, 4))
+
+
+def test_one_month_draws_times_as_the_september_benchmark() -> None:
+    for template in TEMPLATES:
+        for seed in range(20):
+            a, b = random.Random(seed), random.Random(seed)
+            for lang in ("vi", "en"):
+                assert _time(a, template, lang, SEPTEMBER) == legacy_time(b, template, lang)
+            assert a.random() == b.random()  # the same draws, so later fills are the same
+
+
+def test_two_months_draw_both_months_and_cross_ranges() -> None:
+    rng = random.Random(1)
+    times = [_time(rng, t, "en", TWO_MONTHS) for t in TEMPLATES * 30]
+    spans = [f.time for f in times if f is not None]
+    assert {start.month for start, _ in spans} == {9, 10}
+    assert any(start.month == 9 and end > date(2026, 10, 1) for start, end in spans)
+    assert all(TWO_MONTHS.start <= start < end <= TWO_MONTHS.end for start, end in spans)
+    assert None in times  # a template without time asks about all the data
+
+
+def test_gold_ranks_class_members_by_the_question_under_the_question_rule(
+    link: LinkTables,
+) -> None:
+    # 0xp1 (pool) leads over all the data; on Sept 2 only swap was called
+    link.daily_calls = {"0xp1": {date(2026, 9, 1): 20}, "0xs1": {date(2026, 9, 2): 5}}
+    record = {
+        "mentions": [{"type": "class", "target": "dex", "top_n": 1, "placeholder": "E1"}],
+        "time": {"start": "2026-09-02T00:00:00", "end": "2026-09-03T00:00:00"},
+    }
+    assert placeholder_addresses(link, record) == {"E1": ["0xp1"]}  # the "data" rule
+    link.class_rank = "question"
+    assert placeholder_addresses(link, record) == {"E1": ["0xs1", "0xs2"]}
+    assert placeholder_addresses(link, record | {"time": None}) == {"E1": ["0xp1"]}

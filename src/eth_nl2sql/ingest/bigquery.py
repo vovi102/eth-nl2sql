@@ -183,6 +183,15 @@ class Window:
         return self.start.strftime("%Y%m")
 
     @property
+    def months(self) -> list[date]:
+        """The first day of every calendar month the window touches."""
+        out, d = [], self.start.replace(day=1)
+        while d < self.end:
+            out.append(d)
+            d = (d.replace(day=28) + timedelta(days=4)).replace(day=1)
+        return out
+
+    @property
     def label(self) -> str:
         """The months covered: 'September 2026', 'September–October 2026', or
         'December 2026–January 2027' (English names, whatever the locale)."""

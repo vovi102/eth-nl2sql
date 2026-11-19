@@ -6,6 +6,14 @@ Writes data/benchmark/dev.jsonl, test.jsonl and manifest.json (docs/benchmark.md
 question is a linking record of docs/linking-labels.md plus `gold_sql`, `template_id` and
 `knowledge_base_version`. Fillers come from the reviewed `link` schema; a question is kept only
 when its gold SQL passes the checks of benchmark.validate and returns an informative result.
+
+The data window of the database (meta.build) bounds the questions. With one month, times are
+drawn as for the September benchmark, so it reproduces (with --class-rank data, the rule it
+was built with). With several months, every question draws its month, and half the ranges
+cross into the next month (docs/multi-month-plan.md D4):
+
+    uv run eth-nl2sql build-benchmark --db data/db/ethereum_2026-09_2026-10.duckdb \
+      --out-dir data/benchmark-multi --seed 20261118 --id-prefix m
 """
 
 from __future__ import annotations
@@ -18,8 +26,8 @@ import random
 import re
 from collections import Counter, defaultdict
 from collections.abc import Callable
-from dataclasses import dataclass
-from datetime import date
+from dataclasses import dataclass, field
+from datetime import date, timedelta
 from pathlib import Path
 
 import duckdb
@@ -34,11 +42,15 @@ from eth_nl2sql.benchmark.templates import (
     Variant,
     assign_placeholders,
     implicit_senses,
+    month_end,
+    range_fill,
     render,
     time_condition,
     time_fill,
 )
+from eth_nl2sql.ingest.bigquery import Window
 from eth_nl2sql.knowledge.entities import ALIASES, ENTITIES, normalize_alias, read_sheet
+from eth_nl2sql.linking.linker import CLASS_RANKS, rank_window
 from eth_nl2sql.sql.evaluation import same_rows
 
 log = logging.getLogger(__name__)
@@ -96,11 +108,18 @@ class LinkTables:
     addresses: dict[str, list[dict]]  # canonical_id -> address rows
     aliases: list[dict]
     tokens: dict[str, dict]  # token address -> token_stats row
-    calls: dict[str, int]  # September transactions per to_address (knowledge base addresses)
+    calls: dict[str, int]  # transactions of all the data per to_address (knowledge base)
     senses: dict[str, str]  # sense_id -> kind
+    # Built by hand (tests), the tables are those of the September benchmark.
+    daily_calls: dict[str, dict[date, int]] = field(default_factory=dict)  # calls per UTC day
+    data_window: Window = validate.SEPTEMBER  # the days the database holds (meta.build)
+    class_rank: str = "data"  # how the gold ranks class members (linker.CLASS_RANKS)
 
 
-def load_link_tables(con: duckdb.DuckDBPyConnection) -> LinkTables:
+def load_link_tables(con: duckdb.DuckDBPyConnection, *, class_rank: str) -> LinkTables:
+    if class_rank not in CLASS_RANKS:
+        raise ValueError(f"class_rank must be one of {CLASS_RANKS}, not {class_rank!r}")
+
     def rows(sql: str) -> list[dict]:
         cur = con.execute(sql)
         names = [d[0] for d in cur.description]
@@ -126,20 +145,29 @@ def load_link_tables(con: duckdb.DuckDBPyConnection) -> LinkTables:
     addresses: dict[str, list[dict]] = defaultdict(list)
     for a in rows("SELECT canonical_id, address, name_tag, classes FROM link.entity_addresses"):
         addresses[a["canonical_id"]].append(a)
-    calls = dict(
-        con.execute(
-            "SELECT to_address, count(*) FROM main.transactions WHERE to_address IN "
-            "(SELECT address FROM link.entity_addresses) GROUP BY 1"
-        ).fetchall()
-    )
+    daily_calls: dict[str, dict[date, int]] = defaultdict(dict)
+    calls: dict[str, int] = defaultdict(int)
+    for address, day, n in con.execute(
+        "SELECT to_address, CAST(block_timestamp AS DATE), count(*) FROM main.transactions "
+        "WHERE to_address IN (SELECT address FROM link.entity_addresses) GROUP BY 1, 2"
+    ).fetchall():
+        daily_calls[address][day] = n
+        calls[address] += n
+    build = dict(con.execute("SELECT key, value FROM meta.build").fetchall())
     return LinkTables(
         entities=entities,
         children=dict(children),
         addresses=dict(addresses),
         aliases=rows("SELECT * FROM link.entity_aliases"),
         tokens={t["address"]: t for t in rows("SELECT * FROM link.token_stats")},
-        calls=calls,
+        calls=dict(calls),
+        daily_calls=dict(daily_calls),
         senses=dict(con.execute("SELECT sense_id, kind FROM link.property_senses").fetchall()),
+        data_window=Window(
+            date.fromisoformat(build["window_start"]),
+            date.fromisoformat(build["window_end_exclusive"]),
+        ),
+        class_rank=class_rank,
     )
 
 
@@ -159,13 +187,22 @@ def entity_addresses(link: LinkTables, entity_id: str) -> list[str]:
     return sorted({a["address"] for e in subtree(link, entity_id) for a in link.addresses[e]})
 
 
-def class_members(link: LinkTables, class_id: str) -> list[tuple[str, list[str]]]:
+def _calls(link: LinkTables, address: str, window: tuple[date, date] | None) -> int:
+    if window is None:
+        return link.calls.get(address, 0)
+    start, end = window
+    return sum(n for d, n in link.daily_calls.get(address, {}).items() if start <= d < end)
+
+
+def class_members(
+    link: LinkTables, class_id: str, window: tuple[date, date] | None = None
+) -> list[tuple[str, list[str]]]:
     """Members of a class with their addresses, ranked (docs/linking-labels.md §2).
 
     A child rolls up to its highest ancestor that has the class too. A member's addresses are
     those of the entities in its tree that have the class, without token contracts. Groups have
-    no reviewed class: their addresses that carry the class count. Ranked by September calls,
-    ties by id.
+    no reviewed class: their addresses that carry the class count. Ranked by calls in
+    [start, end) of `window`, or in all the data without one, ties by id.
     """
     members: dict[str, set[str]] = defaultdict(set)
     for eid, e in link.entities.items():
@@ -186,7 +223,9 @@ def class_members(link: LinkTables, class_id: str) -> list[tuple[str, list[str]]
             members[top] |= {
                 a["address"] for a in link.addresses.get(eid, []) if a["address"] not in link.tokens
             }
-    ranked = sorted(members.items(), key=lambda m: (-sum(link.calls.get(a, 0) for a in m[1]), m[0]))
+    ranked = sorted(
+        members.items(), key=lambda m: (-sum(_calls(link, a, window) for a in m[1]), m[0])
+    )
     return [(eid, sorted(addresses)) for eid, addresses in ranked]
 
 
@@ -200,7 +239,8 @@ def placeholder_addresses(link: LinkTables, record: dict) -> dict[str, list[str]
         if m["type"] == "entity":
             out[name] = entity_addresses(link, m["target"])
         elif m["type"] == "class":
-            top = class_members(link, m["target"])[: m["top_n"]]
+            window = rank_window(record.get("time"), link.data_window, link.class_rank)
+            top = class_members(link, m["target"], window)[: m["top_n"]]
             out[name] = sorted({a for _, addresses in top for a in addresses})
         else:
             out[name] = [m["target"]]
@@ -220,7 +260,7 @@ class Fillers:
     literals: list[str]
     nil_entities: list[tuple[str, str]]  # (name, nil_reason)
     nil_tokens: list[str]
-    activity: dict[str, Counter]  # address -> September counts (calls, eth_in, failed, ...)
+    activity: dict[str, Counter]  # address -> counts in all the data (calls, eth_in, ...)
     token_receipts: dict[str, set[str]]  # receiver address -> tokens it received
 
 
@@ -298,18 +338,22 @@ def load_fillers(
             named[a["target_id"]].append((a["alias"], a["lang"]))
     owner = {a["address"]: eid for eid, rows in link.addresses.items() for a in rows}
 
-    # Activity of every named address, entity address and typed-address candidate.
+    # Activity of every named address, entity address and typed-address candidate. Typed
+    # addresses are the busiest of day 15 of the first month (2026-09-15 for September).
+    day = link.data_window.start.replace(day=15)
+    day_condition = (
+        f"block_timestamp >= TIMESTAMP '{day} 00:00:00' "
+        f"AND block_timestamp < TIMESTAMP '{day + timedelta(days=1)} 00:00:00'"
+    )
     literal_candidates = [
         r[0]
         for r in con.execute(
-            """SELECT address FROM (
+            f"""SELECT address FROM (
               SELECT to_address AS address, count(*) AS n FROM main.transactions
-              WHERE block_timestamp >= TIMESTAMP '2026-09-15 00:00:00'
-                AND block_timestamp < TIMESTAMP '2026-09-16 00:00:00' GROUP BY 1
+              WHERE {day_condition} GROUP BY 1
               UNION ALL
               SELECT from_address, count(*) FROM main.transactions
-              WHERE block_timestamp >= TIMESTAMP '2026-09-15 00:00:00'
-                AND block_timestamp < TIMESTAMP '2026-09-16 00:00:00' GROUP BY 1)
+              WHERE {day_condition} GROUP BY 1)
             WHERE address IS NOT NULL GROUP BY address ORDER BY sum(n) DESC, address LIMIT 600"""
         ).fetchall()
         if r[0] not in owner and r[0] not in link.tokens
@@ -470,12 +514,29 @@ def _pick_alias(rng: random.Random, aliases: list[tuple[str, str]], lang: str) -
     return rng.choice(sorted(allowed))
 
 
-def _time(rng: random.Random, template: Template, lang: str) -> Fill | None:
+def _time(rng: random.Random, template: Template, lang: str, data: Window) -> Fill | None:
+    months = data.months
     kind = rng.choice(template.times)
+    if len(months) == 1:  # the draws of the September benchmark, so that it reproduces
+        if kind == "range":
+            first = rng.randint(1, 24)
+            return time_fill(kind, lang, first, first + rng.randint(2, 6), month=months[0])
+        day = rng.randint(1, 30) if kind == "day" else rng.randint(1, 4)
+        return time_fill(kind, lang, day, month=months[0])
+    if kind == "none":  # all the data
+        return None
+    month = rng.choice(months)
+    days = (month_end(month) - month).days
     if kind == "range":
-        first = rng.randint(1, 24)
-        return time_fill(kind, lang, first, first + rng.randint(2, 6))
-    return time_fill(kind, lang, rng.randint(1, 30) if kind == "day" else rng.randint(1, 4))
+        span = rng.randint(3, 7)  # days, both ends included, as in one month
+        if rng.random() < 0.5:  # across the start of the next month
+            boundary = rng.choice(months[1:])
+            first = boundary - timedelta(days=rng.randint(1, span - 1))
+        else:
+            first = month + timedelta(days=rng.randint(0, days - span))
+        return range_fill(lang, first, first + timedelta(days=span - 1))
+    day = rng.randint(1, days) if kind == "day" else rng.randint(1, 4)
+    return time_fill(kind, lang, day, month=month)
 
 
 def _active(fillers: Fillers, addresses: list[str], need: str | None) -> bool:
@@ -590,7 +651,7 @@ def make_record(
 ) -> dict:  # fmt: skip
     surface = rng.choice(variant.surfaces[lang])
     fills, extra = _fill_slots(rng, variant, lang, fillers, link)
-    fills["time"] = _time(rng, template, lang) if "{time}" in surface else None
+    fills["time"] = _time(rng, template, lang, link.data_window) if "{time}" in surface else None
     return build_record(template, variant, lang, surface, fills, extra, link.senses)
 
 
@@ -629,7 +690,7 @@ def build_record(
 
 def verify(record: dict, link: LinkTables, con: duckdb.DuckDBPyConnection, timeout: float) -> dict:
     """Run every check; returns the measured result, or raises Rejected."""
-    problems = validate.check_record(record, link.senses)
+    problems = validate.check_record(record, link.senses, link.data_window)
     if problems:
         raise ValueError(f"{record['template_id']}: {record['question']!r}: {problems}")
     if record["gold_sql"] is None:
@@ -767,7 +828,7 @@ def discriminates(
     None when the mistaken query is too slow to tell. Uses no randomness, so annotating does
     not change which questions a seed produces.
     """
-    variants = validate.wrong_variants(record)
+    variants = validate.wrong_variants(record, link.data_window)
     if not variants:
         return {}
     addresses = placeholder_addresses(link, record)
@@ -836,20 +897,23 @@ def knowledge_base_version(files: dict[str, str]) -> str:
 def build(
     db: Path, knowledge_base_dir: Path, property_senses_dir: Path, out_dir: Path, *,
     seed: int = SEED, timeout: float = QUERY_TIMEOUT, count_scale: float = 1.0,
-    memory_limit: str = "4GB",
+    memory_limit: str = "4GB", class_rank: str = "question", split_seed: int = SEED,
+    id_prefix: str = "q",
 ) -> dict:  # fmt: skip
+    """`seed` draws the questions, `split_seed` the dev/test split of the templates (by default
+    the split of the September benchmark, whatever the seed)."""
     files = knowledge_base_files(knowledge_base_dir, property_senses_dir)
     version = knowledge_base_version(files)
     con = duckdb.connect(str(db), read_only=True)
     con.execute(f"SET memory_limit = '{memory_limit}'")
-    link = load_link_tables(con)
+    link = load_link_tables(con, class_rank=class_rank)
     fillers = load_fillers(con, link, knowledge_base_dir)
     log.info(
         "fillers: %d entities, %d named addresses, %d tokens, %d literals, %d NIL names",
         len(fillers.entities), len(fillers.addresses), len(fillers.tokens),
         len(fillers.literals), len(fillers.nil_entities),
     )  # fmt: skip
-    splits = split_templates(TEMPLATES, seed)
+    splits = split_templates(TEMPLATES, split_seed)
     records: dict[str, list[dict]] = {"dev": [], "test": []}
     rejected: dict[str, Counter] = {}
     rng = random.Random(seed)
@@ -869,7 +933,7 @@ def build(
     for split in ("dev", "test"):
         for r in records[split]:
             n += 1
-            r["question_id"] = f"q{n:05d}"
+            r["question_id"] = f"{id_prefix}{n:05d}"
             r["knowledge_base_version"] = version
             question_phenomena[r["question_id"]] = phenomena(r, link, groups[r["template_id"]])
             if r["gold_sql"] is not None:
@@ -891,6 +955,9 @@ def build(
     manifest = {
         "created": date.today().isoformat(),
         "seed": seed,
+        "split_seed": split_seed,
+        "data_window": [link.data_window.start.isoformat(), link.data_window.end.isoformat()],
+        "class_rank": class_rank,
         "knowledge_base_version": version,
         "knowledge_base_files": files,
         "files": manifest_files,
@@ -943,12 +1010,22 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--timeout", type=float, default=QUERY_TIMEOUT, help="seconds per query")
     parser.add_argument("--count-scale", type=float, default=1.0, help="e.g. 0.1 for a dry run")
     parser.add_argument("--memory-limit", default="4GB")
+    parser.add_argument(
+        "--class-rank", choices=CLASS_RANKS, default="question",
+        help="how the gold ranks class members: by the question's time range (default), or by "
+        "all the data (`data`: the rule data/benchmark was built with)",
+    )  # fmt: skip
+    parser.add_argument(
+        "--split-seed", type=int, default=SEED, help="dev/test split of the templates"
+    )
+    parser.add_argument("--id-prefix", default="q", help="question ids: <prefix>00001, ...")
     args = parser.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s", datefmt="%H:%M:%S")
     manifest = build(
         args.db, args.knowledge_base_dir, args.property_senses_dir, args.out_dir,
         seed=args.seed, timeout=args.timeout, count_scale=args.count_scale,
-        memory_limit=args.memory_limit,
+        memory_limit=args.memory_limit, class_rank=args.class_rank,
+        split_seed=args.split_seed, id_prefix=args.id_prefix,
     )  # fmt: skip
     for name, info in manifest["files"].items():
         print(f"  {name:<12} {info['questions']:>5} questions")

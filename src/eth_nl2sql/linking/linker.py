@@ -30,6 +30,7 @@ from datetime import date, datetime
 
 from rapidfuzz import fuzz, process
 
+from eth_nl2sql.ingest.bigquery import Window
 from eth_nl2sql.knowledge.entities import normalize_alias
 from eth_nl2sql.linking.resources import LinkingResources, Target
 from eth_nl2sql.linking.time_expr import fold, parse_time
@@ -717,18 +718,8 @@ class EntityLinker:
     # ---- B4 and B8: placeholders -> addresses ----------------------------------------
 
     def rank_window(self, record: dict) -> tuple[date, date] | None:
-        """The days whose calls rank the class members of the record: its time range under the
-        "question" rule, cut to the data; None (all the data) under "data", for a question
-        without time, or for a range that covers all the data."""
-        time = record.get("time")
-        if self.class_rank == "data" or not time:
-            return None
-        data = self.resources.data_window
-        start, end = (datetime.fromisoformat(time[k]).date() for k in ("start", "end"))
-        start, end = max(start, data.start), min(end, data.end)
-        if (start, end) == (data.start, data.end) or start >= end:
-            return None
-        return start, end
+        """The days whose calls rank the class members of the record (`rank_window`)."""
+        return rank_window(record.get("time"), self.resources.data_window, self.class_rank)
 
     def class_members(
         self, class_id: str, top_n: int, window: tuple[date, date] | None = None
@@ -805,6 +796,19 @@ def _assign_placeholders(mentions: list[dict]) -> None:
         items = {k: m[k] for k in order if k in m} | rest
         m.clear()
         m.update(items)
+
+
+def rank_window(time: dict | None, data: Window, class_rank: str) -> tuple[date, date] | None:
+    """The days whose calls rank class members: the question's time range under the "question"
+    rule, cut to the data; None (all the data) under "data", for a question without time, or
+    for a range that covers all the data. The gold of the benchmark uses it too."""
+    if class_rank == "data" or not time:
+        return None
+    start, end = (datetime.fromisoformat(time[k]).date() for k in ("start", "end"))
+    start, end = max(start, data.start), min(end, data.end)
+    if (start, end) == (data.start, data.end) or start >= end:
+        return None
+    return start, end
 
 
 def substitute_placeholders(sql: str, addresses: dict[str, list[str]]) -> str:

@@ -13,9 +13,10 @@ import re
 from dataclasses import dataclass, field
 from datetime import date, timedelta
 
+from eth_nl2sql.ingest.bigquery import MONTH_NAMES
+
 SURFACE_RE = re.compile(r"\[([^\]]+)\]\((\w+)\)|\{(\w+)\}")
-MONTH_START = date(2026, 9, 1)
-MONTH_END = date(2026, 10, 1)
+MONTH_START = date(2026, 9, 1)  # the month of the September benchmark, the default
 
 # Mention kinds a slot can take. "named" kinds carry a placeholder in the gold SQL.
 PLACEHOLDER_TYPES = ("entity", "address", "token", "class")
@@ -60,36 +61,55 @@ class Template:
 ORDINAL_EN = {1: "first", 2: "second", 3: "third", 4: "fourth"}
 
 
-def time_fill(kind: str, lang: str, day: int = 1, last: int = 1) -> Fill | None:
-    """The time slot. Vietnamese drops "trong" from the span; English keeps "in"/"on"/"the"."""
-    d = MONTH_START
+def month_end(month: date) -> date:
+    """The first day of the month after `month`."""
+    return (month.replace(day=28) + timedelta(days=4)).replace(day=1)
+
+
+def time_fill(
+    kind: str, lang: str, day: int = 1, last: int = 1, month: date = MONTH_START
+) -> Fill | None:
+    """The time slot in `month` (its first day; September by default). Vietnamese drops "trong"
+    from the span; English keeps "in"/"on"/"the"."""
+    d, end_of_month = month, month_end(month)
+    m, name = d.month, MONTH_NAMES[d.month - 1]
     if kind == "none":
         return None
     if kind == "month":
-        start, end, vi, en = d, MONTH_END, "tháng 9", "in September"
+        start, end, vi, en = d, end_of_month, f"tháng {m}", f"in {name}"
     elif kind == "day":
         start = d.replace(day=day)
         end = start + timedelta(days=1)
-        vi, en = f"ngày {day}/9", f"on September {day}"
-    elif kind == "week":  # week k of September = [7k-6, 7k+1)
+        vi, en = f"ngày {day}/{m}", f"on {name} {day}"
+    elif kind == "week":  # week k of a month = [7k-6, 7k+1)
         start, end = d.replace(day=7 * day - 6), d.replace(day=7 * day + 1)
-        vi = "tuần đầu tháng 9" if day == 1 else f"tuần thứ {day} tháng 9"
-        en = f"in the {ORDINAL_EN[day]} week of September"
-    elif kind == "last_week":
-        start, end, vi, en = (
-            d.replace(day=24),
-            MONTH_END,
-            "tuần cuối tháng 9",
-            ("in the last week of September"),
-        )
+        vi = f"tuần đầu tháng {m}" if day == 1 else f"tuần thứ {day} tháng {m}"
+        en = f"in the {ORDINAL_EN[day]} week of {name}"
+    elif kind == "last_week":  # the last 7 days, as the linker reads it
+        start, end = end_of_month - timedelta(days=7), end_of_month
+        vi, en = f"tuần cuối tháng {m}", f"in the last week of {name}"
     elif kind == "half":
         start, end = d, d.replace(day=16)
-        vi, en = "nửa đầu tháng 9", "in the first half of September"
+        vi, en = f"nửa đầu tháng {m}", f"in the first half of {name}"
     elif kind == "range":
-        start, end = d.replace(day=day), d.replace(day=last) + timedelta(days=1)
-        vi, en = f"từ {day}/9 đến {last}/9", f"from September {day} to {last}"
+        return range_fill(lang, d.replace(day=day), d.replace(day=last))
     else:
         raise ValueError(kind)
+    return _time_fill(lang, vi, en, start, end)
+
+
+def range_fill(lang: str, first: date, last: date) -> Fill:
+    """From `first` to `last`, both days included; they may lie in two months."""
+    first_name, last_name = MONTH_NAMES[first.month - 1], MONTH_NAMES[last.month - 1]
+    vi = f"từ {first.day}/{first.month} đến {last.day}/{last.month}"
+    if (first.year, first.month) == (last.year, last.month):
+        en = f"from {first_name} {first.day} to {last.day}"
+    else:
+        en = f"from {first_name} {first.day} to {last_name} {last.day}"
+    return _time_fill(lang, vi, en, first, last + timedelta(days=1))
+
+
+def _time_fill(lang: str, vi: str, en: str, start: date, end: date) -> Fill:
     if lang == "vi":
         prefix = "" if vi.startswith(("ngày", "từ")) else "trong "
         return Fill(vi, prefix=prefix, time=(start, end))

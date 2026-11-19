@@ -2,16 +2,20 @@
 
 from __future__ import annotations
 
+from datetime import date
+
 import pytest
 
 from eth_nl2sql.benchmark.templates import (
     Fill,
     assign_placeholders,
     implicit_senses,
+    range_fill,
     render,
     time_condition,
     time_fill,
 )
+from eth_nl2sql.linking.time_expr import parse_time
 
 UNSUPPORTED = {"balance", "usd_value", "internal_eth"}
 TORNADO = Fill("Tornado Cash", {"type": "entity", "target": "tornado-cash"})
@@ -137,3 +141,55 @@ def test_time_condition_is_half_open() -> None:
     )
     assert time_condition(None) == ""
     assert time_condition(fill.time, "timestamp").startswith("timestamp >= ")
+
+
+OCTOBER = date(2026, 10, 1)
+
+
+@pytest.mark.parametrize(
+    ("kind", "lang", "args", "text", "window"),
+    [
+        ("month", "en", (), "in October", ("2026-10-01", "2026-11-01")),
+        ("day", "vi", (31,), "ngày 31/10", ("2026-10-31", "2026-11-01")),
+        ("week", "vi", (1,), "tuần đầu tháng 10", ("2026-10-01", "2026-10-08")),
+        ("last_week", "vi", (), "tuần cuối tháng 10", ("2026-10-25", "2026-11-01")),  # 31 days
+        ("range", "en", (3, 9), "from October 3 to 9", ("2026-10-03", "2026-10-10")),
+    ],
+)
+def test_time_fill_in_another_month(kind, lang, args, text, window) -> None:
+    fill = time_fill(kind, lang, *args, month=OCTOBER)
+    assert fill.text == text
+    assert tuple(str(d) for d in fill.time) == window
+
+
+@pytest.mark.parametrize(
+    ("lang", "text"), [("vi", "từ 28/9 đến 3/10"), ("en", "from September 28 to October 3")]
+)
+def test_range_across_two_months(lang: str, text: str) -> None:
+    fill = range_fill(lang, date(2026, 9, 28), date(2026, 10, 3))
+    assert fill.text == text
+    assert fill.time == (date(2026, 9, 28), date(2026, 10, 4))
+
+
+def every_time_fill():
+    for month in (date(2026, 9, 1), OCTOBER):
+        for lang in ("vi", "en"):
+            yield time_fill("month", lang, month=month)
+            yield time_fill("last_week", lang, month=month)
+            yield time_fill("half", lang, month=month)
+            for k in (1, 2, 3, 4):
+                yield time_fill("week", lang, k, month=month)
+            for day in (1, 9, 10, 30):
+                yield time_fill("day", lang, day, month=month)
+            yield time_fill("range", lang, 1, 7, month=month)
+            yield time_fill("range", lang, 24, 30, month=month)
+        for lang in ("vi", "en"):
+            yield range_fill(lang, date(2026, 9, 30), date(2026, 10, 2))
+
+
+@pytest.mark.parametrize("fill", list(every_time_fill()), ids=lambda f: f.text)
+def test_the_linker_reads_every_time_back(fill: Fill) -> None:
+    """The gold time of a question is what the linker reads from its text."""
+    parsed = parse_time(f"Bao nhiêu ETH {fill.prefix}{fill.text}?")
+    assert parsed is not None and parsed["text"] == fill.text
+    assert (parsed["start"][:10], parsed["end"][:10]) == tuple(str(d) for d in fill.time)

@@ -158,7 +158,9 @@ def test_every_l1_reason(db: Path) -> None:
     gold = {"mentions": [swapper], "gold_sql": "SELECT COUNT(*) FROM transactions "
             "WHERE from_address IN {E1}"}  # fmt: skip
     with duckdb.connect(str(db), read_only=True) as con:
-        link = bb.load_link_tables(con)  # swapper -> [ROUTER], which sent nothing
+        link = bb.load_link_tables(
+            con, class_rank="data"
+        )  # swapper -> [ROUTER], which sent nothing
 
         def reason(linked=gold, decision="sql", evidence="", addresses=None):
             stub = StubLinker({"E1": [ROUTER]} if addresses is None else addresses)
