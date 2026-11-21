@@ -1,0 +1,1851 @@
+{
+ "near_templates": [
+  "address_eth_received",
+  "address_eth_sent",
+  "address_token_received",
+  "ambiguous_times",
+  "ambiguous_users",
+  "ambiguous_value_received",
+  "ambiguous_volume",
+  "class_call_count",
+  "class_distinct_callers",
+  "class_eth_received",
+  "class_token_received",
+  "entity_call_count",
+  "entity_daily_calls",
+  "entity_distinct_callers",
+  "entity_eth_received",
+  "entity_fees_paid",
+  "entity_token_received",
+  "literal_eth_received",
+  "token_amount_total",
+  "token_daily_transfers",
+  "token_distinct_senders",
+  "token_transfer_count"
+ ],
+ "far_templates": [
+  "address_largest_eth_sent",
+  "address_tx_sent_count",
+  "blob_tx_count",
+  "class_top_contracts",
+  "contract_creation_count",
+  "daily_avg_gas_price",
+  "entity_failed_calls",
+  "entity_top_callers",
+  "literal_tx_sent_count",
+  "token_largest_transfer",
+  "token_top_receivers",
+  "top_block_producers"
+ ],
+ "dev": {
+  "3b": {
+   "all": {
+    "correct": 161,
+    "questions": 177,
+    "ex": 0.91
+   },
+   "answerable": {
+    "correct": 145,
+    "questions": 161,
+    "ex": 0.901
+   },
+   "september": {
+    "correct": 58,
+    "questions": 62,
+    "ex": 0.935
+   },
+   "october": {
+    "correct": 57,
+    "questions": 62,
+    "ex": 0.919
+   },
+   "across": {
+    "correct": 4,
+    "questions": 6,
+    "ex": 0.667
+   },
+   "all_data": {
+    "correct": 26,
+    "questions": 31,
+    "ex": 0.839
+   },
+   "near": {
+    "correct": 109,
+    "questions": 123,
+    "ex": 0.886
+   },
+   "near:september": {
+    "correct": 41,
+    "questions": 44,
+    "ex": 0.932
+   },
+   "near:october": {
+    "correct": 44,
+    "questions": 49,
+    "ex": 0.898
+   },
+   "near:across": {
+    "correct": 4,
+    "questions": 6,
+    "ex": 0.667
+   },
+   "near:all_data": {
+    "correct": 20,
+    "questions": 24,
+    "ex": 0.833
+   },
+   "far": {
+    "correct": 36,
+    "questions": 38,
+    "ex": 0.947
+   },
+   "far:september": {
+    "correct": 17,
+    "questions": 18,
+    "ex": 0.944
+   },
+   "far:october": {
+    "correct": 13,
+    "questions": 13,
+    "ex": 1.0
+   },
+   "far:across": {
+    "correct": 0,
+    "questions": 0,
+    "ex": null
+   },
+   "far:all_data": {
+    "correct": 6,
+    "questions": 7,
+    "ex": 0.857
+   }
+  },
+  "3b_lora": {
+   "all": {
+    "correct": 171,
+    "questions": 177,
+    "ex": 0.966
+   },
+   "answerable": {
+    "correct": 155,
+    "questions": 161,
+    "ex": 0.963
+   },
+   "september": {
+    "correct": 59,
+    "questions": 62,
+    "ex": 0.952
+   },
+   "october": {
+    "correct": 60,
+    "questions": 62,
+    "ex": 0.968
+   },
+   "across": {
+    "correct": 5,
+    "questions": 6,
+    "ex": 0.833
+   },
+   "all_data": {
+    "correct": 31,
+    "questions": 31,
+    "ex": 1.0
+   },
+   "near": {
+    "correct": 120,
+    "questions": 123,
+    "ex": 0.976
+   },
+   "near:september": {
+    "correct": 43,
+    "questions": 44,
+    "ex": 0.977
+   },
+   "near:october": {
+    "correct": 48,
+    "questions": 49,
+    "ex": 0.98
+   },
+   "near:across": {
+    "correct": 5,
+    "questions": 6,
+    "ex": 0.833
+   },
+   "near:all_data": {
+    "correct": 24,
+    "questions": 24,
+    "ex": 1.0
+   },
+   "far": {
+    "correct": 35,
+    "questions": 38,
+    "ex": 0.921
+   },
+   "far:september": {
+    "correct": 16,
+    "questions": 18,
+    "ex": 0.889
+   },
+   "far:october": {
+    "correct": 12,
+    "questions": 13,
+    "ex": 0.923
+   },
+   "far:across": {
+    "correct": 0,
+    "questions": 0,
+    "ex": null
+   },
+   "far:all_data": {
+    "correct": 7,
+    "questions": 7,
+    "ex": 1.0
+   }
+  },
+  "1.5b": {
+   "all": {
+    "correct": 115,
+    "questions": 177,
+    "ex": 0.65
+   },
+   "answerable": {
+    "correct": 99,
+    "questions": 161,
+    "ex": 0.615
+   },
+   "september": {
+    "correct": 41,
+    "questions": 62,
+    "ex": 0.661
+   },
+   "october": {
+    "correct": 36,
+    "questions": 62,
+    "ex": 0.581
+   },
+   "across": {
+    "correct": 2,
+    "questions": 6,
+    "ex": 0.333
+   },
+   "all_data": {
+    "correct": 20,
+    "questions": 31,
+    "ex": 0.645
+   },
+   "near": {
+    "correct": 77,
+    "questions": 123,
+    "ex": 0.626
+   },
+   "near:september": {
+    "correct": 29,
+    "questions": 44,
+    "ex": 0.659
+   },
+   "near:october": {
+    "correct": 29,
+    "questions": 49,
+    "ex": 0.592
+   },
+   "near:across": {
+    "correct": 2,
+    "questions": 6,
+    "ex": 0.333
+   },
+   "near:all_data": {
+    "correct": 17,
+    "questions": 24,
+    "ex": 0.708
+   },
+   "far": {
+    "correct": 22,
+    "questions": 38,
+    "ex": 0.579
+   },
+   "far:september": {
+    "correct": 12,
+    "questions": 18,
+    "ex": 0.667
+   },
+   "far:october": {
+    "correct": 7,
+    "questions": 13,
+    "ex": 0.538
+   },
+   "far:across": {
+    "correct": 0,
+    "questions": 0,
+    "ex": null
+   },
+   "far:all_data": {
+    "correct": 3,
+    "questions": 7,
+    "ex": 0.429
+   }
+  },
+  "1.5b_lora": {
+   "all": {
+    "correct": 169,
+    "questions": 177,
+    "ex": 0.955
+   },
+   "answerable": {
+    "correct": 153,
+    "questions": 161,
+    "ex": 0.95
+   },
+   "september": {
+    "correct": 57,
+    "questions": 62,
+    "ex": 0.919
+   },
+   "october": {
+    "correct": 60,
+    "questions": 62,
+    "ex": 0.968
+   },
+   "across": {
+    "correct": 5,
+    "questions": 6,
+    "ex": 0.833
+   },
+   "all_data": {
+    "correct": 31,
+    "questions": 31,
+    "ex": 1.0
+   },
+   "near": {
+    "correct": 120,
+    "questions": 123,
+    "ex": 0.976
+   },
+   "near:september": {
+    "correct": 43,
+    "questions": 44,
+    "ex": 0.977
+   },
+   "near:october": {
+    "correct": 48,
+    "questions": 49,
+    "ex": 0.98
+   },
+   "near:across": {
+    "correct": 5,
+    "questions": 6,
+    "ex": 0.833
+   },
+   "near:all_data": {
+    "correct": 24,
+    "questions": 24,
+    "ex": 1.0
+   },
+   "far": {
+    "correct": 33,
+    "questions": 38,
+    "ex": 0.868
+   },
+   "far:september": {
+    "correct": 14,
+    "questions": 18,
+    "ex": 0.778
+   },
+   "far:october": {
+    "correct": 12,
+    "questions": 13,
+    "ex": 0.923
+   },
+   "far:across": {
+    "correct": 0,
+    "questions": 0,
+    "ex": null
+   },
+   "far:all_data": {
+    "correct": 7,
+    "questions": 7,
+    "ex": 1.0
+   }
+  },
+  "mcnemar": {
+   "3b_lora_vs_3b": {
+    "all": {
+     "better": 12,
+     "worse": 2,
+     "p": 0.0129
+    },
+    "september": {
+     "better": 2,
+     "worse": 1,
+     "p": 1.0
+    },
+    "october": {
+     "better": 4,
+     "worse": 1,
+     "p": 0.375
+    },
+    "across": {
+     "better": 1,
+     "worse": 0,
+     "p": 1.0
+    },
+    "all_data": {
+     "better": 5,
+     "worse": 0,
+     "p": 0.0625
+    }
+   },
+   "1.5b_lora_vs_1.5b": {
+    "all": {
+     "better": 54,
+     "worse": 0,
+     "p": 0.0
+    },
+    "september": {
+     "better": 16,
+     "worse": 0,
+     "p": 0.0
+    },
+    "october": {
+     "better": 24,
+     "worse": 0,
+     "p": 0.0
+    },
+    "across": {
+     "better": 3,
+     "worse": 0,
+     "p": 0.25
+    },
+    "all_data": {
+     "better": 11,
+     "worse": 0,
+     "p": 0.001
+    }
+   },
+   "3b_lora_vs_1.5b_lora": {
+    "all": {
+     "better": 4,
+     "worse": 2,
+     "p": 0.6875
+    }
+   }
+  }
+ },
+ "test": {
+  "3b": {
+   "all": {
+    "correct": 253,
+    "questions": 328,
+    "ex": 0.771
+   },
+   "answerable": {
+    "correct": 221,
+    "questions": 296,
+    "ex": 0.747
+   },
+   "september": {
+    "correct": 88,
+    "questions": 114,
+    "ex": 0.772
+   },
+   "october": {
+    "correct": 94,
+    "questions": 123,
+    "ex": 0.764
+   },
+   "across": {
+    "correct": 17,
+    "questions": 23,
+    "ex": 0.739
+   },
+   "all_data": {
+    "correct": 22,
+    "questions": 36,
+    "ex": 0.611
+   },
+   "near": {
+    "correct": 155,
+    "questions": 180,
+    "ex": 0.861
+   },
+   "near:september": {
+    "correct": 58,
+    "questions": 68,
+    "ex": 0.853
+   },
+   "near:october": {
+    "correct": 72,
+    "questions": 82,
+    "ex": 0.878
+   },
+   "near:across": {
+    "correct": 10,
+    "questions": 11,
+    "ex": 0.909
+   },
+   "near:all_data": {
+    "correct": 15,
+    "questions": 19,
+    "ex": 0.789
+   },
+   "far": {
+    "correct": 66,
+    "questions": 116,
+    "ex": 0.569
+   },
+   "far:september": {
+    "correct": 30,
+    "questions": 46,
+    "ex": 0.652
+   },
+   "far:october": {
+    "correct": 22,
+    "questions": 41,
+    "ex": 0.537
+   },
+   "far:across": {
+    "correct": 7,
+    "questions": 12,
+    "ex": 0.583
+   },
+   "far:all_data": {
+    "correct": 7,
+    "questions": 17,
+    "ex": 0.412
+   }
+  },
+  "3b_lora": {
+   "all": {
+    "correct": 265,
+    "questions": 328,
+    "ex": 0.808
+   },
+   "answerable": {
+    "correct": 233,
+    "questions": 296,
+    "ex": 0.787
+   },
+   "september": {
+    "correct": 95,
+    "questions": 114,
+    "ex": 0.833
+   },
+   "october": {
+    "correct": 100,
+    "questions": 123,
+    "ex": 0.813
+   },
+   "across": {
+    "correct": 18,
+    "questions": 23,
+    "ex": 0.783
+   },
+   "all_data": {
+    "correct": 20,
+    "questions": 36,
+    "ex": 0.556
+   },
+   "near": {
+    "correct": 170,
+    "questions": 180,
+    "ex": 0.944
+   },
+   "near:september": {
+    "correct": 63,
+    "questions": 68,
+    "ex": 0.926
+   },
+   "near:october": {
+    "correct": 79,
+    "questions": 82,
+    "ex": 0.963
+   },
+   "near:across": {
+    "correct": 11,
+    "questions": 11,
+    "ex": 1.0
+   },
+   "near:all_data": {
+    "correct": 17,
+    "questions": 19,
+    "ex": 0.895
+   },
+   "far": {
+    "correct": 63,
+    "questions": 116,
+    "ex": 0.543
+   },
+   "far:september": {
+    "correct": 32,
+    "questions": 46,
+    "ex": 0.696
+   },
+   "far:october": {
+    "correct": 21,
+    "questions": 41,
+    "ex": 0.512
+   },
+   "far:across": {
+    "correct": 7,
+    "questions": 12,
+    "ex": 0.583
+   },
+   "far:all_data": {
+    "correct": 3,
+    "questions": 17,
+    "ex": 0.176
+   }
+  },
+  "1.5b": {
+   "all": {
+    "correct": 217,
+    "questions": 328,
+    "ex": 0.662
+   },
+   "answerable": {
+    "correct": 185,
+    "questions": 296,
+    "ex": 0.625
+   },
+   "september": {
+    "correct": 78,
+    "questions": 114,
+    "ex": 0.684
+   },
+   "october": {
+    "correct": 78,
+    "questions": 123,
+    "ex": 0.634
+   },
+   "across": {
+    "correct": 12,
+    "questions": 23,
+    "ex": 0.522
+   },
+   "all_data": {
+    "correct": 17,
+    "questions": 36,
+    "ex": 0.472
+   },
+   "near": {
+    "correct": 127,
+    "questions": 180,
+    "ex": 0.706
+   },
+   "near:september": {
+    "correct": 50,
+    "questions": 68,
+    "ex": 0.735
+   },
+   "near:october": {
+    "correct": 59,
+    "questions": 82,
+    "ex": 0.72
+   },
+   "near:across": {
+    "correct": 6,
+    "questions": 11,
+    "ex": 0.545
+   },
+   "near:all_data": {
+    "correct": 12,
+    "questions": 19,
+    "ex": 0.632
+   },
+   "far": {
+    "correct": 58,
+    "questions": 116,
+    "ex": 0.5
+   },
+   "far:september": {
+    "correct": 28,
+    "questions": 46,
+    "ex": 0.609
+   },
+   "far:october": {
+    "correct": 19,
+    "questions": 41,
+    "ex": 0.463
+   },
+   "far:across": {
+    "correct": 6,
+    "questions": 12,
+    "ex": 0.5
+   },
+   "far:all_data": {
+    "correct": 5,
+    "questions": 17,
+    "ex": 0.294
+   }
+  },
+  "1.5b_lora": {
+   "all": {
+    "correct": 262,
+    "questions": 328,
+    "ex": 0.799
+   },
+   "answerable": {
+    "correct": 230,
+    "questions": 296,
+    "ex": 0.777
+   },
+   "september": {
+    "correct": 93,
+    "questions": 114,
+    "ex": 0.816
+   },
+   "october": {
+    "correct": 100,
+    "questions": 123,
+    "ex": 0.813
+   },
+   "across": {
+    "correct": 17,
+    "questions": 23,
+    "ex": 0.739
+   },
+   "all_data": {
+    "correct": 20,
+    "questions": 36,
+    "ex": 0.556
+   },
+   "near": {
+    "correct": 167,
+    "questions": 180,
+    "ex": 0.928
+   },
+   "near:september": {
+    "correct": 61,
+    "questions": 68,
+    "ex": 0.897
+   },
+   "near:october": {
+    "correct": 79,
+    "questions": 82,
+    "ex": 0.963
+   },
+   "near:across": {
+    "correct": 10,
+    "questions": 11,
+    "ex": 0.909
+   },
+   "near:all_data": {
+    "correct": 17,
+    "questions": 19,
+    "ex": 0.895
+   },
+   "far": {
+    "correct": 63,
+    "questions": 116,
+    "ex": 0.543
+   },
+   "far:september": {
+    "correct": 32,
+    "questions": 46,
+    "ex": 0.696
+   },
+   "far:october": {
+    "correct": 21,
+    "questions": 41,
+    "ex": 0.512
+   },
+   "far:across": {
+    "correct": 7,
+    "questions": 12,
+    "ex": 0.583
+   },
+   "far:all_data": {
+    "correct": 3,
+    "questions": 17,
+    "ex": 0.176
+   }
+  },
+  "mcnemar": {
+   "3b_lora_vs_3b": {
+    "all": {
+     "better": 26,
+     "worse": 14,
+     "p": 0.0807
+    },
+    "september": {
+     "better": 10,
+     "worse": 3,
+     "p": 0.0923
+    },
+    "october": {
+     "better": 11,
+     "worse": 5,
+     "p": 0.2101
+    },
+    "across": {
+     "better": 2,
+     "worse": 1,
+     "p": 1.0
+    },
+    "all_data": {
+     "better": 3,
+     "worse": 5,
+     "p": 0.7266
+    }
+   },
+   "1.5b_lora_vs_1.5b": {
+    "all": {
+     "better": 48,
+     "worse": 3,
+     "p": 0.0
+    },
+    "september": {
+     "better": 15,
+     "worse": 0,
+     "p": 0.0001
+    },
+    "october": {
+     "better": 22,
+     "worse": 0,
+     "p": 0.0
+    },
+    "across": {
+     "better": 6,
+     "worse": 1,
+     "p": 0.125
+    },
+    "all_data": {
+     "better": 5,
+     "worse": 2,
+     "p": 0.4531
+    }
+   },
+   "3b_lora_vs_1.5b_lora": {
+    "all": {
+     "better": 3,
+     "worse": 0,
+     "p": 0.25
+    }
+   }
+  }
+ },
+ "test_templates": {
+  "address_eth_received": {
+   "bucket": "near",
+   "questions": [
+    13,
+    13
+   ],
+   "3b": [
+    7,
+    9
+   ],
+   "3b_lora": [
+    13,
+    12
+   ],
+   "1.5b": [
+    13,
+    12
+   ],
+   "1.5b_lora": [
+    13,
+    12
+   ]
+  },
+  "address_largest_eth_sent": {
+   "bucket": "far",
+   "questions": [
+    13,
+    13
+   ],
+   "3b": [
+    3,
+    3
+   ],
+   "3b_lora": [
+    0,
+    0
+   ],
+   "1.5b": [
+    0,
+    0
+   ],
+   "1.5b_lora": [
+    0,
+    0
+   ]
+  },
+  "address_tx_sent_count": {
+   "bucket": "far",
+   "questions": [
+    13,
+    13
+   ],
+   "3b": [
+    13,
+    13
+   ],
+   "3b_lora": [
+    13,
+    13
+   ],
+   "1.5b": [
+    13,
+    13
+   ],
+   "1.5b_lora": [
+    13,
+    13
+   ]
+  },
+  "ambiguous_times": {
+   "bucket": "near",
+   "questions": [
+    15,
+    15
+   ],
+   "3b": [
+    14,
+    11
+   ],
+   "3b_lora": [
+    14,
+    13
+   ],
+   "1.5b": [
+    9,
+    8
+   ],
+   "1.5b_lora": [
+    14,
+    13
+   ]
+  },
+  "ambiguous_users": {
+   "bucket": "near",
+   "questions": [
+    15,
+    15
+   ],
+   "3b": [
+    8,
+    6
+   ],
+   "3b_lora": [
+    9,
+    9
+   ],
+   "1.5b": [
+    5,
+    7
+   ],
+   "1.5b_lora": [
+    7,
+    6
+   ]
+  },
+  "ambiguous_volume": {
+   "bucket": "near",
+   "questions": [
+    15,
+    15
+   ],
+   "3b": [
+    13,
+    13
+   ],
+   "3b_lora": [
+    14,
+    14
+   ],
+   "1.5b": [
+    13,
+    12
+   ],
+   "1.5b_lora": [
+    14,
+    14
+   ]
+  },
+  "blob_tx_count": {
+   "bucket": "far",
+   "questions": [
+    12,
+    12
+   ],
+   "3b": [
+    12,
+    12
+   ],
+   "3b_lora": [
+    12,
+    12
+   ],
+   "1.5b": [
+    12,
+    12
+   ],
+   "1.5b_lora": [
+    12,
+    12
+   ]
+  },
+  "class_call_count": {
+   "bucket": "near",
+   "questions": [
+    14,
+    14
+   ],
+   "3b": [
+    14,
+    14
+   ],
+   "3b_lora": [
+    14,
+    14
+   ],
+   "1.5b": [
+    9,
+    6
+   ],
+   "1.5b_lora": [
+    14,
+    14
+   ]
+  },
+  "class_distinct_callers": {
+   "bucket": "near",
+   "questions": [
+    14,
+    14
+   ],
+   "3b": [
+    12,
+    14
+   ],
+   "3b_lora": [
+    14,
+    14
+   ],
+   "1.5b": [
+    3,
+    9
+   ],
+   "1.5b_lora": [
+    14,
+    14
+   ]
+  },
+  "class_top_contracts": {
+   "bucket": "far",
+   "questions": [
+    14,
+    14
+   ],
+   "3b": [
+    3,
+    3
+   ],
+   "3b_lora": [
+    0,
+    0
+   ],
+   "1.5b": [
+    0,
+    0
+   ],
+   "1.5b_lora": [
+    0,
+    0
+   ]
+  },
+  "contract_creation_count": {
+   "bucket": "far",
+   "questions": [
+    12,
+    12
+   ],
+   "3b": [
+    12,
+    12
+   ],
+   "3b_lora": [
+    12,
+    12
+   ],
+   "1.5b": [
+    12,
+    12
+   ],
+   "1.5b_lora": [
+    12,
+    12
+   ]
+  },
+  "daily_avg_gas_price": {
+   "bucket": "far",
+   "questions": [
+    12,
+    12
+   ],
+   "3b": [
+    4,
+    5
+   ],
+   "3b_lora": [
+    12,
+    12
+   ],
+   "1.5b": [
+    2,
+    5
+   ],
+   "1.5b_lora": [
+    12,
+    12
+   ]
+  },
+  "entity_call_count": {
+   "bucket": "near",
+   "questions": [
+    14,
+    14
+   ],
+   "3b": [
+    14,
+    14
+   ],
+   "3b_lora": [
+    14,
+    14
+   ],
+   "1.5b": [
+    12,
+    13
+   ],
+   "1.5b_lora": [
+    14,
+    14
+   ]
+  },
+  "entity_daily_calls": {
+   "bucket": "near",
+   "questions": [
+    14,
+    14
+   ],
+   "3b": [
+    13,
+    13
+   ],
+   "3b_lora": [
+    14,
+    14
+   ],
+   "1.5b": [
+    9,
+    11
+   ],
+   "1.5b_lora": [
+    14,
+    14
+   ]
+  },
+  "entity_eth_received": {
+   "bucket": "near",
+   "questions": [
+    14,
+    14
+   ],
+   "3b": [
+    14,
+    14
+   ],
+   "3b_lora": [
+    14,
+    14
+   ],
+   "1.5b": [
+    9,
+    14
+   ],
+   "1.5b_lora": [
+    14,
+    14
+   ]
+  },
+  "entity_failed_calls": {
+   "bucket": "far",
+   "questions": [
+    14,
+    14
+   ],
+   "3b": [
+    11,
+    11
+   ],
+   "3b_lora": [
+    14,
+    14
+   ],
+   "1.5b": [
+    13,
+    14
+   ],
+   "1.5b_lora": [
+    14,
+    14
+   ]
+  },
+  "entity_token_received": {
+   "bucket": "near",
+   "questions": [
+    14,
+    14
+   ],
+   "3b": [
+    10,
+    10
+   ],
+   "3b_lora": [
+    14,
+    14
+   ],
+   "1.5b": [
+    2,
+    2
+   ],
+   "1.5b_lora": [
+    14,
+    14
+   ]
+  },
+  "literal_eth_received": {
+   "bucket": "near",
+   "questions": [
+    12,
+    12
+   ],
+   "3b": [
+    12,
+    12
+   ],
+   "3b_lora": [
+    12,
+    12
+   ],
+   "1.5b": [
+    11,
+    12
+   ],
+   "1.5b_lora": [
+    12,
+    12
+   ]
+  },
+  "nil_eth_received": {
+   "bucket": "refuse",
+   "questions": [
+    8,
+    8
+   ],
+   "3b": [
+    8,
+    8
+   ],
+   "3b_lora": [
+    8,
+    8
+   ],
+   "1.5b": [
+    8,
+    8
+   ],
+   "1.5b_lora": [
+    8,
+    8
+   ]
+  },
+  "nil_token_transfer_count": {
+   "bucket": "refuse",
+   "questions": [
+    8,
+    8
+   ],
+   "3b": [
+    8,
+    8
+   ],
+   "3b_lora": [
+    8,
+    8
+   ],
+   "1.5b": [
+    8,
+    8
+   ],
+   "1.5b_lora": [
+    8,
+    8
+   ]
+  },
+  "token_amount_total": {
+   "bucket": "near",
+   "questions": [
+    13,
+    13
+   ],
+   "3b": [
+    13,
+    12
+   ],
+   "3b_lora": [
+    13,
+    13
+   ],
+   "1.5b": [
+    12,
+    13
+   ],
+   "1.5b_lora": [
+    13,
+    13
+   ]
+  },
+  "token_largest_transfer": {
+   "bucket": "far",
+   "questions": [
+    13,
+    13
+   ],
+   "3b": [
+    0,
+    0
+   ],
+   "3b_lora": [
+    0,
+    0
+   ],
+   "1.5b": [
+    0,
+    0
+   ],
+   "1.5b_lora": [
+    0,
+    0
+   ]
+  },
+  "token_top_receivers": {
+   "bucket": "far",
+   "questions": [
+    13,
+    13
+   ],
+   "3b": [
+    5,
+    7
+   ],
+   "3b_lora": [
+    0,
+    0
+   ],
+   "1.5b": [
+    0,
+    2
+   ],
+   "1.5b_lora": [
+    0,
+    0
+   ]
+  },
+  "token_transfer_count": {
+   "bucket": "near",
+   "questions": [
+    13,
+    13
+   ],
+   "3b": [
+    13,
+    13
+   ],
+   "3b_lora": [
+    13,
+    13
+   ],
+   "1.5b": [
+    10,
+    8
+   ],
+   "1.5b_lora": [
+    13,
+    13
+   ]
+  },
+  "unsupported_balance": {
+   "bucket": "refuse",
+   "questions": [
+    8,
+    8
+   ],
+   "3b": [
+    8,
+    8
+   ],
+   "3b_lora": [
+    8,
+    8
+   ],
+   "1.5b": [
+    8,
+    8
+   ],
+   "1.5b_lora": [
+    8,
+    8
+   ]
+  },
+  "unsupported_usd_value": {
+   "bucket": "refuse",
+   "questions": [
+    8,
+    8
+   ],
+   "3b": [
+    8,
+    8
+   ],
+   "3b_lora": [
+    8,
+    8
+   ],
+   "1.5b": [
+    8,
+    8
+   ],
+   "1.5b_lora": [
+    8,
+    8
+   ]
+  }
+ },
+ "sept_test": {
+  "3b": {
+   "correct": 252,
+   "questions": 328,
+   "ex": 0.768
+  },
+  "3b_lora": {
+   "correct": 267,
+   "questions": 328,
+   "ex": 0.814
+  },
+  "1.5b": {
+   "correct": 201,
+   "questions": 328,
+   "ex": 0.613
+  },
+  "1.5b_lora": {
+   "correct": 265,
+   "questions": 328,
+   "ex": 0.808
+  }
+ },
+ "time_use": {
+  "dev": {
+   "3b": {
+    "september": {
+     "exact:wrong": 3,
+     "exact:ok": 58,
+     "none:wrong": 1
+    },
+    "october": {
+     "exact:wrong": 4,
+     "exact:ok": 57,
+     "none:wrong": 1
+    },
+    "across": {
+     "exact:wrong": 1,
+     "exact:ok": 4,
+     "none:wrong": 1
+    },
+    "all_data": {
+     "exact:wrong": 5,
+     "exact:ok": 26
+    }
+   },
+   "3b_lora": {
+    "september": {
+     "exact:wrong": 2,
+     "exact:ok": 59,
+     "none:wrong": 1
+    },
+    "october": {
+     "exact:wrong": 1,
+     "exact:ok": 60,
+     "none:wrong": 1
+    },
+    "across": {
+     "exact:ok": 5,
+     "none:wrong": 1
+    },
+    "all_data": {
+     "exact:ok": 31
+    }
+   },
+   "1.5b": {
+    "september": {
+     "exact:wrong": 20,
+     "exact:ok": 41,
+     "none:wrong": 1
+    },
+    "october": {
+     "exact:wrong": 25,
+     "exact:ok": 36,
+     "none:wrong": 1
+    },
+    "across": {
+     "exact:wrong": 3,
+     "exact:ok": 2,
+     "none:wrong": 1
+    },
+    "all_data": {
+     "exact:wrong": 11,
+     "exact:ok": 20
+    }
+   },
+   "1.5b_lora": {
+    "september": {
+     "exact:wrong": 4,
+     "exact:ok": 57,
+     "none:wrong": 1
+    },
+    "october": {
+     "exact:wrong": 1,
+     "exact:ok": 60,
+     "none:wrong": 1
+    },
+    "across": {
+     "exact:ok": 5,
+     "none:wrong": 1
+    },
+    "all_data": {
+     "exact:ok": 31
+    }
+   }
+  },
+  "test": {
+   "3b": {
+    "september": {
+     "exact:wrong": 24,
+     "exact:ok": 88,
+     "none:wrong": 2
+    },
+    "october": {
+     "exact:wrong": 26,
+     "exact:ok": 94,
+     "none:wrong": 3
+    },
+    "across": {
+     "exact:wrong": 6,
+     "exact:ok": 17
+    },
+    "all_data": {
+     "exact:wrong": 14,
+     "exact:ok": 22
+    }
+   },
+   "3b_lora": {
+    "september": {
+     "exact:wrong": 18,
+     "exact:ok": 95,
+     "none:wrong": 1
+    },
+    "october": {
+     "exact:wrong": 21,
+     "exact:ok": 100,
+     "none:wrong": 2
+    },
+    "across": {
+     "exact:wrong": 5,
+     "exact:ok": 18
+    },
+    "all_data": {
+     "exact:wrong": 16,
+     "exact:ok": 20
+    }
+   },
+   "1.5b": {
+    "september": {
+     "exact:wrong": 35,
+     "exact:ok": 78,
+     "none:wrong": 1
+    },
+    "october": {
+     "exact:wrong": 39,
+     "exact:ok": 78,
+     "none:wrong": 5,
+     "other:wrong": 1
+    },
+    "across": {
+     "exact:wrong": 11,
+     "exact:ok": 12
+    },
+    "all_data": {
+     "exact:wrong": 19,
+     "exact:ok": 17
+    }
+   },
+   "1.5b_lora": {
+    "september": {
+     "exact:wrong": 19,
+     "exact:ok": 93,
+     "none:wrong": 2
+    },
+    "october": {
+     "exact:wrong": 21,
+     "exact:ok": 100,
+     "none:wrong": 2
+    },
+    "across": {
+     "exact:wrong": 6,
+     "exact:ok": 17
+    },
+    "all_data": {
+     "exact:wrong": 16,
+     "exact:ok": 20
+    }
+   }
+  }
+ },
+ "error_kinds_test": {
+  "3b": {
+   "september": {
+    "wrong_result": 20,
+    "execution": 3,
+    "extra_columns": 1,
+    "abstained": 1,
+    "parse": 1
+   },
+   "october": {
+    "wrong_result": 19,
+    "execution": 6,
+    "parse": 2,
+    "abstained": 2
+   },
+   "across": {
+    "wrong_result": 4,
+    "execution": 2
+   },
+   "all_data": {
+    "wrong_result": 12,
+    "execution": 1,
+    "unknown_placeholder": 1
+   }
+  },
+  "3b_lora": {
+   "september": {
+    "execution": 7,
+    "wrong_result": 6,
+    "unknown_placeholder": 5,
+    "abstained": 1
+   },
+   "october": {
+    "execution": 9,
+    "wrong_result": 9,
+    "unknown_placeholder": 3,
+    "abstained": 2
+   },
+   "across": {
+    "unknown_placeholder": 2,
+    "wrong_result": 2,
+    "execution": 1
+   },
+   "all_data": {
+    "wrong_result": 7,
+    "unknown_placeholder": 5,
+    "execution": 4
+   }
+  },
+  "1.5b": {
+   "september": {
+    "wrong_result": 24,
+    "execution": 9,
+    "parse": 2,
+    "abstained": 1
+   },
+   "october": {
+    "wrong_result": 23,
+    "execution": 12,
+    "parse": 6,
+    "timeout": 2,
+    "abstained": 2
+   },
+   "across": {
+    "wrong_result": 5,
+    "execution": 4,
+    "parse": 2
+   },
+   "all_data": {
+    "execution": 10,
+    "wrong_result": 8,
+    "parse": 1
+   }
+  },
+  "1.5b_lora": {
+   "september": {
+    "execution": 9,
+    "wrong_result": 6,
+    "unknown_placeholder": 5,
+    "abstained": 1
+   },
+   "october": {
+    "execution": 10,
+    "wrong_result": 6,
+    "unknown_placeholder": 3,
+    "extra_columns": 2,
+    "abstained": 2
+   },
+   "across": {
+    "wrong_result": 3,
+    "unknown_placeholder": 2,
+    "execution": 1
+   },
+   "all_data": {
+    "wrong_result": 8,
+    "unknown_placeholder": 5,
+    "execution": 3
+   }
+  }
+ },
+ "all_data_test": {
+  "address_largest_eth_sent": {
+   "questions": 6,
+   "3b": 1,
+   "3b_lora": 0,
+   "1.5b": 0,
+   "1.5b_lora": 0
+  },
+  "ambiguous_times": {
+   "questions": 2,
+   "3b": 1,
+   "3b_lora": 2,
+   "1.5b": 1,
+   "1.5b_lora": 2
+  },
+  "ambiguous_users": {
+   "questions": 1,
+   "3b": 0,
+   "3b_lora": 0,
+   "1.5b": 0,
+   "1.5b_lora": 0
+  },
+  "ambiguous_volume": {
+   "questions": 3,
+   "3b": 2,
+   "3b_lora": 2,
+   "1.5b": 2,
+   "1.5b_lora": 2
+  },
+  "blob_tx_count": {
+   "questions": 2,
+   "3b": 2,
+   "3b_lora": 2,
+   "1.5b": 2,
+   "1.5b_lora": 2
+  },
+  "class_distinct_callers": {
+   "questions": 1,
+   "3b": 1,
+   "3b_lora": 1,
+   "1.5b": 1,
+   "1.5b_lora": 1
+  },
+  "class_top_contracts": {
+   "questions": 1,
+   "3b": 1,
+   "3b_lora": 0,
+   "1.5b": 0,
+   "1.5b_lora": 0
+  },
+  "entity_eth_received": {
+   "questions": 4,
+   "3b": 4,
+   "3b_lora": 4,
+   "1.5b": 4,
+   "1.5b_lora": 4
+  },
+  "entity_failed_calls": {
+   "questions": 1,
+   "3b": 0,
+   "3b_lora": 1,
+   "1.5b": 1,
+   "1.5b_lora": 1
+  },
+  "entity_token_received": {
+   "questions": 1,
+   "3b": 1,
+   "3b_lora": 1,
+   "1.5b": 0,
+   "1.5b_lora": 1
+  },
+  "literal_eth_received": {
+   "questions": 3,
+   "3b": 3,
+   "3b_lora": 3,
+   "1.5b": 3,
+   "1.5b_lora": 3
+  },
+  "token_amount_total": {
+   "questions": 1,
+   "3b": 0,
+   "3b_lora": 1,
+   "1.5b": 1,
+   "1.5b_lora": 1
+  },
+  "token_largest_transfer": {
+   "questions": 3,
+   "3b": 0,
+   "3b_lora": 0,
+   "1.5b": 0,
+   "1.5b_lora": 0
+  },
+  "token_top_receivers": {
+   "questions": 4,
+   "3b": 3,
+   "3b_lora": 0,
+   "1.5b": 2,
+   "1.5b_lora": 0
+  },
+  "token_transfer_count": {
+   "questions": 3,
+   "3b": 3,
+   "3b_lora": 3,
+   "1.5b": 0,
+   "1.5b_lora": 3
+  }
+ },
+ "all_data_changes_test": {
+  "3b_lora_vs_3b": {
+   "better": [
+    "m00207",
+    "m00306",
+    "m00405"
+   ],
+   "worse": [
+    "m00275",
+    "m00315",
+    "m00318",
+    "m00322",
+    "m00369"
+   ]
+  },
+  "1.5b_lora_vs_1.5b": {
+   "better": [
+    "m00239",
+    "m00291",
+    "m00295",
+    "m00299",
+    "m00403"
+   ],
+   "worse": [
+    "m00318",
+    "m00322"
+   ]
+  }
+ }
+}
