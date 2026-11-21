@@ -1,0 +1,960 @@
+{
+ "3b": {
+  "across": {
+   "ex": 0.7241,
+   "correct": 21,
+   "questions": 29
+  },
+  "all": {
+   "ex": 0.8198,
+   "correct": 414,
+   "questions": 505
+  },
+  "all_data": {
+   "ex": 0.7164,
+   "correct": 48,
+   "questions": 67
+  },
+  "dev": {
+   "ex": 0.9096,
+   "correct": 161,
+   "questions": 177
+  },
+  "october": {
+   "ex": 0.8162,
+   "correct": 151,
+   "questions": 185
+  },
+  "september": {
+   "ex": 0.8295,
+   "correct": 146,
+   "questions": 176
+  },
+  "template:address_eth_received": {
+   "ex": 0.6923,
+   "correct": 9,
+   "questions": 13
+  },
+  "template:address_eth_sent": {
+   "ex": 0.9231,
+   "correct": 12,
+   "questions": 13
+  },
+  "template:address_largest_eth_sent": {
+   "ex": 0.2308,
+   "correct": 3,
+   "questions": 13
+  },
+  "template:address_token_received": {
+   "ex": 0.6923,
+   "correct": 9,
+   "questions": 13
+  },
+  "template:address_tx_sent_count": {
+   "ex": 1.0,
+   "correct": 13,
+   "questions": 13
+  },
+  "template:ambiguous_times": {
+   "ex": 0.7333,
+   "correct": 11,
+   "questions": 15
+  },
+  "template:ambiguous_users": {
+   "ex": 0.4,
+   "correct": 6,
+   "questions": 15
+  },
+  "template:ambiguous_value_received": {
+   "ex": 0.8667,
+   "correct": 13,
+   "questions": 15
+  },
+  "template:ambiguous_volume": {
+   "ex": 0.8667,
+   "correct": 13,
+   "questions": 15
+  },
+  "template:blob_tx_count": {
+   "ex": 1.0,
+   "correct": 12,
+   "questions": 12
+  },
+  "template:class_call_count": {
+   "ex": 1.0,
+   "correct": 14,
+   "questions": 14
+  },
+  "template:class_distinct_callers": {
+   "ex": 1.0,
+   "correct": 14,
+   "questions": 14
+  },
+  "template:class_eth_received": {
+   "ex": 1.0,
+   "correct": 14,
+   "questions": 14
+  },
+  "template:class_token_received": {
+   "ex": 0.7143,
+   "correct": 10,
+   "questions": 14
+  },
+  "template:class_top_contracts": {
+   "ex": 0.2143,
+   "correct": 3,
+   "questions": 14
+  },
+  "template:contract_creation_count": {
+   "ex": 1.0,
+   "correct": 12,
+   "questions": 12
+  },
+  "template:daily_avg_gas_price": {
+   "ex": 0.4167,
+   "correct": 5,
+   "questions": 12
+  },
+  "template:entity_call_count": {
+   "ex": 1.0,
+   "correct": 14,
+   "questions": 14
+  },
+  "template:entity_daily_calls": {
+   "ex": 0.9286,
+   "correct": 13,
+   "questions": 14
+  },
+  "template:entity_distinct_callers": {
+   "ex": 1.0,
+   "correct": 14,
+   "questions": 14
+  },
+  "template:entity_eth_received": {
+   "ex": 1.0,
+   "correct": 14,
+   "questions": 14
+  },
+  "template:entity_failed_calls": {
+   "ex": 0.7857,
+   "correct": 11,
+   "questions": 14
+  },
+  "template:entity_fees_paid": {
+   "ex": 1.0,
+   "correct": 14,
+   "questions": 14
+  },
+  "template:entity_token_received": {
+   "ex": 0.7143,
+   "correct": 10,
+   "questions": 14
+  },
+  "template:entity_top_callers": {
+   "ex": 0.8571,
+   "correct": 12,
+   "questions": 14
+  },
+  "template:literal_eth_received": {
+   "ex": 1.0,
+   "correct": 12,
+   "questions": 12
+  },
+  "template:literal_tx_sent_count": {
+   "ex": 1.0,
+   "correct": 12,
+   "questions": 12
+  },
+  "template:nil_call_count": {
+   "ex": 1.0,
+   "correct": 8,
+   "questions": 8
+  },
+  "template:nil_eth_received": {
+   "ex": 1.0,
+   "correct": 8,
+   "questions": 8
+  },
+  "template:nil_token_transfer_count": {
+   "ex": 1.0,
+   "correct": 8,
+   "questions": 8
+  },
+  "template:token_amount_total": {
+   "ex": 0.9231,
+   "correct": 12,
+   "questions": 13
+  },
+  "template:token_daily_transfers": {
+   "ex": 0.8462,
+   "correct": 11,
+   "questions": 13
+  },
+  "template:token_distinct_senders": {
+   "ex": 0.9231,
+   "correct": 12,
+   "questions": 13
+  },
+  "template:token_largest_transfer": {
+   "ex": 0.0,
+   "correct": 0,
+   "questions": 13
+  },
+  "template:token_top_receivers": {
+   "ex": 0.5385,
+   "correct": 7,
+   "questions": 13
+  },
+  "template:token_transfer_count": {
+   "ex": 1.0,
+   "correct": 13,
+   "questions": 13
+  },
+  "template:top_block_producers": {
+   "ex": 1.0,
+   "correct": 12,
+   "questions": 12
+  },
+  "template:unsupported_balance": {
+   "ex": 1.0,
+   "correct": 8,
+   "questions": 8
+  },
+  "template:unsupported_internal_eth": {
+   "ex": 1.0,
+   "correct": 8,
+   "questions": 8
+  },
+  "template:unsupported_usd_value": {
+   "ex": 1.0,
+   "correct": 8,
+   "questions": 8
+  },
+  "test": {
+   "ex": 0.7713,
+   "correct": 253,
+   "questions": 328
+  }
+ },
+ "3b_lora": {
+  "across": {
+   "ex": 0.7931,
+   "correct": 23,
+   "questions": 29
+  },
+  "all": {
+   "ex": 0.8634,
+   "correct": 436,
+   "questions": 505
+  },
+  "all_data": {
+   "ex": 0.7612,
+   "correct": 51,
+   "questions": 67
+  },
+  "dev": {
+   "ex": 0.9661,
+   "correct": 171,
+   "questions": 177
+  },
+  "october": {
+   "ex": 0.8649,
+   "correct": 160,
+   "questions": 185
+  },
+  "september": {
+   "ex": 0.875,
+   "correct": 154,
+   "questions": 176
+  },
+  "template:address_eth_received": {
+   "ex": 0.9231,
+   "correct": 12,
+   "questions": 13
+  },
+  "template:address_eth_sent": {
+   "ex": 0.9231,
+   "correct": 12,
+   "questions": 13
+  },
+  "template:address_largest_eth_sent": {
+   "ex": 0.0,
+   "correct": 0,
+   "questions": 13
+  },
+  "template:address_token_received": {
+   "ex": 1.0,
+   "correct": 13,
+   "questions": 13
+  },
+  "template:address_tx_sent_count": {
+   "ex": 1.0,
+   "correct": 13,
+   "questions": 13
+  },
+  "template:ambiguous_times": {
+   "ex": 0.8667,
+   "correct": 13,
+   "questions": 15
+  },
+  "template:ambiguous_users": {
+   "ex": 0.6,
+   "correct": 9,
+   "questions": 15
+  },
+  "template:ambiguous_value_received": {
+   "ex": 1.0,
+   "correct": 15,
+   "questions": 15
+  },
+  "template:ambiguous_volume": {
+   "ex": 0.9333,
+   "correct": 14,
+   "questions": 15
+  },
+  "template:blob_tx_count": {
+   "ex": 1.0,
+   "correct": 12,
+   "questions": 12
+  },
+  "template:class_call_count": {
+   "ex": 1.0,
+   "correct": 14,
+   "questions": 14
+  },
+  "template:class_distinct_callers": {
+   "ex": 1.0,
+   "correct": 14,
+   "questions": 14
+  },
+  "template:class_eth_received": {
+   "ex": 1.0,
+   "correct": 14,
+   "questions": 14
+  },
+  "template:class_token_received": {
+   "ex": 0.9286,
+   "correct": 13,
+   "questions": 14
+  },
+  "template:class_top_contracts": {
+   "ex": 0.0,
+   "correct": 0,
+   "questions": 14
+  },
+  "template:contract_creation_count": {
+   "ex": 1.0,
+   "correct": 12,
+   "questions": 12
+  },
+  "template:daily_avg_gas_price": {
+   "ex": 1.0,
+   "correct": 12,
+   "questions": 12
+  },
+  "template:entity_call_count": {
+   "ex": 1.0,
+   "correct": 14,
+   "questions": 14
+  },
+  "template:entity_daily_calls": {
+   "ex": 1.0,
+   "correct": 14,
+   "questions": 14
+  },
+  "template:entity_distinct_callers": {
+   "ex": 1.0,
+   "correct": 14,
+   "questions": 14
+  },
+  "template:entity_eth_received": {
+   "ex": 1.0,
+   "correct": 14,
+   "questions": 14
+  },
+  "template:entity_failed_calls": {
+   "ex": 1.0,
+   "correct": 14,
+   "questions": 14
+  },
+  "template:entity_fees_paid": {
+   "ex": 1.0,
+   "correct": 14,
+   "questions": 14
+  },
+  "template:entity_token_received": {
+   "ex": 1.0,
+   "correct": 14,
+   "questions": 14
+  },
+  "template:entity_top_callers": {
+   "ex": 0.7857,
+   "correct": 11,
+   "questions": 14
+  },
+  "template:literal_eth_received": {
+   "ex": 1.0,
+   "correct": 12,
+   "questions": 12
+  },
+  "template:literal_tx_sent_count": {
+   "ex": 1.0,
+   "correct": 12,
+   "questions": 12
+  },
+  "template:nil_call_count": {
+   "ex": 1.0,
+   "correct": 8,
+   "questions": 8
+  },
+  "template:nil_eth_received": {
+   "ex": 1.0,
+   "correct": 8,
+   "questions": 8
+  },
+  "template:nil_token_transfer_count": {
+   "ex": 1.0,
+   "correct": 8,
+   "questions": 8
+  },
+  "template:token_amount_total": {
+   "ex": 1.0,
+   "correct": 13,
+   "questions": 13
+  },
+  "template:token_daily_transfers": {
+   "ex": 0.9231,
+   "correct": 12,
+   "questions": 13
+  },
+  "template:token_distinct_senders": {
+   "ex": 1.0,
+   "correct": 13,
+   "questions": 13
+  },
+  "template:token_largest_transfer": {
+   "ex": 0.0,
+   "correct": 0,
+   "questions": 13
+  },
+  "template:token_top_receivers": {
+   "ex": 0.0,
+   "correct": 0,
+   "questions": 13
+  },
+  "template:token_transfer_count": {
+   "ex": 1.0,
+   "correct": 13,
+   "questions": 13
+  },
+  "template:top_block_producers": {
+   "ex": 1.0,
+   "correct": 12,
+   "questions": 12
+  },
+  "template:unsupported_balance": {
+   "ex": 1.0,
+   "correct": 8,
+   "questions": 8
+  },
+  "template:unsupported_internal_eth": {
+   "ex": 1.0,
+   "correct": 8,
+   "questions": 8
+  },
+  "template:unsupported_usd_value": {
+   "ex": 1.0,
+   "correct": 8,
+   "questions": 8
+  },
+  "test": {
+   "ex": 0.8079,
+   "correct": 265,
+   "questions": 328
+  }
+ },
+ "1.5b": {
+  "across": {
+   "ex": 0.4828,
+   "correct": 14,
+   "questions": 29
+  },
+  "all": {
+   "ex": 0.6574,
+   "correct": 332,
+   "questions": 505
+  },
+  "all_data": {
+   "ex": 0.5522,
+   "correct": 37,
+   "questions": 67
+  },
+  "dev": {
+   "ex": 0.6497,
+   "correct": 115,
+   "questions": 177
+  },
+  "october": {
+   "ex": 0.6162,
+   "correct": 114,
+   "questions": 185
+  },
+  "september": {
+   "ex": 0.6761,
+   "correct": 119,
+   "questions": 176
+  },
+  "template:address_eth_received": {
+   "ex": 0.9231,
+   "correct": 12,
+   "questions": 13
+  },
+  "template:address_eth_sent": {
+   "ex": 0.9231,
+   "correct": 12,
+   "questions": 13
+  },
+  "template:address_largest_eth_sent": {
+   "ex": 0.0,
+   "correct": 0,
+   "questions": 13
+  },
+  "template:address_token_received": {
+   "ex": 0.9231,
+   "correct": 12,
+   "questions": 13
+  },
+  "template:address_tx_sent_count": {
+   "ex": 1.0,
+   "correct": 13,
+   "questions": 13
+  },
+  "template:ambiguous_times": {
+   "ex": 0.5333,
+   "correct": 8,
+   "questions": 15
+  },
+  "template:ambiguous_users": {
+   "ex": 0.4667,
+   "correct": 7,
+   "questions": 15
+  },
+  "template:ambiguous_value_received": {
+   "ex": 0.6667,
+   "correct": 10,
+   "questions": 15
+  },
+  "template:ambiguous_volume": {
+   "ex": 0.8,
+   "correct": 12,
+   "questions": 15
+  },
+  "template:blob_tx_count": {
+   "ex": 1.0,
+   "correct": 12,
+   "questions": 12
+  },
+  "template:class_call_count": {
+   "ex": 0.4286,
+   "correct": 6,
+   "questions": 14
+  },
+  "template:class_distinct_callers": {
+   "ex": 0.6429,
+   "correct": 9,
+   "questions": 14
+  },
+  "template:class_eth_received": {
+   "ex": 0.2143,
+   "correct": 3,
+   "questions": 14
+  },
+  "template:class_token_received": {
+   "ex": 0.0,
+   "correct": 0,
+   "questions": 14
+  },
+  "template:class_top_contracts": {
+   "ex": 0.0,
+   "correct": 0,
+   "questions": 14
+  },
+  "template:contract_creation_count": {
+   "ex": 1.0,
+   "correct": 12,
+   "questions": 12
+  },
+  "template:daily_avg_gas_price": {
+   "ex": 0.4167,
+   "correct": 5,
+   "questions": 12
+  },
+  "template:entity_call_count": {
+   "ex": 0.9286,
+   "correct": 13,
+   "questions": 14
+  },
+  "template:entity_daily_calls": {
+   "ex": 0.7857,
+   "correct": 11,
+   "questions": 14
+  },
+  "template:entity_distinct_callers": {
+   "ex": 0.7857,
+   "correct": 11,
+   "questions": 14
+  },
+  "template:entity_eth_received": {
+   "ex": 1.0,
+   "correct": 14,
+   "questions": 14
+  },
+  "template:entity_failed_calls": {
+   "ex": 1.0,
+   "correct": 14,
+   "questions": 14
+  },
+  "template:entity_fees_paid": {
+   "ex": 0.5,
+   "correct": 7,
+   "questions": 14
+  },
+  "template:entity_token_received": {
+   "ex": 0.1429,
+   "correct": 2,
+   "questions": 14
+  },
+  "template:entity_top_callers": {
+   "ex": 0.1429,
+   "correct": 2,
+   "questions": 14
+  },
+  "template:literal_eth_received": {
+   "ex": 1.0,
+   "correct": 12,
+   "questions": 12
+  },
+  "template:literal_tx_sent_count": {
+   "ex": 1.0,
+   "correct": 12,
+   "questions": 12
+  },
+  "template:nil_call_count": {
+   "ex": 1.0,
+   "correct": 8,
+   "questions": 8
+  },
+  "template:nil_eth_received": {
+   "ex": 1.0,
+   "correct": 8,
+   "questions": 8
+  },
+  "template:nil_token_transfer_count": {
+   "ex": 1.0,
+   "correct": 8,
+   "questions": 8
+  },
+  "template:token_amount_total": {
+   "ex": 1.0,
+   "correct": 13,
+   "questions": 13
+  },
+  "template:token_daily_transfers": {
+   "ex": 0.9231,
+   "correct": 12,
+   "questions": 13
+  },
+  "template:token_distinct_senders": {
+   "ex": 0.7692,
+   "correct": 10,
+   "questions": 13
+  },
+  "template:token_largest_transfer": {
+   "ex": 0.0,
+   "correct": 0,
+   "questions": 13
+  },
+  "template:token_top_receivers": {
+   "ex": 0.1538,
+   "correct": 2,
+   "questions": 13
+  },
+  "template:token_transfer_count": {
+   "ex": 0.6154,
+   "correct": 8,
+   "questions": 13
+  },
+  "template:top_block_producers": {
+   "ex": 0.6667,
+   "correct": 8,
+   "questions": 12
+  },
+  "template:unsupported_balance": {
+   "ex": 1.0,
+   "correct": 8,
+   "questions": 8
+  },
+  "template:unsupported_internal_eth": {
+   "ex": 1.0,
+   "correct": 8,
+   "questions": 8
+  },
+  "template:unsupported_usd_value": {
+   "ex": 1.0,
+   "correct": 8,
+   "questions": 8
+  },
+  "test": {
+   "ex": 0.6616,
+   "correct": 217,
+   "questions": 328
+  }
+ },
+ "1.5b_lora": {
+  "across": {
+   "ex": 0.7586,
+   "correct": 22,
+   "questions": 29
+  },
+  "all": {
+   "ex": 0.8535,
+   "correct": 431,
+   "questions": 505
+  },
+  "all_data": {
+   "ex": 0.7612,
+   "correct": 51,
+   "questions": 67
+  },
+  "dev": {
+   "ex": 0.9548,
+   "correct": 169,
+   "questions": 177
+  },
+  "october": {
+   "ex": 0.8649,
+   "correct": 160,
+   "questions": 185
+  },
+  "september": {
+   "ex": 0.8523,
+   "correct": 150,
+   "questions": 176
+  },
+  "template:address_eth_received": {
+   "ex": 0.9231,
+   "correct": 12,
+   "questions": 13
+  },
+  "template:address_eth_sent": {
+   "ex": 0.9231,
+   "correct": 12,
+   "questions": 13
+  },
+  "template:address_largest_eth_sent": {
+   "ex": 0.0,
+   "correct": 0,
+   "questions": 13
+  },
+  "template:address_token_received": {
+   "ex": 1.0,
+   "correct": 13,
+   "questions": 13
+  },
+  "template:address_tx_sent_count": {
+   "ex": 1.0,
+   "correct": 13,
+   "questions": 13
+  },
+  "template:ambiguous_times": {
+   "ex": 0.8667,
+   "correct": 13,
+   "questions": 15
+  },
+  "template:ambiguous_users": {
+   "ex": 0.4,
+   "correct": 6,
+   "questions": 15
+  },
+  "template:ambiguous_value_received": {
+   "ex": 1.0,
+   "correct": 15,
+   "questions": 15
+  },
+  "template:ambiguous_volume": {
+   "ex": 0.9333,
+   "correct": 14,
+   "questions": 15
+  },
+  "template:blob_tx_count": {
+   "ex": 1.0,
+   "correct": 12,
+   "questions": 12
+  },
+  "template:class_call_count": {
+   "ex": 1.0,
+   "correct": 14,
+   "questions": 14
+  },
+  "template:class_distinct_callers": {
+   "ex": 1.0,
+   "correct": 14,
+   "questions": 14
+  },
+  "template:class_eth_received": {
+   "ex": 1.0,
+   "correct": 14,
+   "questions": 14
+  },
+  "template:class_token_received": {
+   "ex": 0.9286,
+   "correct": 13,
+   "questions": 14
+  },
+  "template:class_top_contracts": {
+   "ex": 0.0,
+   "correct": 0,
+   "questions": 14
+  },
+  "template:contract_creation_count": {
+   "ex": 1.0,
+   "correct": 12,
+   "questions": 12
+  },
+  "template:daily_avg_gas_price": {
+   "ex": 1.0,
+   "correct": 12,
+   "questions": 12
+  },
+  "template:entity_call_count": {
+   "ex": 1.0,
+   "correct": 14,
+   "questions": 14
+  },
+  "template:entity_daily_calls": {
+   "ex": 1.0,
+   "correct": 14,
+   "questions": 14
+  },
+  "template:entity_distinct_callers": {
+   "ex": 1.0,
+   "correct": 14,
+   "questions": 14
+  },
+  "template:entity_eth_received": {
+   "ex": 1.0,
+   "correct": 14,
+   "questions": 14
+  },
+  "template:entity_failed_calls": {
+   "ex": 1.0,
+   "correct": 14,
+   "questions": 14
+  },
+  "template:entity_fees_paid": {
+   "ex": 1.0,
+   "correct": 14,
+   "questions": 14
+  },
+  "template:entity_token_received": {
+   "ex": 1.0,
+   "correct": 14,
+   "questions": 14
+  },
+  "template:entity_top_callers": {
+   "ex": 0.8571,
+   "correct": 12,
+   "questions": 14
+  },
+  "template:literal_eth_received": {
+   "ex": 1.0,
+   "correct": 12,
+   "questions": 12
+  },
+  "template:literal_tx_sent_count": {
+   "ex": 1.0,
+   "correct": 12,
+   "questions": 12
+  },
+  "template:nil_call_count": {
+   "ex": 1.0,
+   "correct": 8,
+   "questions": 8
+  },
+  "template:nil_eth_received": {
+   "ex": 1.0,
+   "correct": 8,
+   "questions": 8
+  },
+  "template:nil_token_transfer_count": {
+   "ex": 1.0,
+   "correct": 8,
+   "questions": 8
+  },
+  "template:token_amount_total": {
+   "ex": 1.0,
+   "correct": 13,
+   "questions": 13
+  },
+  "template:token_daily_transfers": {
+   "ex": 0.9231,
+   "correct": 12,
+   "questions": 13
+  },
+  "template:token_distinct_senders": {
+   "ex": 1.0,
+   "correct": 13,
+   "questions": 13
+  },
+  "template:token_largest_transfer": {
+   "ex": 0.0,
+   "correct": 0,
+   "questions": 13
+  },
+  "template:token_top_receivers": {
+   "ex": 0.0,
+   "correct": 0,
+   "questions": 13
+  },
+  "template:token_transfer_count": {
+   "ex": 1.0,
+   "correct": 13,
+   "questions": 13
+  },
+  "template:top_block_producers": {
+   "ex": 0.75,
+   "correct": 9,
+   "questions": 12
+  },
+  "template:unsupported_balance": {
+   "ex": 1.0,
+   "correct": 8,
+   "questions": 8
+  },
+  "template:unsupported_internal_eth": {
+   "ex": 1.0,
+   "correct": 8,
+   "questions": 8
+  },
+  "template:unsupported_usd_value": {
+   "ex": 1.0,
+   "correct": 8,
+   "questions": 8
+  },
+  "test": {
+   "ex": 0.7988,
+   "correct": 262,
+   "questions": 328
+  }
+ },
+ "3b_lora_vs_3b": {
+  "better": 38,
+  "worse": 16,
+  "p": 0.003838
+ },
+ "1.5b_lora_vs_1.5b": {
+  "better": 102,
+  "worse": 3,
+  "p": 0.0
+ }
+}

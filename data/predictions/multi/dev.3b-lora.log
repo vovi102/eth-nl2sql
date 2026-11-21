@@ -1,0 +1,199 @@
+model qwen2.5-coder-3b-instruct-q4_k_m, LoRA 3b-e2.gguf at scale 1.0, n_ctx 8192, 177 prompts, fixed prefix 4217 tokens -> data/predictions/multi/dev.predictions.prompts.qwen2.5-coder-3b-instruct-q4_k_m.3b-e2.jsonl
+  [1/177] m00001 sql ran (4.2 s)
+  [2/177] m00002 sql ran (1.8 s)
+  [3/177] m00003 sql ran (4.2 s)
+  [4/177] m00004 sql ran (4.1 s)
+  [5/177] m00005 sql ran (4.1 s)
+  [6/177] m00006 sql ran (4.1 s)
+  [7/177] m00007 sql ran (4.1 s)
+  [8/177] m00008 sql ran (3.9 s)
+  [9/177] m00009 sql ran (1.9 s)
+  [10/177] m00010 sql ran (4.1 s)
+  [11/177] m00011 sql ran (4.3 s)
+  [12/177] m00012 sql ran (4.1 s)
+  [13/177] m00013 sql ran (4.3 s)
+  [14/177] m00014 sql ran (4.1 s)
+  [15/177] m00015 sql ran (5.3 s)
+  [16/177] m00016 sql ran (5.1 s)
+  [17/177] m00017 sql ran (5.1 s)
+  [18/177] m00018 sql ran (5.1 s)
+  [19/177] m00019 sql ran (2.9 s)
+  [20/177] m00020 sql ran (5.1 s)
+  [21/177] m00021 sql ran (5.1 s)
+  [22/177] m00022 sql ran (5.1 s)
+  [23/177] m00023 sql ran (5.3 s)
+  [24/177] m00024 sql ran (2.9 s)
+  [25/177] m00025 sql ran (5.1 s)
+  [26/177] m00026 sql ran (5.0 s)
+  [27/177] m00027 sql ran (5.1 s)
+  [28/177] m00028 sql ran (5.1 s)
+  [29/177] m00029 sql ran (4.8 s)
+  [30/177] m00030 sql ran (2.5 s)
+  [31/177] m00031 sql ran (4.8 s)
+  [32/177] m00032 sql ran (2.6 s)
+  [33/177] m00033 sql ran (2.6 s)
+  [34/177] m00034 sql ran (4.8 s)
+  [35/177] m00035 sql ran (4.8 s)
+  [36/177] m00036 sql ran (4.8 s)
+  [37/177] m00037 sql ran (4.8 s)
+  [38/177] m00038 sql ran (4.8 s)
+  [39/177] m00039 sql ran (4.8 s)
+  [40/177] m00040 sql ran (2.5 s)
+  [41/177] m00041 sql ran (4.9 s)
+  [42/177] m00042 sql ran (4.7 s)
+  [43/177] m00043 sql ran (4.6 s)
+  [44/177] m00044 sql ran (4.3 s)
+  [45/177] m00045 sql ran (4.6 s)
+  [46/177] m00046 sql ran (4.3 s)
+  [47/177] m00047 sql ran (4.3 s)
+  [48/177] m00048 sql ran (2.2 s)
+  [49/177] m00049 sql ran (4.5 s)
+  [50/177] m00050 nil 
+  [51/177] m00051 sql ran (4.6 s)
+  [52/177] m00052 sql ran (4.3 s)
+  [53/177] m00053 sql ran (4.5 s)
+  [54/177] m00054 sql ran (2.2 s)
+  [55/177] m00055 sql ran (4.6 s)
+  [56/177] m00056 sql ran (3.2 s)
+  [57/177] m00057 sql ran (3.2 s)
+  [58/177] m00058 sql ran (3.1 s)
+  [59/177] m00059 sql ran (5.6 s)
+  [60/177] m00060 sql ran (3.3 s)
+  [61/177] m00061 sql ran (5.6 s)
+  [62/177] m00062 sql ran (5.3 s)
+  [63/177] m00063 sql ran (3.1 s)
+  [64/177] m00064 sql ran (5.4 s)
+  [65/177] m00065 sql ran (3.2 s)
+  [66/177] m00066 sql ran (5.3 s)
+  [67/177] m00067 sql ran (5.3 s)
+  [68/177] m00068 sql ran (3.3 s)
+  [69/177] m00069 sql ran (4.3 s)
+  [70/177] m00070 sql ran (4.1 s)
+  [71/177] m00071 sql ran (4.1 s)
+  [72/177] m00072 sql ran (4.1 s)
+  [73/177] m00073 sql ran (4.2 s)
+  [74/177] m00074 sql ran (4.1 s)
+  [75/177] m00075 sql ran (4.1 s)
+  [76/177] m00076 sql ran (4.1 s)
+  [77/177] m00077 sql ran (1.8 s)
+  [78/177] m00078 sql ran (4.0 s)
+  [79/177] m00079 sql ran (4.1 s)
+  [80/177] m00080 sql ran (1.9 s)
+  [81/177] m00081 sql ran (4.1 s)
+  [82/177] m00082 sql ran (5.0 s)
+  [83/177] m00083 sql ran (4.8 s)
+  [84/177] m00084 sql ran (4.9 s)
+  [85/177] m00085 sql ran (4.8 s)
+  [86/177] m00086 nil 
+  [87/177] m00087 sql ran (4.9 s)
+  [88/177] m00088 sql ran (4.8 s)
+  [89/177] m00089 sql ran (4.8 s)
+  [90/177] m00090 sql ran (5.0 s)
+  [91/177] m00091 sql ran (4.7 s)
+  [92/177] m00092 sql ran (4.8 s)
+  [93/177] m00093 sql ran (4.8 s)
+  [94/177] m00094 sql ran (5.1 s)
+  [95/177] m00095 sql ran (5.1 s)
+  [96/177] m00096 sql ran (4.9 s)
+  [97/177] m00097 sql ran (4.9 s)
+  [98/177] m00098 sql ran (2.5 s)
+  [99/177] m00099 sql ran (2.7 s)
+  [100/177] m00100 sql ran (4.8 s)
+  [101/177] m00101 sql ran (5.1 s)
+  [102/177] m00102 sql ran (4.8 s)
+  [103/177] m00103 sql ran (4.8 s)
+  [104/177] m00104 sql ran (2.5 s)
+  [105/177] m00105 sql ran (4.8 s)
+  [106/177] m00106 sql ran (4.8 s)
+  [107/177] m00107 sql ran (4.8 s)
+  [108/177] m00108 sql ran (4.8 s)
+  [109/177] m00109 sql ran (5.7 s)
+  [110/177] m00110 sql ran (5.4 s)
+  [111/177] m00111 sql ran (5.9 s)
+  [112/177] m00112 nil 
+  [113/177] m00113 sql ran (5.7 s)
+  [114/177] m00114 sql ran (5.7 s)
+  [115/177] m00115 sql ran (5.7 s)
+  [116/177] m00116 sql ran (5.7 s)
+  [117/177] m00117 sql ran (5.7 s)
+  [118/177] m00118 sql ran (5.7 s)
+  [119/177] m00119 sql ran (5.8 s)
+  [120/177] m00120 sql ran (5.7 s)
+  [121/177] m00121 sql ran (3.4 s)
+  [122/177] m00122 sql ran (5.8 s)
+  [123/177] m00123 sql ran (2.3 s)
+  [124/177] m00124 sql ran (4.5 s)
+  [125/177] m00125 sql ran (3.2 s)
+  [126/177] m00126 sql ran (5.4 s)
+  [127/177] m00127 sql ran (4.6 s)
+  [128/177] m00128 sql ran (2.1 s)
+  [129/177] m00129 sql ran (5.3 s)
+  [130/177] m00130 sql ran (5.2 s)
+  [131/177] m00131 sql ran (4.6 s)
+  [132/177] m00132 sql ran (4.4 s)
+  [133/177] m00133 sql ran (5.5 s)
+  [134/177] m00134 sql ran (3.2 s)
+  [135/177] m00135 sql ran (4.6 s)
+  [136/177] m00136 sql ran (4.4 s)
+  [137/177] m00137 sql ran (3.5 s)
+  [138/177] m00138 sql ran (5.4 s)
+  [139/177] m00139 sql ran (3.5 s)
+  [140/177] m00140 sql ran (5.8 s)
+  [141/177] m00141 sql ran (5.9 s)
+  [142/177] m00142 sql ran (5.8 s)
+  [143/177] m00143 sql ran (5.8 s)
+  [144/177] m00144 sql ran (5.9 s)
+  [145/177] m00145 sql ran (5.6 s)
+  [146/177] m00146 sql ran (5.9 s)
+  [147/177] m00147 sql ran (5.4 s)
+  [148/177] m00148 sql ran (5.9 s)
+  [149/177] m00149 sql ran (5.9 s)
+  [150/177] m00150 sql ran (3.9 s)
+  [151/177] m00151 sql ran (3.9 s)
+  [152/177] m00152 sql ran (4.0 s)
+  [153/177] m00153 sql ran (3.9 s)
+  [154/177] m00154 sql ran (3.9 s)
+  [155/177] m00155 sql ran (3.9 s)
+  [156/177] m00156 sql ran (3.9 s)
+  [157/177] m00157 sql ran (3.9 s)
+  [158/177] m00158 sql ran (3.9 s)
+  [159/177] m00159 sql ran (1.8 s)
+  [160/177] m00160 sql ran (1.7 s)
+  [161/177] m00161 sql ran (3.9 s)
+  [162/177] m00162 nil 
+  [163/177] m00163 nil 
+  [164/177] m00164 nil 
+  [165/177] m00165 nil 
+  [166/177] m00166 nil 
+  [167/177] m00167 nil 
+  [168/177] m00168 nil 
+  [169/177] m00169 nil 
+  [170/177] m00170 unsupported 
+  [171/177] m00171 unsupported 
+  [172/177] m00172 unsupported 
+  [173/177] m00173 unsupported 
+  [174/177] m00174 unsupported 
+  [175/177] m00175 unsupported 
+  [176/177] m00176 unsupported 
+  [177/177] m00177 unsupported 
+{
+  "questions": 177,
+  "decisions": {
+    "sql": 158,
+    "nil": 11,
+    "unsupported": 8
+  },
+  "skipped": 0,
+  "asked": 158,
+  "repaired": 0,
+  "repair_ran": 0,
+  "first_attempt": {
+    "ran": 158
+  },
+  "final": {
+    "ran": 158
+  },
+  "seconds_per_question": 4.404259493670886,
+  "seconds_first_attempt": 4.404259493670886,
+  "max_completion_tokens": 111
+}

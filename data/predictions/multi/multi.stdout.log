@@ -1,0 +1,43 @@
+2026-11-20 00:22:16 two-month set (M5): preconditions
+set and database match; S3 freeze holds; adapters 3b-e2, 1.5b-e2
+2026-11-20 00:22:17 adapters: 3B 3b-e2, 1.5B 1.5b-e2
+2026-11-20 00:22:24 llama-server ready: qwen2.5-coder-3b-instruct-q4_k_m --lora /home/khoavd/WORKSPACE/thesis/eth-nl2sql-multi/models/lora/3b-run/gguf/3b-e2.gguf
+2026-11-20 00:22:24 runtime check: 3B + 3b-e2 on the September dev prompts (about 14 min)
+runtime check passed: the 177 replies are identical to the S6 dev run
+2026-11-20 00:34:47 prompts: dev
+2026-11-20 00:34:53 prompts: test
+2026-11-20 00:35:04 llama-server ready: qwen2.5-coder-3b-instruct-q4_k_m 
+2026-11-20 00:35:04 3b dev: generating -> data/predictions/multi/dev.predictions.prompts.qwen2.5-coder-3b-instruct-q4_k_m.jsonl
+2026-11-20 00:48:35 3b dev: done
+2026-11-20 00:48:35 3b test: generating -> data/predictions/multi/test.predictions.prompts.qwen2.5-coder-3b-instruct-q4_k_m.jsonl
+2026-11-20 01:13:07 3b test: done
+2026-11-20 01:13:14 llama-server ready: qwen2.5-coder-3b-instruct-q4_k_m --lora /home/khoavd/WORKSPACE/thesis/eth-nl2sql-multi/models/lora/3b-run/gguf/3b-e2.gguf
+2026-11-20 01:13:14 3b-lora dev: generating -> data/predictions/multi/dev.predictions.prompts.qwen2.5-coder-3b-instruct-q4_k_m.3b-e2.jsonl
+2026-11-20 01:25:59 3b-lora dev: done
+2026-11-20 01:25:59 3b-lora test: generating -> data/predictions/multi/test.predictions.prompts.qwen2.5-coder-3b-instruct-q4_k_m.3b-e2.jsonl
+2026-11-20 01:49:09 3b-lora test: done
+2026-11-20 01:49:13 llama-server ready: qwen2.5-coder-1.5b-instruct-q4_k_m 
+2026-11-20 01:49:13 1.5b dev: generating -> data/predictions/multi/dev.predictions.prompts.qwen2.5-coder-1.5b-instruct-q4_k_m.jsonl
+2026-11-20 01:59:55 1.5b dev: done
+2026-11-20 01:59:55 1.5b test: generating -> data/predictions/multi/test.predictions.prompts.qwen2.5-coder-1.5b-instruct-q4_k_m.jsonl
+2026-11-20 02:19:39 1.5b test: done
+2026-11-20 02:19:44 llama-server ready: qwen2.5-coder-1.5b-instruct-q4_k_m --lora /home/khoavd/WORKSPACE/thesis/eth-nl2sql-multi/models/lora/1.5b-run/gguf/1.5b-e2.gguf
+2026-11-20 02:19:44 1.5b-lora dev: generating -> data/predictions/multi/dev.predictions.prompts.qwen2.5-coder-1.5b-instruct-q4_k_m.1.5b-e2.jsonl
+2026-11-20 02:27:52 1.5b-lora dev: done
+2026-11-20 02:27:52 1.5b-lora test: generating -> data/predictions/multi/test.predictions.prompts.qwen2.5-coder-1.5b-instruct-q4_k_m.1.5b-e2.jsonl
+2026-11-20 02:42:10 1.5b-lora test: done
+2026-11-20 02:42:12 score: data/predictions/multi/dev.predictions.prompts.qwen2.5-coder-3b-instruct-q4_k_m.jsonl
+2026-11-20 02:44:23 score: data/predictions/multi/dev.predictions.prompts.qwen2.5-coder-3b-instruct-q4_k_m.3b-e2.jsonl
+2026-11-20 02:46:30 score: data/predictions/multi/dev.predictions.prompts.qwen2.5-coder-1.5b-instruct-q4_k_m.jsonl
+2026-11-20 02:48:39 score: data/predictions/multi/dev.predictions.prompts.qwen2.5-coder-1.5b-instruct-q4_k_m.1.5b-e2.jsonl
+2026-11-20 02:51:23 score: data/predictions/multi/test.predictions.prompts.qwen2.5-coder-3b-instruct-q4_k_m.jsonl
+2026-11-20 02:54:36 score: data/predictions/multi/test.predictions.prompts.qwen2.5-coder-3b-instruct-q4_k_m.3b-e2.jsonl
+2026-11-20 02:57:26 score: data/predictions/multi/test.predictions.prompts.qwen2.5-coder-1.5b-instruct-q4_k_m.jsonl
+2026-11-20 03:01:47 score: data/predictions/multi/test.predictions.prompts.qwen2.5-coder-1.5b-instruct-q4_k_m.1.5b-e2.jsonl
+3b         all 414/505 = 0.8198  dev 161/177  test 253/328  september 146/176  october 151/185  across 21/29  all_data 48/67
+3b_lora    all 436/505 = 0.8634  dev 171/177  test 265/328  september 154/176  october 160/185  across 23/29  all_data 51/67
+1.5b       all 332/505 = 0.6574  dev 115/177  test 217/328  september 119/176  october 114/185  across 14/29  all_data 37/67
+1.5b_lora  all 431/505 = 0.8535  dev 169/177  test 262/328  september 150/176  october 160/185  across 22/29  all_data 51/67
+3b_lora vs 3b: {'better': 38, 'worse': 16, 'p': 0.003838}
+1.5b_lora vs 1.5b: {'better': 102, 'worse': 3, 'p': 0.0}
+2026-11-20 03:04:33 done in 162 min; failed: none

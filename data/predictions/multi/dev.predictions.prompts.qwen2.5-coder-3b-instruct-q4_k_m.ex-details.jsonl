@@ -1,0 +1,177 @@
+{"question_id": "m00001", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00002", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00003", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00004", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00005", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00006", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00007", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00008", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00009", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00010", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00011", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00012", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00013", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00014", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00015", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00016", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00017", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00018", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00019", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00020", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00021", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00022", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00023", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00024", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00025", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00026", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00027", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00028", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00029", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00030", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00031", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00032", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00033", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00034", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00035", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00036", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00037", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "m00038", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00039", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00040", "expected": "sql", "decision": "sql", "kind": "parse", "error": "SQLGlot cannot parse it as DuckDB", "correct": false, "correct_extra_columns": false}
+{"question_id": "m00041", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00042", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00043", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00044", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00045", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00046", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00047", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00048", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00049", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00050", "expected": "sql", "decision": "nil", "kind": "abstained", "correct": false, "correct_extra_columns": false}
+{"question_id": "m00051", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00052", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00053", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00054", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00055", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00056", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Binder Error: Referenced column \"name\" not found in FROM clause!", "correct": false, "correct_extra_columns": false}
+{"question_id": "m00057", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "m00058", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00059", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00060", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00061", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00062", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Binder Error: Referenced column \"symbol\" not found in FROM clause!", "correct": false, "correct_extra_columns": false}
+{"question_id": "m00063", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00064", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00065", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00066", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00067", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Binder Error: Referenced column \"name\" not found in FROM clause!", "correct": false, "correct_extra_columns": false}
+{"question_id": "m00068", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00069", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00070", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00071", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00072", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00073", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00074", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00075", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00076", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00077", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00078", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00079", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00080", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Binder Error: Referenced column \"decimals\" not found in FROM clause!", "correct": false, "correct_extra_columns": false}
+{"question_id": "m00081", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00082", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00083", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00084", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00085", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00086", "expected": "sql", "decision": "nil", "kind": "abstained", "correct": false, "correct_extra_columns": false}
+{"question_id": "m00087", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00088", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Binder Error: Referenced column \"symbol\" not found in FROM clause!", "correct": false, "correct_extra_columns": false}
+{"question_id": "m00089", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00090", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00091", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00092", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00093", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00094", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00095", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00096", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00097", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00098", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00099", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00100", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00101", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00102", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00103", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00104", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00105", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00106", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00107", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00108", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00109", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00110", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00111", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00112", "expected": "sql", "decision": "nil", "kind": "abstained", "correct": false, "correct_extra_columns": false}
+{"question_id": "m00113", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00114", "expected": "sql", "decision": "sql", "kind": "parse", "error": "SQLGlot cannot parse it as DuckDB", "correct": false, "correct_extra_columns": false}
+{"question_id": "m00115", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "m00116", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00117", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Binder Error: Referenced column \"symbol\" not found in FROM clause!", "correct": false, "correct_extra_columns": false}
+{"question_id": "m00118", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00119", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00120", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00121", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00122", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00123", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00124", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00125", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00126", "expected": "sql", "decision": "sql", "kind": "execution", "error": "Binder Error: Referenced column \"name\" not found in FROM clause!", "correct": false, "correct_extra_columns": false}
+{"question_id": "m00127", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00128", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00129", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00130", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00131", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00132", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00133", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00134", "expected": "sql", "decision": "sql", "kind": "wrong_result", "correct": false, "correct_extra_columns": false, "postgres_parses": true}
+{"question_id": "m00135", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00136", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00137", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00138", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00139", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00140", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00141", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00142", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00143", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00144", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00145", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00146", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00147", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00148", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00149", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00150", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00151", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00152", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00153", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00154", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00155", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00156", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00157", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00158", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00159", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00160", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00161", "expected": "sql", "decision": "sql", "kind": "correct", "correct": true, "correct_extra_columns": true, "postgres_parses": true}
+{"question_id": "m00162", "expected": "nil", "decision": "nil", "kind": "correct", "correct": true, "correct_extra_columns": true}
+{"question_id": "m00163", "expected": "nil", "decision": "nil", "kind": "correct", "correct": true, "correct_extra_columns": true}
+{"question_id": "m00164", "expected": "nil", "decision": "nil", "kind": "correct", "correct": true, "correct_extra_columns": true}
+{"question_id": "m00165", "expected": "nil", "decision": "nil", "kind": "correct", "correct": true, "correct_extra_columns": true}
+{"question_id": "m00166", "expected": "nil", "decision": "nil", "kind": "correct", "correct": true, "correct_extra_columns": true}
+{"question_id": "m00167", "expected": "nil", "decision": "nil", "kind": "correct", "correct": true, "correct_extra_columns": true}
+{"question_id": "m00168", "expected": "nil", "decision": "nil", "kind": "correct", "correct": true, "correct_extra_columns": true}
+{"question_id": "m00169", "expected": "nil", "decision": "nil", "kind": "correct", "correct": true, "correct_extra_columns": true}
+{"question_id": "m00170", "expected": "unsupported", "decision": "unsupported", "kind": "correct", "correct": true, "correct_extra_columns": true}
+{"question_id": "m00171", "expected": "unsupported", "decision": "unsupported", "kind": "correct", "correct": true, "correct_extra_columns": true}
+{"question_id": "m00172", "expected": "unsupported", "decision": "unsupported", "kind": "correct", "correct": true, "correct_extra_columns": true}
+{"question_id": "m00173", "expected": "unsupported", "decision": "unsupported", "kind": "correct", "correct": true, "correct_extra_columns": true}
+{"question_id": "m00174", "expected": "unsupported", "decision": "unsupported", "kind": "correct", "correct": true, "correct_extra_columns": true}
+{"question_id": "m00175", "expected": "unsupported", "decision": "unsupported", "kind": "correct", "correct": true, "correct_extra_columns": true}
+{"question_id": "m00176", "expected": "unsupported", "decision": "unsupported", "kind": "correct", "correct": true, "correct_extra_columns": true}
+{"question_id": "m00177", "expected": "unsupported", "decision": "unsupported", "kind": "correct", "correct": true, "correct_extra_columns": true}
