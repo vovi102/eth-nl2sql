@@ -14,6 +14,8 @@ src/eth_nl2sql/
   sql/                  B6–B8: prompt, gọi model, chạy SQL, chấm EX
   benchmark/            template, kiểm tra và bộ sinh dev/test
   training/             template train, kiểm tra rò rỉ, bộ sinh dữ liệu phase 2
+  api/                  giao diện web: API FastAPI, quản lý llama-server (`eth-nl2sql serve`)
+web/                    giao diện web: Next.js, build ra web/out (static)
 tests/                  pytest, một file mỗi module
 scripts/phase1/         test.sh (S4)
 scripts/phase2/         dev.sh (S5–S6), quant.sh (S7), test.sh (S8), precheck.sh
@@ -439,6 +441,57 @@ Theo M6, dữ liệu 2 tháng hầu như không thêm loại lỗi mới: SQL ch
 (chỉ 1 câu của 1.5B gốc đổi mốc cuối 1/11 thành 31/10),
 EX theo từng template gần bằng test tháng 9, và LoRA tăng ở template gần, không tăng ở template xa
 như S8.
+
+## Giao diện web
+
+Giao diện hỏi đáp để demo. Có thể gõ câu hỏi bất kỳ và chọn model như ChatGPT. Pipeline chạy
+thật: linker → prompt → llama-server → DuckDB, từng bước hiện dần trên trang. Trang Benchmark
+duyệt lại các lần chạy đã chốt, đúng/sai theo EX của từng cấu hình, và chạy lại SQL đã lưu.
+
+| Thành phần | Ở đâu |
+|---|---|
+| Backend | `src/eth_nl2sql/api/` (FastAPI, nhóm dependency `api`, cài mặc định với `uv sync`) |
+| Frontend | `web/` (Next.js 15, export static) |
+| Lệnh chạy | `eth-nl2sql serve`: phục vụ cả API lẫn `web/out` ở http://127.0.0.1:8000 |
+
+```bash
+cd web && npm ci && npm run build && cd ..   # một lần: web/out
+uv run eth-nl2sql serve                      # mở http://127.0.0.1:8000
+uv run eth-nl2sql serve --no-llama           # không dùng GPU: chỉ trang Benchmark
+uv run eth-nl2sql serve --allow-test         # thêm tập test vào trang Benchmark
+uv run eth-nl2sql check-serve 20             # câu trả lời live có trùng lần chạy đã chốt?
+```
+
+- **Cấu hình.** Có 4 cấu hình: 3B và 1.5B, mỗi cỡ có bản phase 1 (model gốc) và phase 2
+  (`--lora models/lora/<cỡ>-run/gguf/<cỡ>-e2.gguf`). Mỗi cấu hình chạy trong một tiến trình
+  llama-server riêng, với đúng cờ của các lần chạy đã chốt.
+- **Đổi model.** GTX 1650 chỉ chứa được một model, nên đổi model nghĩa là khởi động lại
+  llama-server, mất khoảng 20 s (3B).
+  - Không đổi adapter LoRA trên server đang chạy: llama.cpp phải cấp phát lại buffer, và trên
+    WSL server đã chết hai lần vì lỗi CUDA.
+  - Nếu llama-server chết giữa một câu hỏi, server được khởi động lại và câu đó được hỏi lại một
+    lần.
+- **Prefix cố định.** Prefix của `generate-sql` (4.195 token, khoảng 30 s cho 3B) chỉ phải tính
+  lần đầu với mỗi cấu hình.
+  - Sau lần đầu, KV cache của prefix được lưu vào `~/.cache/eth-nl2sql-serve/slots/`
+    (`--slot-save-path`; khoảng 550 MB cho 4 model). Thư mục này không mất khi WSL khởi động
+    lại, khác `/tmp`. Khóa của file gồm file model, binary, cờ và file prompt.
+  - Những lần khởi động sau chỉ khôi phục file này.
+  - Lúc khởi động, `serve` tính trước prefix của các cấu hình chưa có file, rồi nạp model mặc
+    định (`--model`, mặc định `3b-lora`).
+- **Tái lập.** Câu hỏi đi qua đúng các hàm của `generate-sql`: `EntityLinker`, `PromptBuilder`,
+  `generate_one` (kiểm tra placeholder, sửa lỗi một lần) và `SqlRunner`, với prefix được prime
+  như `generate`.
+  - Điểm khác duy nhất: câu trả lời được stream để hiện từng token, còn văn bản thì không đổi.
+  - `check-serve N` hỏi lại N câu dev rải đều với cả 4 cấu hình, rồi so prompt, câu trả lời của
+    từng lần thử và SQL với lần chạy đã chốt.
+  - Một câu gõ trùng nguyên văn một câu benchmark được chấm luôn so với gold.
+  - Thành viên class được xếp theo số lời gọi trên toàn bộ dữ liệu (`--class-rank data`, mặc
+    định của `serve` và `check-serve`), là quy tắc của các lần chạy tháng 9 mà trang chiếu lại.
+  - Trang chạy trên database tháng 9 (`--db` mặc định). Với database 2 tháng thì chưa kiểm tra:
+    chữ trên trang vẫn ghi tháng 9/2026, và prefix cố định vẫn tính từ prompt dev tháng 9.
+- **Phát triển frontend.** Chạy `uv run eth-nl2sql serve`, rồi trong `web/`:
+  `NEXT_PUBLIC_API_URL=http://127.0.0.1:8000 npm run dev` (cổng 3000).
 
 ## Dữ liệu cũ (đã lưu trữ)
 

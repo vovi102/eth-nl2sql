@@ -395,6 +395,64 @@ def _count_prompt_tokens(args: argparse.Namespace) -> int:
     return 0
 
 
+def _default_llama_bin() -> Path:
+    from eth_nl2sql.api.llama import DEFAULT_BINARY  # $LLAMA, else the build of README
+
+    return DEFAULT_BINARY
+
+
+def _serve_settings(args: argparse.Namespace):
+    from eth_nl2sql.api.service import Settings
+
+    return Settings(
+        db=args.db,
+        knowledge_base_dir=args.knowledge_base_dir,
+        memory_limit=args.memory_limit,
+        llama=not getattr(args, "no_llama", False),
+        llama_bin=args.llama_bin,
+        llama_port=args.llama_port,
+        default_model=getattr(args, "model", "3b-lora"),
+        allow_test=getattr(args, "allow_test", False),
+        class_rank=args.class_rank,
+    )
+
+
+def _serve(args: argparse.Namespace) -> int:
+    """The web app: the API, llama-server, and the page built in web/out."""
+    try:
+        import uvicorn
+
+        from eth_nl2sql.api.app import create_app
+        from eth_nl2sql.api.service import Service
+    except ImportError as e:
+        print(f"error: {e}; install the api group: uv sync --group api", file=sys.stderr)
+        return 1
+    static = args.web_dir if args.web_dir.is_dir() else None
+    if static is None:
+        print(f"note: {args.web_dir} is missing, only the API is served "
+              "(cd web && npm ci && npm run build)")  # fmt: skip
+    service = Service.load(_serve_settings(args))
+    uvicorn.run(create_app(service, static_dir=static), host=args.host, port=args.port)
+    return 0
+
+
+def _check_serve(args: argparse.Namespace) -> int:
+    """Live answers of the app against the frozen dev runs, on n evenly spaced sql questions."""
+    from eth_nl2sql.api.service import Service, check_reproduction
+
+    service = Service.load(_serve_settings(args))
+    try:
+        prompts = read_records(service.settings.prefix_prompts)
+        ids = [p["question_id"] for p in _spread([p for p in prompts if p["decision"] == "sql"],
+                                                 args.n)]  # fmt: skip
+        print(f"{len(ids)} dev questions x {len(service.models)} configurations")
+        ok = check_reproduction(service, ids)
+    finally:
+        service.close()
+    print("all identical" if ok else "DIFFERENCES: see above")
+    return 0 if ok else 1
+
+
 def _print_tables(report: dict) -> None:
     for name, info in report["tables"].items():
         print(f"  {name:<16} {info['rows']:>12,} rows")
@@ -621,6 +679,33 @@ def main(argv: list[str] | None = None) -> int:
             "(default), or those of all the data (`data`: the rule of the September experiments)",
         )  # fmt: skip
 
+    p = sub.add_parser("serve", help="the web app: API, llama-server and the page of web/")
+    p.add_argument("--host", default="127.0.0.1")
+    p.add_argument("--port", type=int, default=8000)
+    p.add_argument(
+        "--model", default="3b-lora", choices=("3b-lora", "3b", "1.5b-lora", "1.5b"),
+        help="model loaded at start (the page can switch)",
+    )  # fmt: skip
+    p.add_argument("--no-llama", action="store_true", help="browse the frozen runs only, no GPU")
+    p.add_argument("--web-dir", type=Path, default=Path("web/out"), help="the built page")
+    p.add_argument("--allow-test", action="store_true", help="also browse and score the test split")
+    p = sub.add_parser(
+        "check-serve", help="the app's live answers against the frozen dev runs (all 4 models)"
+    )
+    p.add_argument("n", type=int, nargs="?", default=20, help="dev questions, evenly spaced")
+    for name in ("serve", "check-serve"):
+        p = sub.choices[name]
+        p.add_argument("--db", type=Path, default=DEFAULT_DB)
+        p.add_argument("--knowledge-base-dir", type=Path, default=DEFAULT_KNOWLEDGE_BASE_DIR)
+        p.add_argument("--memory-limit", default="4GB")
+        p.add_argument("--llama-bin", type=Path, default=_default_llama_bin())
+        p.add_argument("--llama-port", type=int, default=8080)
+        p.add_argument(
+            "--class-rank", choices=CLASS_RANKS, default="data",
+            help="calls that rank the members of a class: those of all the data (default, the "
+            "rule of the September runs the page replays), or those of the question's time range",
+        )  # fmt: skip
+
     for name, (_, help_text) in BUILDERS.items():
         sub.add_parser(name, help=help_text, add_help=False)  # listed only; dispatched above
 
@@ -653,6 +738,15 @@ def main(argv: list[str] | None = None) -> int:
         try:
             return _linking(args)
         except (EvaluationError, GoldError, ClientError) as e:
+            print(f"error: {e}", file=sys.stderr)
+            return 1
+
+    if args.command == "serve":
+        return _serve(args)
+    if args.command == "check-serve":
+        try:
+            return _check_serve(args)
+        except ClientError as e:
             print(f"error: {e}", file=sys.stderr)
             return 1
 

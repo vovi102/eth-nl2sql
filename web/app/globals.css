@@ -1,0 +1,195 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+:root {
+  --bg: #f6f6f7;
+  --surface: #ffffff;
+  --surface-2: #f0f0f2;
+  --surface-3: #e7e7ea;
+  --border: #e2e2e6;
+  --border-strong: #cfcfd5;
+  --text: #17171c;
+  --muted: #6b6b76;
+  --faint: #9a9aa5;
+  --accent: #4f46e5;
+  --accent-strong: #4338ca;
+  --accent-soft: #eef0ff;
+  --accent-text: #ffffff;
+  --ok: #15803d;
+  --ok-soft: #e7f6ec;
+  --bad: #c2261d;
+  --bad-soft: #fdeceb;
+  --warn: #a35a00;
+  --warn-soft: #fdf3e2;
+  --code-bg: #f4f4f6;
+
+  /* linking: one hue per kind of span */
+  --c-entity: #2563eb;
+  --c-token: #059669;
+  --c-class: #7c3aed;
+  --c-address: #52525b;
+  --c-nil: #dc2626;
+  --c-property: #c2410c;
+  --c-time: #0e7490;
+
+  /* SQL */
+  --sql-keyword: #7c3aed;
+  --sql-function: #0e7490;
+  --sql-string: #15803d;
+  --sql-number: #c2410c;
+  --sql-placeholder: #2563eb;
+  --sql-comment: #9a9aa5;
+}
+
+:root[data-theme="dark"] {
+  --bg: #0e0e12;
+  --surface: #17171d;
+  --surface-2: #1f1f27;
+  --surface-3: #2a2a34;
+  --border: #2b2b35;
+  --border-strong: #3b3b47;
+  --text: #ececf1;
+  --muted: #a0a0ad;
+  --faint: #6f6f7c;
+  --accent: #8b8cf8;
+  --accent-strong: #a5a6fb;
+  --accent-soft: #24243d;
+  --accent-text: #0e0e12;
+  --ok: #4ade80;
+  --ok-soft: #12291b;
+  --bad: #f87171;
+  --bad-soft: #321716;
+  --warn: #fbbf24;
+  --warn-soft: #2e2410;
+  --code-bg: #121217;
+
+  --c-entity: #60a5fa;
+  --c-token: #34d399;
+  --c-class: #a78bfa;
+  --c-address: #a1a1aa;
+  --c-nil: #f87171;
+  --c-property: #fb923c;
+  --c-time: #22d3ee;
+
+  --sql-keyword: #c4b5fd;
+  --sql-function: #67e8f9;
+  --sql-string: #86efac;
+  --sql-number: #fdba74;
+  --sql-placeholder: #93c5fd;
+  --sql-comment: #6f6f7c;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-text: var(--accent-text);
+  --color-ok: var(--ok);
+  --color-ok-soft: var(--ok-soft);
+  --color-bad: var(--bad);
+  --color-bad-soft: var(--bad-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-code: var(--code-bg);
+  --font-sans: var(--font-ui), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-code), ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+/* thin scrollbars inside panels */
+.scroll-thin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+
+.caret::after {
+  content: "";
+  display: inline-block;
+  width: 0.5em;
+  height: 1em;
+  margin-left: 1px;
+  vertical-align: text-bottom;
+  background: currentColor;
+  opacity: 0.6;
+  animation: blink 1s steps(2, start) infinite;
+}
+
+@keyframes blink {
+  to {
+    visibility: hidden;
+  }
+}
+
+.span-mark {
+  --c: var(--c-entity);
+  color: var(--c);
+  background: color-mix(in srgb, var(--c) 12%, transparent);
+  box-shadow: inset 0 -2px 0 color-mix(in srgb, var(--c) 55%, transparent);
+  border-radius: 4px;
+  padding: 1px 3px;
+}
+
+.span-entity { --c: var(--c-entity); }
+.span-token { --c: var(--c-token); }
+.span-class { --c: var(--c-class); }
+.span-address,
+.span-literal_address { --c: var(--c-address); }
+.span-nil { --c: var(--c-nil); }
+.span-property { --c: var(--c-property); }
+.span-time { --c: var(--c-time); }
+.span-unsupported { --c: var(--c-nil); }
+
+.dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--c, var(--faint));
+}
+
+.sql-keyword { color: var(--sql-keyword); font-weight: 600; }
+.sql-function { color: var(--sql-function); }
+.sql-string { color: var(--sql-string); }
+.sql-number { color: var(--sql-number); }
+.sql-placeholder {
+  color: var(--sql-placeholder);
+  background: color-mix(in srgb, var(--sql-placeholder) 14%, transparent);
+  border-radius: 4px;
+  padding: 0 2px;
+  font-weight: 600;
+}
+.sql-comment { color: var(--sql-comment); font-style: italic; }
+
+@keyframes pulse-soft {
+  50% {
+    opacity: 0.45;
+  }
+}
+.pulse-soft {
+  animation: pulse-soft 1.4s ease-in-out infinite;
+}
