@@ -1,6 +1,7 @@
 # Phương pháp schema/entity linking
 
-Các quyết định đã chốt ngày 2026-10-31. Số liệu đo trên `data/raw/2026-09`.
+Các quyết định đã chốt ngày 2026-10-31. Số liệu đo trên `data/raw/2026-09`. KB giữ nguyên khi thêm
+tháng 10 ([multi-month-plan.md](multi-month-plan.md) D6); cách xếp hạng thành viên của lớp đổi theo D3 của cùng file.
 
 ## 1. Nguyên tắc: BigQuery là nguồn chuẩn
 

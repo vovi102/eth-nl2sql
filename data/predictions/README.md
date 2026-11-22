@@ -10,7 +10,7 @@ là đường dẫn lúc chạy, tức bố cục phẳng cũ (tag `thesis-v1`);
 Mỗi bước nối thêm một đoạn vào tên của file đầu vào:
 
 ```
-dev                       data/benchmark/dev.jsonl (gold)
+dev                       data/benchmark/dev.jsonl (gold; bộ 2 tháng: data/benchmark-multi/)
 dev.predictions           data/linking/: bản ghi của bộ linking
 dev.predictions.prompts   data/prompts/: prompt dựng từ linking dự đoán
 dev.prompts               data/prompts/: prompt dựng từ gold (linking oracle)
@@ -34,6 +34,7 @@ Mỗi run `X.jsonl` có `X.jsonl.meta.json` (prompts, linking, server, SHA256), 
 | `phase2/dev/` | S5/S6: adapter e1, e2 và kiểm tra scale 0 cho 1.5B và 3B; `dev-phase2-<model>.summary.json` ghi checkpoint được chọn | `scripts/phase2/dev.sh` | `docs/proposed-method.md`, `docs/phase2-plan.md` |
 | `phase2/quant/` | S7: fp16 so với Q4_K_M, có và không có LoRA (no-check, no-repair) | `scripts/phase2/quant.sh` | `docs/proposed-method.md`, README |
 | `phase2/test/` | S8: phase 2 trên test (3B+LoRA mặc định, no-check, oracle; 1.5B+LoRA); `recheck/`: kiểm tra lại dev | `scripts/phase2/test.sh` | README (bảng kết quả), `docs/proposed-method.md` |
+| `multi/` | M5: 3B, 3B+LoRA, 1.5B, 1.5B+LoRA trên bộ 2 tháng (`data/benchmark-multi`, prompt trong `data/prompts-multi`, linking trong `data/linking-multi`); `selfcheck/`: gold SQL tự chấm (M4); `recheck/`: kiểm tra lại dev tháng 9; `multi.summary.json`: EX theo tầng thời gian; `analyze.py` → `multi.analysis.json` (M6) | `scripts/multi/test.sh` | `docs/multi-month-plan.md` M4–M6, README |
 
 ### Kết quả chính
 
@@ -51,6 +52,15 @@ EX = `overall.ex` trong `X.ex.json`.
 | 3B + LoRA e2 | 0,977 | 0,814 |
 | 3B + LoRA e2, oracle | | 0,823 |
 | 1.5B + LoRA e2 | 0,960 | 0,808 |
+
+Bộ 2 tháng (`multi/`, câu hỏi khác, cùng template):
+
+| Run | dev | test |
+|---|---:|---:|
+| 3B | 0,910 | 0,771 |
+| 3B + LoRA e2 | 0,966 | 0,808 |
+| 1.5B | 0,650 | 0,662 |
+| 1.5B + LoRA e2 | 0,955 | 0,799 |
 
 ### `phase1/dev-history/`
 

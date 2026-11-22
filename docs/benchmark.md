@@ -18,7 +18,8 @@ câu theo [linking-labels.md](linking-labels.md), cộng `gold_sql`, `template_i
 
 ## 2. Quy ước chung
 
-**Thời gian.** UTC, nửa mở `[start, end)`, trong tháng 9/2026. Span theo quy ước chung với
+**Thời gian.** UTC, nửa mở `[start, end)`, trong tháng 9/2026. Bộ 2 tháng `data/benchmark-multi/`
+dùng cùng cách viết cho tháng 10 và cho khoảng vắt tháng ("từ 25/9 đến 5/10"), xem [multi-month-plan.md](multi-month-plan.md) M3. Span theo quy ước chung với
 bộ linking (chốt 2026-11-01): tiếng Việt bỏ "trong"/"vào", giữ "ngày"/"từ"; tiếng Anh giữ
 "on"/"in"/"during" và "the". Phần trong ngoặc vuông dưới đây không thuộc span.
 

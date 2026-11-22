@@ -88,6 +88,10 @@ Giá trị `nil_reason`:
   tức số lượt được gọi; hoà thì xếp theo mã thực thể. Trên dữ liệu tháng 9, cách này cho cùng
   top-5 với cách đếm cả gửi lẫn nhận ở các lớp dex, bridge và lending, nhưng không tính giao dịch
   của các ví vận hành.
+- **Từ khi có dữ liệu nhiều tháng** (2026-11-17, [multi-month-plan.md](multi-month-plan.md) D3), số lượt được gọi đếm trong
+  khoảng thời gian của câu hỏi (`--class-rank question`, mặc định); câu không nêu thời gian thì đếm
+  trên toàn bộ dữ liệu. Mọi kết quả tháng 9 dùng quy tắc cũ (`--class-rank data`: đếm trên toàn bộ
+  dữ liệu, tức cả tháng 9).
 
 Hỏi về **cả một thực thể** (mention `entity`) thì vẫn dùng mọi địa chỉ của thực thể và các con, kể
 cả contract token: "Circle nhận bao nhiêu ETH" tính cả contract USDC.

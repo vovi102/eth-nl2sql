@@ -17,15 +17,17 @@ src/eth_nl2sql/
 tests/                  pytest, một file mỗi module
 scripts/phase1/         test.sh (S4)
 scripts/phase2/         dev.sh (S5–S6), quant.sh (S7), test.sh (S8), precheck.sh
+scripts/multi/          test.sh (M5: bốn cấu hình trên dữ liệu 2 tháng)
 kaggle/phase2-train/    huấn luyện LoRA trên Kaggle (project uv riêng)
-docs/                   phương pháp, nhãn linking, benchmark, kế hoạch phase 2
+docs/                   phương pháp, nhãn linking, benchmark, kế hoạch phase 2, dữ liệu nhiều tháng
 data/
-  raw/                  2026-09/: tháng 9/2026 (Parquet không đưa vào git); labels/: eth-labels
-  db/                   ethereum.duckdb (không đưa vào git)
+  raw/                  2026-09/, 2026-10/: tháng 9 và 10/2026 (Parquet không đưa vào git); labels/: eth-labels
+  db/                   ethereum.duckdb (tháng 9), ethereum_2026-09_2026-10.duckdb (không đưa vào git)
   entity_knowledge_base/, schema/   KB và từ điển đã duyệt
   benchmark/, train/    bộ đánh giá dev/test, dữ liệu train phase 2
   linking/, prompts/    đầu ra linking và prompt, mỗi file đầu vào một file
   predictions/          kết quả sinh SQL, mỗi thí nghiệm một thư mục (xem README.md trong đó)
+  benchmark-multi/, linking-multi/, prompts-multi/   như trên, cho bộ đánh giá 2 tháng
 models/                 GGUF, tokenizer, adapter LoRA (không đưa vào git)
 ```
 
@@ -58,32 +60,38 @@ git switch --detach thesis-v1   # bố cục và code như luận văn
 git switch -                    # quay lại nhánh đang làm
 ```
 
-## Dữ liệu tháng 2026-09 (đầy đủ)
+Phần dữ liệu hai tháng của luận văn (mục 4.5 và 5.7, phụ lục C) dùng bố cục mới, ở commit
+`771b7f0` của nhánh `multi-month` (kết quả M5–M6). Script `thesis-report/phan-tich/nhieu_thang.py`
+đọc các file của bố cục này.
 
-`data/raw/2026-09/` là **toàn bộ** tháng 9/2026 (UTC) của `bigquery-public-data.crypto_ethereum`,
-dạng Parquet (zstd). `transactions` và `token_transfers` mỗi ngày một file
-(`transactions/transactions_2026-09-05.parquet`), các bảng còn lại một file cho cả tháng
-(`blocks/blocks_2026-09.parquet`):
+## Dữ liệu thô: tháng 2026-09 và 2026-10 (đầy đủ)
 
-| Bảng | Số dòng | Nguồn |
-|---|---:|---|
-| `blocks` | 215.033 | `blocks` |
-| `transactions` | 56.880.856 | `transactions` (bỏ `input`, `block_hash`; có receipt/gas đầy đủ) |
-| `token_transfers` | 103.638.134 | `token_transfers` |
-| `contracts` | 309.264 | `contracts` chạm tới trong tháng; một dòng mỗi lần deploy |
-| `tokens` | 95.473 | `tokens_latest` của các token có transfer trong tháng |
-| `amended_tokens` | 95.473 | `amended_tokens`, để đối chiếu symbol/decimals |
+`data/raw/2026-09/` và `data/raw/2026-10/` là **toàn bộ** tháng 9 và tháng 10/2026 (UTC) của
+`bigquery-public-data.crypto_ethereum`, dạng Parquet (zstd). `transactions` và `token_transfers`
+mỗi ngày một file (`transactions/transactions_2026-09-05.parquet`), các bảng còn lại một file cho
+cả tháng (`blocks/blocks_2026-09.parquet`). Mọi kết quả phase 1 và phase 2 chỉ dùng tháng 9;
+tháng 10 dùng cho phần [dữ liệu nhiều tháng](#dữ-liệu-nhiều-tháng-m0m7).
+
+| Bảng | 2026-09 | 2026-10 | Nguồn |
+|---|---:|---:|---|
+| `blocks` | 215.033 | 222.451 | `blocks` |
+| `transactions` | 56.880.856 | 55.365.081 | `transactions` (bỏ `input`, `block_hash`; có receipt/gas đầy đủ) |
+| `token_transfers` | 103.638.134 | 130.611.631 | `token_transfers` |
+| `contracts` | 309.264 | 349.803 | `contracts` chạm tới trong tháng; một dòng mỗi lần deploy |
+| `tokens` | 95.473 | 106.146 | `tokens_latest` của các token có transfer trong tháng |
+| `amended_tokens` | 95.473 | 106.146 | `amended_tokens`, để đối chiếu symbol/decimals |
 
 ```bash
-uv run eth-nl2sql extract --month 2026-09 --dry-run   # chỉ ước lượng GB
-uv run eth-nl2sql extract --month 2026-09             # trích xuất (chạy lại để resume)
-uv run eth-nl2sql verify-extract --out data/raw/2026-09
+uv run eth-nl2sql extract --month 2026-10 --dry-run   # chỉ ước lượng GB
+uv run eth-nl2sql extract --month 2026-10             # trích xuất (chạy lại để resume)
+uv run eth-nl2sql verify-extract --out data/raw/2026-10
 ```
 
 `manifest.json` ghi câu SQL, job id và số byte bị tính phí của từng file; `parity.json` là
 aggregate theo ngày tính trên BigQuery, `verify-extract` tính lại bằng DuckDB và phải khớp.
 Project GCP là sandbox (giới hạn lưu trữ 10 GB) nên không dùng bảng staging: mỗi file đọc thẳng
-bảng kết quả tạm của job qua Storage Read API. Lần trích xuất 2026-10-31 bị tính 106 GB.
+bảng kết quả tạm của job qua Storage Read API. Lần trích xuất tháng 9 (2026-10-31) bị tính
+106 GB, tháng 10 (2026-11-16) 121,9 GB.
 
 Bảng BigQuery không dùng và các loại câu hỏi không trả lời được: [docs/data-scope.md](docs/data-scope.md).
 
@@ -117,6 +125,16 @@ uv run eth-nl2sql evaluate-sql --gold data/benchmark/dev.jsonl --predictions <ru
 ```
 
 `data/benchmark/test.jsonl` chỉ đọc được khi có `--allow-test` (đánh giá cuối).
+
+Bộ linking và prompt đọc khoảng thời gian của dữ liệu từ `meta.build` của database. Các lệnh
+`link-question`, `evaluate-linking`, `build-prompts`, `generate-sql`, `evaluate-sql` có
+`--class-rank` cho cách chọn top-N thành viên của một lớp (ví dụ "các sàn DEX"):
+
+- `question` (mặc định): xếp theo số lần gọi trong khoảng thời gian của câu hỏi; câu không nêu
+  thời gian thì theo toàn bộ dữ liệu.
+- `data`: xếp theo số lần gọi trên toàn bộ dữ liệu, như mọi lần chạy tháng 9. Các script
+  `scripts/phase1`, `scripts/phase2` và `build-train` ghim quy tắc này, nên kết quả tháng 9 tái
+  lập được từng byte.
 
 ## Sinh SQL bằng model local (phase 1)
 
@@ -384,6 +402,44 @@ S8 đã chạy ngày 2026-11-08 – 2026-11-09 (114 phút). EX test so với pha
 Phân tích ở [docs/phase2-plan.md](docs/phase2-plan.md) §5.8 và
 [docs/proposed-method.md](docs/proposed-method.md) §8.
 
+## Dữ liệu nhiều tháng (M0–M7)
+
+Kế hoạch, các quyết định D1–D6 và kết quả từng bước: [docs/multi-month-plan.md](docs/multi-month-plan.md).
+Phase 2 không huấn luyện lại: hai adapter `3b-e2`, `1.5b-e2` chỉ được đánh giá.
+
+```bash
+uv run eth-nl2sql build-db --raw-dir data/raw/2026-09 data/raw/2026-10 \
+    --db data/db/ethereum_2026-09_2026-10.duckdb --memory-limit 3GB   # 26 phút, 22,4 GB
+uv run eth-nl2sql build-benchmark --db data/db/ethereum_2026-09_2026-10.duckdb \
+    --seed 20261118 --id-prefix m --out-dir data/benchmark-multi --memory-limit 3GB
+bash scripts/multi/test.sh --check   # điều kiện: bộ đánh giá, database, adapter, cổng 8080
+bash scripts/multi/test.sh           # 4 cấu hình, chấm, tóm tắt theo tầng thời gian (~2,7 giờ)
+python3 data/predictions/multi/analyze.py   # phân tích M6 -> multi.analysis.json
+```
+
+- Các tháng phải liền nhau. Bảng theo thời gian được nối lại; `contracts` lấy hợp không trùng
+  (khoá trùng giữa các tháng mà khác dòng thì build dừng); `tokens` và `amended_tokens` lấy bản
+  của tháng mới nhất.
+- Bộ đánh giá 2 tháng `data/benchmark-multi/` giữ 40 template và cách chia dev/test theo template
+  của tháng 9 (`--split-seed`), với 177 câu dev và 328 câu test. Mỗi câu rút một tháng neo; khoảng
+  ngày vắt sang tháng sau với xác suất 1/2; câu không nêu thời gian hỏi trên cả 2 tháng.
+- Trước khi sinh SQL, `scripts/multi/test.sh` chạy lại 3B + `3b-e2` trên prompt dev tháng 9 và
+  dừng nếu câu trả lời khác S6.
+
+M5 chạy ngày 2026-11-20 (162 phút). EX:
+
+| Cấu hình | dev | test | test tháng 9 (S4/S8) |
+|---|---:|---:|---:|
+| 3B | 0,910 | 0,771 | 0,768 |
+| 3B + `3b-e2` | 0,966 | 0,808 | 0,814 |
+| 1.5B | 0,650 | 0,662 | 0,613 |
+| 1.5B + `1.5b-e2` | 0,955 | 0,799 | 0,808 |
+
+Theo M6, dữ liệu 2 tháng hầu như không thêm loại lỗi mới: SQL chép đúng khoảng thời gian của evidence
+(chỉ 1 câu của 1.5B gốc đổi mốc cuối 1/11 thành 31/10),
+EX theo từng template gần bằng test tháng 9, và LoRA tăng ở template gần, không tăng ở template xa
+như S8.
+
 ## Dữ liệu cũ (đã lưu trữ)
 
 Tập mẫu CSV `data/raw/full/` (06/2026, giao dịch địa chỉ có nhãn + ~1% còn lại) và database
@@ -395,6 +451,7 @@ build từ nó đã chuyển sang `../archive/luanvan-full-2026-06/` ngày 2026-
 uv sync
 uv run eth-nl2sql build-db              # data/raw/2026-09 -> data/db/ethereum.duckdb
 uv run eth-nl2sql verify-db             # kiểm tra lại database có sẵn với Parquet gốc
+# nhiều tháng: --raw-dir data/raw/2026-09 data/raw/2026-10 --db data/db/<tên>.duckdb
 uv run eth-nl2sql load-knowledge-base   # chỉ nạp lại schema link sau một đợt duyệt KB
 uv run eth-nl2sql check-property-senses # kiểm tra data/schema/property_*.csv
 uv run eth-nl2sql fetch-bigquery-schema # tải lại mô tả cột của BigQuery (data/schema/)
@@ -405,9 +462,9 @@ Database có ba schema:
 
 | Schema | Nội dung | Ai dùng |
 |---|---|---|
-| `main` | `blocks`, `transactions`, `token_transfers`, `contracts`, `tokens`, `amended_tokens` của tháng 9: tên bảng, cột và giá trị như `bigquery-public-data.crypto_ethereum` | Gold SQL và model NL2SQL; gold SQL chỉ chạm schema này |
+| `main` | `blocks`, `transactions`, `token_transfers`, `contracts`, `tokens`, `amended_tokens` của các tháng đã nạp: tên bảng, cột và giá trị như `bigquery-public-data.crypto_ethereum` | Gold SQL và model NL2SQL; gold SQL chỉ chạm schema này |
 | `link` | `entity_classes`, `entities`, `entity_addresses`, `entity_aliases` (chỉ dòng đã duyệt của `data/entity_knowledge_base/`), `token_stats` (số ví gọi, số transfer của mỗi token), `property_senses`, `property_phrases` (từ điển nghĩa property đã duyệt trong `data/schema/`) | Entity linking, property linking |
-| `meta` | `tables`, `columns` (mô tả cột chính thức của BigQuery, 2 giá trị ví dụ mỗi cột), `build` | Dựng prompt, schema linking |
+| `meta` | `tables`, `columns` (mô tả cột chính thức của BigQuery, 2 giá trị ví dụ mỗi cột), `build` (gồm khoảng thời gian của dữ liệu) | Dựng prompt, schema linking |
 
 Mô tả cột cũng được gắn vào `main` bằng `COMMENT ON`. Khác biệt duy nhất so với BigQuery:
 
@@ -418,14 +475,15 @@ Mô tả cột cũng được gắn vào `main` bằng `COMMENT ON`. Khác biệ
 - Các cột do bản trích xuất suy ra: `transactions.blob_count`, `tokens.token_standards` và
   `tokens.protocols` (mảng nối bằng `|`).
 
-Build chỉ thay `ethereum.duckdb` khi mọi kiểm tra đều đạt; kết quả ghi vào
-`data/db/ethereum.report.json`:
+Build chỉ thay database khi mọi kiểm tra đều đạt; kết quả ghi vào `data/db/<tên>.report.json`:
 
 - SHA256 của mọi file Parquet khớp `SHA256SUMS`.
 - **Khớp BigQuery:** mọi aggregate trong `parity.json` (số dòng, số khoá phân biệt, các tổng theo
   ngày) tính lại trên bảng đã nạp bằng chính câu SQL BigQuery đã chạy, phải bằng giá trị BigQuery.
 - **Không mất mát:** fingerprint (số dòng + tổng hash từng dòng) của mỗi bảng bằng của file
   Parquet; số được so dưới dạng text đã trích xuất, nên không giá trị nào bị đổi, mất hay nhân đôi.
+- Với nhiều tháng: các bảng gộp (`contracts`, `tokens`, `amended_tokens`) được so khớp BigQuery
+  theo từng tháng trên file Parquet, và `blocks` không được thiếu số block nào.
 - Không có dòng treo: `transactions.block_number → blocks.number`,
   `token_transfers.block_number → blocks.number`,
   `token_transfers.transaction_hash → transactions.hash`.
